@@ -1,27 +1,65 @@
 {
   "name": "@repo/ui",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "exports": {
-    "./*": "./src/*.tsx"
+    ".": "./src/index.ts",
+    "./button": "./src/components/button.tsx",
+    "./card": "./src/components/card.tsx",
+    "./input": "./src/components/input.tsx",
+    "./select": "./src/components/select.tsx",
+    "./dialog": "./src/components/dialog.tsx",
+    "./avatar": "./src/components/avatar.tsx",
+    "./tabs": "./src/components/tabs.tsx",
+    "./theme": "./src/theme.ts",
+    "./styles": "./src/styles.css",
+    "./tailwind-config": "./src/tailwind-config.ts"
   },
   "scripts": {
-    "lint": "eslint . --max-warnings 0",
-    "generate:component": "turbo gen react-component",
-    "check-types": "tsc --noEmit"
+    "lint": "biome lint .",
+    "format": "biome format . --write",
+    "check-types": "tsc --noEmit",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwindcss": "^3.3.0"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
-    "@turbo/gen": "^2.5.0",
-    "@types/node": "^22.15.3",
-    "@types/react": "19.1.0",
-    "@types/react-dom": "19.1.1",
-    "eslint": "^9.27.0",
-    "typescript": "5.8.2"
+    "@biomejs/biome": "1.5.3",
+    "@storybook/addon-essentials": "^7.6.10",
+    "@storybook/addon-interactions": "^7.6.10",
+    "@storybook/addon-links": "^7.6.10",
+    "@storybook/addon-onboarding": "^1.0.11",
+    "@storybook/blocks": "^7.6.10",
+    "@storybook/react": "^7.6.10",
+    "@storybook/react-vite": "^7.6.10",
+    "@storybook/test": "^7.6.10",
+    "@types/react": "^18.2.46",
+    "@types/react-dom": "^18.2.18",
+    "autoprefixer": "^10.4.16",
+    "class-variance-authority": "^0.7.0",
+    "postcss": "^8.4.33",
+    "storybook": "^7.6.10",
+    "tailwindcss": "^3.4.1",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.3.3"
   },
   "dependencies": {
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "@radix-ui/react-avatar": "^1.0.4",
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-dropdown-menu": "^2.0.6",
+    "@radix-ui/react-label": "^2.0.2",
+    "@radix-ui/react-popover": "^1.0.7",
+    "@radix-ui/react-select": "^2.0.0",
+    "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-tabs": "^1.0.4",
+    "@radix-ui/react-toast": "^1.1.5",
+    "clsx": "^2.1.0",
+    "lucide-react": "^0.309.0",
+    "react": "^18.2.0",
+    "tailwind-merge": "^2.2.0"
   }
 }

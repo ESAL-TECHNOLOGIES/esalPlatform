@@ -1,0 +1,25 @@
+{
+  "name": "esal-platform-root",
+  "private": true,
+  "scripts": {
+    "dev": "cd EsalPlatform && pnpm dev",
+    "dev:docs": "cd EsalPlatform/apps/docs && pnpm dev",
+    "dev:api": "cd EsalPlatform/apps/api && python run.py",
+    "dev:all": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "format": "turbo format",
+    "api:install": "cd EsalPlatform/apps/api && pip install -r requirements.txt",
+    "test": "turbo test",
+    "test:ui": "cd EsalPlatform && pnpm run test:ui",
+    "prepare": "husky install"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.5.3",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.0"
+  }
+}

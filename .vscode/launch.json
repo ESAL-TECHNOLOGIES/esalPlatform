@@ -1,0 +1,49 @@
+{
+  "version": "0.2.0",
+  "compounds": [
+    {
+      "name": "Full Stack: API + Web",
+      "configurations": ["Python: FastAPI", "Next.js: Web"],
+      "stopAll": true
+    }
+  ],
+  "configurations": [
+    {
+      "name": "Python: FastAPI",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["main:app", "--reload", "--port", "8000"],
+      "cwd": "${workspaceFolder}/EsalPlatform/apps/api",
+      "justMyCode": false
+    },
+    {
+      "name": "Next.js: Web",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/EsalPlatform/apps/web",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["dev"],
+      "skipFiles": ["<node_internals>/**"],
+      "serverReadyAction": {
+        "pattern": "- Local:.+(https?://\\S+)",
+        "uriFormat": "%s",
+        "action": "debugWithChrome"
+      }
+    },
+    {
+      "name": "Next.js: Docs",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/EsalPlatform/apps/docs",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["dev"],
+      "skipFiles": ["<node_internals>/**"],
+      "serverReadyAction": {
+        "pattern": "- Local:.+(https?://\\S+)",
+        "uriFormat": "%s",
+        "action": "debugWithChrome"
+      }
+    }
+  ]
+}

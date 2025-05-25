@@ -1,11 +1,14 @@
-import { type JSX } from "react";
+import * as React from "react";
 
-export function Code({
-  children,
-  className,
-}: {
+interface CodeProps {
   children: React.ReactNode;
   className?: string;
-}): JSX.Element {
-  return <code className={className}>{children}</code>;
+}
+
+export function Code({ children, className = "" }: CodeProps) {
+  return (
+    <code className={`font-mono bg-gray-100 px-1 py-0.5 rounded ${className}`}>
+      {children}
+    </code>
+  );
 }
