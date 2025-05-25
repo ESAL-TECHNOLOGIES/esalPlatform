@@ -1,5 +1,5 @@
 {
-  "name": "my-turborepo",
+  "name": "EsalPlatform",
   "private": true,
   "scripts": {
     "build": "turbo run build",
