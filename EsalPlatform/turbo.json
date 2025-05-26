@@ -7,9 +7,25 @@
       "cache": false,
       "persistent": true
     },
+    "dev:landing": {
+      "cache": false,
+      "persistent": true
+    },
+    "dev:innovator": {
+      "cache": false,
+      "persistent": true
+    },
+    "dev:investor": {
+      "cache": false,
+      "persistent": true
+    },
+    "dev:hub": {
+      "cache": false,
+      "persistent": true
+    },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
+      "outputs": ["dist/**", "build/**", ".next/**"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"]
     },
     "lint": {
@@ -31,6 +47,10 @@
     },
     "check-types": {
       "dependsOn": ["^check-types"]
+    },
+    "deploy": {
+      "dependsOn": ["build", "lint", "test"],
+      "outputs": []
     }
   }
 }

@@ -2,11 +2,34 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"isBackground": true,
-			"label": "dev:api-direct",
+			"label": "preview:docs-vite",
 			"type": "shell",
-			"command": "cd apps\\api && python run.py",
+			"command": "cd apps\\docs-vite && pnpm run preview",
 			"group": "build"
+		},
+		{
+			"label": "dev:api",
+			"type": "shell",
+			"command": "cd EsalPlatform\\apps\\api && python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000",
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "dev:web",
+			"type": "shell",
+			"command": "cd EsalPlatform\\apps\\web && pnpm run dev",
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "dev:docs-vite",
+			"type": "shell",
+			"command": "cd EsalPlatform\\apps\\docs-vite && pnpm run dev",
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": []
 		}
 	]
 }

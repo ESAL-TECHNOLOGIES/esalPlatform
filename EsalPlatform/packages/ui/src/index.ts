@@ -10,6 +10,11 @@ export * from "./components/select";
 export * from "./components/dialog";
 export * from "./components/avatar";
 export * from "./components/tabs";
+export * from "./components/badge";
+export * from "./components/label";
+export * from "./components/textarea";
+export * from "./components/progress";
+export * from "./components/switch";
 
 // Export utilities
 export * from "./lib/utils";

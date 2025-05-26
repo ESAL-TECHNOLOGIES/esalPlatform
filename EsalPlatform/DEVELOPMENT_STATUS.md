@@ -3,7 +3,8 @@
 ## ✅ COMPLETED SETUP
 
 ### 🚀 **Servers Running Successfully**
-- **Frontend (Next.js)**: http://localhost:3333 ✅
+- **Frontend (Vite/React)**: http://localhost:3333 ✅
+- **Documentation Site (Vite/React)**: http://localhost:3001 ✅
 - **Backend (FastAPI)**: http://localhost:8000 ✅
 
 ### 📋 **API Endpoints Available**
@@ -124,6 +125,16 @@ You can now:
 3. **Monitor application health** via health endpoints
 4. **Access user management** and AI matchmaking features
 5. **Build and deploy** using the configured Turbo pipeline
+
+## Framework Migration Notice
+
+⚠️ **IMPORTANT UPDATE**: The project has been migrated from Next.js to Vite for both the main web application and documentation site.
+
+- **📝 Migration Details**: See `MIGRATION_REPORT.md` for full details
+- **🔄 Completed**: The migration process is complete and functional
+- **🚀 New Development URLs**:
+  - Main Application: http://localhost:3333 (unchanged)
+  - Documentation Site: http://localhost:3001
 
 ---
 *Generated on: May 25, 2025*
