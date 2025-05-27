@@ -14,7 +14,7 @@
     "dist/**"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --external react && cp src/styles.css dist/",
+    "build": "tsup src/index.ts --format esm --dts --external react && postcss src/styles.css -o dist/index.css",
     "dev": "tsup src/index.ts --format esm --watch --dts --external react",
     "lint": "eslint src --ext .ts,.tsx",
     "type-check": "tsc --noEmit"
@@ -26,7 +26,11 @@
   "devDependencies": {
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.4.20",
     "eslint": "^9.17.0",
+    "postcss": "^8.5.0",
+    "postcss-cli": "^11.0.0",
+    "tailwindcss": "^3.4.17",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2"
   },

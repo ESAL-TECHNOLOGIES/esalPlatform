@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-import baseConfig from "@esal/ui/tailwind.config.js";
+import baseConfig from "../../packages/ui/tailwind.config.js";
 
 export default {
   ...baseConfig,
