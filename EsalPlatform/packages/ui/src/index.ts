@@ -1,23 +1,10 @@
-/**
- * UI component library entry point
- */
+export * from "./components/Button";
+export * from "./components/Card";
+export * from "./components/Navbar";
+export * from "./components/Sidebar";
+export * from "./components/Layout";
+export * from "./types";
+export * from "./utils";
 
-// Export all components
-export * from "./components/button";
-export * from "./components/card";
-export * from "./components/input";
-export * from "./components/select";
-export * from "./components/dialog";
-export * from "./components/avatar";
-export * from "./components/tabs";
-export * from "./components/badge";
-export * from "./components/label";
-export * from "./components/textarea";
-export * from "./components/progress";
-export * from "./components/switch";
-
-// Export utilities
-export * from "./lib/utils";
-
-// Export theme
-export * from "./theme";
+// Export styles for CSS import
+import "./styles.css";

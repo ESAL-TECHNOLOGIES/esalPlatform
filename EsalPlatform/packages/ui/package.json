@@ -2,72 +2,37 @@
   "name": "@esal/ui",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./button": "./src/components/button.tsx",
-    "./card": "./src/components/card.tsx",
-    "./input": "./src/components/input.tsx",
-    "./select": "./src/components/select.tsx",
-    "./dialog": "./src/components/dialog.tsx",
-    "./avatar": "./src/components/avatar.tsx",
-    "./tabs": "./src/components/tabs.tsx",
-    "./badge": "./src/components/badge.tsx",
-    "./label": "./src/components/label.tsx",
-    "./textarea": "./src/components/textarea.tsx",
-    "./progress": "./src/components/progress.tsx",
-    "./switch": "./src/components/switch.tsx",
-    "./theme": "./src/theme.ts",
-    "./styles": "./src/styles.css",
-    "./tailwind-config": "./src/tailwind-config.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./styles": "./dist/index.css"
   },
+  "files": [
+    "dist/**"
+  ],
   "scripts": {
-    "lint": "biome lint .",
-    "format": "biome format . --write",
-    "check-types": "tsc --noEmit",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build": "tsup src/index.ts --format esm --dts --external react && cp src/styles.css dist/",
+    "dev": "tsup src/index.ts --format esm --watch --dts --external react",
+    "lint": "eslint src --ext .ts,.tsx",
+    "type-check": "tsc --noEmit"
   },
   "peerDependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "tailwindcss": "^3.3.0"
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.5.3",
-    "@storybook/addon-essentials": "^7.6.10",
-    "@storybook/addon-interactions": "^7.6.10",
-    "@storybook/addon-links": "^7.6.10",
-    "@storybook/addon-onboarding": "^1.0.11",
-    "@storybook/blocks": "^7.6.10",
-    "@storybook/react": "^7.6.10",
-    "@storybook/react-vite": "^7.6.10",
-    "@storybook/test": "^7.6.10",
-    "@types/react": "^18.2.46",
-    "@types/react-dom": "^18.2.18",
-    "autoprefixer": "^10.4.16",
-    "class-variance-authority": "^0.7.0",
-    "postcss": "^8.4.33",
-    "storybook": "^7.6.10",
-    "tailwindcss": "^3.4.1",
-    "tailwindcss-animate": "^1.0.7",
-    "typescript": "^5.3.3"
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "eslint": "^9.17.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
   },
   "dependencies": {
     "@esal/ui": "file:",
-    "@radix-ui/react-avatar": "^1.0.4",
-    "@radix-ui/react-dialog": "^1.0.5",
-    "@radix-ui/react-dropdown-menu": "^2.0.6",
-    "@radix-ui/react-label": "^2.0.2",
-    "@radix-ui/react-popover": "^1.0.7",
-    "@radix-ui/react-progress": "^1.0.3",
-    "@radix-ui/react-select": "^2.0.0",
-    "@radix-ui/react-slot": "^1.0.2",
-    "@radix-ui/react-switch": "^1.0.3",
-    "@radix-ui/react-tabs": "^1.0.4",
-    "@radix-ui/react-toast": "^1.1.5",
-    "clsx": "^2.1.0",
-    "lucide-react": "^0.309.0",
-    "react": "^18.2.0",
-    "tailwind-merge": "^2.2.0"
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.5.4"
   }
 }

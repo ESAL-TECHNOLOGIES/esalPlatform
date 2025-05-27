@@ -1,28 +1,115 @@
-# Turborepo starter
+# ESAL Platform Monorepo
 
-This Turborepo starter is maintained by the Turborepo core team.
+A comprehensive entrepreneurship and innovation platform built with modern web technologies and microservices architecture.
 
-## Using this example
+## Platform Overview
 
-Run the following command:
-
-```sh
-npx create-turbo@latest
-```
+The ESAL Platform consists of multiple specialized portals and services designed to connect innovators, investors, and entrepreneurship hubs in a unified ecosystem.
 
 ## What's inside?
 
-This Turborepo includes the following packages/apps:
+This Turborepo includes the following applications and packages:
 
-### Apps and Packages
+### Applications
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+- **`web-vite`**: Main platform application built with React + Vite
+- **`innovator-portal`**: Dedicated interface for innovators to manage projects and collaborations
+- **`investor-portal`**: Investment platform for discovering and funding opportunities  
+- **`hub-portal`**: Community and collaboration hub for entrepreneurship ecosystems
+- **`landing-page`**: Public-facing marketing and information site
+- **`admin-portal`**: ⭐ **NEW** - Administrative interface for managing all platform portals
+- **`docs`**: Documentation site built with Next.js
+- **`api`**: Backend API server built with Python/FastAPI
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+### Packages
+
+- **`@esal/ui`**: Shared React component library with Tailwind CSS
+- **`@esal/auth`**: Authentication and authorization utilities
+- **`@esal/database`**: Database models and utilities
+- **`@esal/ai-client`**: AI integration and client utilities
+- **`@esal/config`**: Shared configuration management
+- **`@esal/eslint-config`**: ESLint configurations for consistent code quality
+- **`@esal/typescript-config`**: Shared TypeScript configurations
+
+## Quick Start
+
+### Prerequisites
+- Node.js 18+
+- pnpm 8+
+- Python 3.8+ (for API services)
+
+### Installation
+```sh
+# Clone and install dependencies
+git clone <repository-url>
+cd EsalPlatform
+pnpm install
+```
+
+### Development
+
+#### Start All Portals
+```sh
+# Start all applications in development mode
+pnpm dev
+
+# Or use the PowerShell script for individual portals
+.\run-portal.ps1 -Portal all
+```
+
+#### Start Individual Portals
+```sh
+# Main application
+.\run-portal.ps1 -Portal main
+
+# Innovator portal
+.\run-portal.ps1 -Portal innovator
+
+# Investor portal  
+.\run-portal.ps1 -Portal investor
+
+# Hub portal
+.\run-portal.ps1 -Portal hub
+
+# Landing page
+.\run-portal.ps1 -Portal landing
+
+# Admin portal (NEW!)
+.\run-portal.ps1 -Portal admin
+
+# Start specific portal with pnpm
+pnpm run dev:admin    # Admin portal
+```
+
+### Portal URLs (Development)
+- **Main Portal**: http://localhost:3000
+- **Innovator Portal**: http://localhost:3001  
+- **Investor Portal**: http://localhost:3002
+- **Hub Portal**: http://localhost:3003
+- **Landing Page**: http://localhost:3004
+- **Admin Portal**: http://localhost:3005 (or auto-assigned port)
+- **API Server**: http://localhost:8000
+
+## New: Admin Portal 🚀
+
+The Admin Portal provides centralized management and monitoring for all ESAL Platform portals:
+
+### Key Features
+- **📊 Dashboard**: Real-time system overview and portal status monitoring
+- **🔧 Portal Manager**: Start, stop, and configure individual portals
+- **👥 User Management**: Comprehensive user administration and role management
+- **📈 Analytics**: Platform usage statistics and performance insights
+- **⚙️ System Settings**: Configuration management and security controls
+- **📋 System Metrics**: Real-time monitoring of system resources
+
+### Admin Portal Technology
+- **React 18** with TypeScript for robust frontend development
+- **Vite 6** for lightning-fast development and builds
+- **Tailwind CSS** for modern, responsive design
+- **Recharts** for beautiful data visualizations
+- **Role-based authentication** with admin-level access control
+
+[📖 Read the full Admin Portal documentation](./apps/admin-portal/README.md)
 
 ### Utilities
 

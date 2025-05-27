@@ -75,15 +75,19 @@ class AuthenticationError(AppException):
 
 
 class AuthorizationError(AppException):
-    """Exception for authorization errors."""
+    """Exception raised for authorization/permission errors."""
     
     def __init__(
         self,
-        message: str = "You don't have permission to perform this action",
-        code: str = "authorization_error",
-        details: Union[Dict[str, Any], List[Dict[str, Any]], None] = None,
+        message: str = "Access denied",
+        details: Dict[str, Any] = None,
     ):
-        super().__init__(message, status_code=403, code=code, details=details)
+        super().__init__(
+            message=message,
+            status_code=status.HTTP_403_FORBIDDEN,
+            code="authorization_error",
+            details=details or {}
+        )
 
 
 class RateLimitError(AppException):

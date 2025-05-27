@@ -5,12 +5,12 @@ This module provides authentication utilities for securing API endpoints.
 It supports JWT token authentication and integration with Supabase Auth.
 """
 from datetime import datetime, timedelta
-from typing import Dict, Optional, Any, Union, List
+from typing import Dict, Optional, Any, List
 import logging
-import jwt
-from fastapi import Depends, HTTPException, status, Request
+from jose import jwt
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, APIKeyHeader
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 from core.config import settings
 from core.exceptions import AuthenticationError
@@ -49,8 +49,10 @@ class User(BaseModel):
     id: str
     email: EmailStr
     name: str
+    role: str
     is_active: bool = True
-    is_admin: bool = False
+    is_approved: bool = False
+    permissions: List[str] = Field(default_factory=list)
 
 
 def create_access_token(

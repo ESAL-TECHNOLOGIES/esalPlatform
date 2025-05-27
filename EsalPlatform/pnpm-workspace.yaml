@@ -1,5 +1,3 @@
 packages:
   - "apps/*"
   - "packages/*"
-  - "!packages/eslint-config"
-  - "!packages/typescript-config"

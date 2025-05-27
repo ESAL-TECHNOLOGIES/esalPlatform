@@ -6,7 +6,6 @@ All environment variables are validated at startup time using Pydantic.
 """
 from functools import lru_cache
 from typing import List, Optional, Union
-import os
 from pydantic import Field, field_validator, PostgresDsn, HttpUrl
 from pydantic_settings import BaseSettings
 
@@ -19,7 +18,7 @@ class Settings(BaseSettings):
         API_VERSION: API version
         DEBUG: Debug mode flag
         ENVIRONMENT: Current environment (dev, test, prod)
-        ALLOWED_ORIGINS: CORS allowed origins
+        CORS_ORIGINS: CORS allowed origins
         DATABASE_URL: PostgreSQL connection URL
         REDIS_URL: Redis connection URL
         GEMINI_API_KEY: Google Gemini API key
@@ -31,23 +30,25 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "ESAL Platform API"
     API_VERSION: str = "v1"
     DEBUG: bool = Field(default=False)
-    ENVIRONMENT: str = Field(default="dev")    # CORS settings
-    ALLOWED_ORIGINS: Union[str, List[str]] = Field(
-        default="http://localhost:3000,http://localhost:8000"
+    ENVIRONMENT: str = Field(default="dev")
+      # CORS settings
+    CORS_ORIGINS: Union[str, List[str]] = Field(
+        default="http://localhost:3000,http://localhost:5173,http://localhost:3005,http://localhost:3006,http://localhost:8000",
+        env="CORS_ORIGINS",
+        description="Comma-separated list of CORS allowed origins"
     )
     
-    @field_validator("ALLOWED_ORIGINS")
+    @field_validator("CORS_ORIGINS")
     @classmethod
-    def parse_allowed_origins(cls, v: Union[str, List[str]]) -> List[str]:
-        """Parse ALLOWED_ORIGINS from comma-separated string to list."""
+    def parse_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
+        """Parse CORS_ORIGINS from comma-separated string to list."""
         if isinstance(v, str):
             return [origin.strip() for origin in v.split(",")]
         return v
-    
-    # Database configurations
+      # Database configurations
     DATABASE_URL: Optional[Union[PostgresDsn, str]] = Field(
-        default="postgresql://postgres:postgres@localhost:5432/esal_db",
-        description="PostgreSQL connection string"
+        default="sqlite:///./esal_dev.db",
+        description="Database connection string (SQLite for development)"
     )
     
     # Redis for caching and background tasks
