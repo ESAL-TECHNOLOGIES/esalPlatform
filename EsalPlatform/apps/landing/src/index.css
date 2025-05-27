@@ -1,4 +1,4 @@
-@import "@esal/ui/styles";
+@import "../../packages/ui/dist/index.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
