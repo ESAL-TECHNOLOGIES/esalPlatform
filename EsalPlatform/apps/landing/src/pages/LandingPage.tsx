@@ -1,19 +1,21 @@
 import React from "react";
 import { Button } from "@esal/ui";
+import { useNavigate } from "react-router-dom";
 
 const LandingPage: React.FC = () => {
+  const navigate = useNavigate();
+
   const handleJoinAs = (role: string) => {
-    // This would redirect to the appropriate portal's auth/signup flow
-    // For now, we'll use placeholder URLs
+    // Redirect to appropriate portal's auth/signup flow
     const portals = {
-      innovator: "http://localhost:3001",
-      investor: "http://localhost:3002",
-      hub: "http://localhost:3003",
+      innovator: "http://localhost:3001/login",
+      investor: "http://localhost:3002/login",
+      hub: "http://localhost:3003/login",
     };
 
     const url = portals[role as keyof typeof portals];
     if (url) {
-      window.open(url, "_blank");
+      window.location.href = url;
     }
   };
 

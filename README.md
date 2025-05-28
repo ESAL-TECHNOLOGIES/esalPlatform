@@ -1,53 +1,123 @@
 # ESAL Platform
 
-A comprehensive platform for ESAL (Entidades Sin Ánimo de Lucro / Non-profit Organizations) management and operations.
+A comprehensive entrepreneurship and innovation platform connecting innovators, investors, and entrepreneurship hubs in a unified ecosystem.
 
-## Project Structure
+> **ESAL** - Entidades Sin Ánimo de Lucro (Non-profit Organizations) Platform
 
-This is a monorepo using Turborepo and pnpm workspaces, consisting of:
+## 🚀 Platform Overview
 
-- **Web App**: Next.js frontend application
-- **API**: FastAPI Python backend
-- **Documentation Site**: Next.js based documentation site
-- **Shared Packages**: UI components, configuration, and other shared code
+This is a modern monorepo built with Turborepo and pnpm workspaces, featuring:
 
-## Getting Started
+- **🌐 Multi-Portal Architecture**: Specialized interfaces for different user types
+- **🤖 AI-Powered Matching**: Intelligent connections between innovators and investors
+- **📊 Analytics Dashboard**: Comprehensive insights and reporting
+- **🔐 Secure Authentication**: Role-based access control with Supabase
+- **⚡ Modern Tech Stack**: React, FastAPI, TypeScript, and Tailwind CSS
+
+## 📁 Project Structure
+
+### Applications
+
+- **Web App**: React + Vite main platform application
+- **API**: FastAPI Python backend with AI integration
+- **Admin Portal**: Administrative interface for platform management
+- **Documentation**: Next.js based documentation site
+
+### Shared Packages
+
+- **UI Components**: Reusable React component library
+- **Authentication**: Supabase integration utilities
+- **Configuration**: Shared configs and utilities
+
+## 🛠️ Getting Started
 
 ### Prerequisites
 
-- Node.js 18 or later
-- pnpm 10.11.0 or later
-- Python 3.9 or later
+- **Node.js** 18+ 
+- **pnpm** 8+
+- **Python** 3.8+
 
-### Installation
+### 🚀 Quick Start
 
-1. Clone the repository
+1. **Clone and Setup**
    ```bash
    git clone [repository-url]
    cd esalPlatform
-   ```
-
-2. Install JavaScript dependencies
-   ```bash
    pnpm install
    ```
 
-3. Install Python dependencies
+2. **Environment Configuration**
    ```bash
-   pnpm run api:install
+   # Copy environment template
+   cp .env.example .env
+   # Configure your API keys and database settings
    ```
 
-### Development
+3. **Start Development**
+   
+   **Option A: Start All Services**
+   ```bash
+   cd EsalPlatform
+   pnpm run dev:all
+   ```
+   
+   **Option B: Start Individual Services**
+   ```bash
+   # Frontend (React + Vite)
+   pnpm run dev:web
+   
+   # Backend API (FastAPI)
+   pnpm run dev:api
+   
+   # Admin Portal
+   pnpm run dev:admin
+   ```
 
-Run the frontend web app:
-```bash
-pnpm run dev
-```
+### 🌐 Access Points
 
-Run the documentation site:
-```bash
-pnpm run dev:docs
-```
+- **Main Platform**: http://localhost:3333
+- **API Documentation**: http://localhost:8000/docs
+- **Admin Portal**: http://localhost:3001
+
+## 🏗️ Architecture
+
+### Frontend Stack
+- **React 18** with **TypeScript**
+- **Vite** for lightning-fast development
+- **Tailwind CSS** for styling
+- **Zustand** for state management
+
+### Backend Stack  
+- **FastAPI** for high-performance APIs
+- **Supabase** for authentication & database
+- **SQLAlchemy** for ORM
+- **Google Gemini AI** for intelligent matching
+
+### DevOps & Tools
+- **Turborepo** for monorepo management
+- **pnpm** for efficient package management
+- **ESLint & Prettier** for code quality
+
+## 📚 Documentation
+
+- [Development Guide](./EsalPlatform/README.md)
+- [API Documentation](./EsalPlatform/apps/api/README.md)
+- [MVP Status](./EsalPlatform/MVP_STATUS.md)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+**Last Updated**: May 28, 2025
 
 Run the Python API:
 ```bash

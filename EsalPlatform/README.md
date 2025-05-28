@@ -2,34 +2,34 @@
 
 A comprehensive entrepreneurship and innovation platform built with modern web technologies and microservices architecture.
 
-## Platform Overview
+## 🚀 Platform Overview
 
 The ESAL Platform consists of multiple specialized portals and services designed to connect innovators, investors, and entrepreneurship hubs in a unified ecosystem.
 
-## What's inside?
+## 📦 What's inside?
 
 This Turborepo includes the following applications and packages:
 
 ### Applications
 
-- **`web-vite`**: Main platform application built with React + Vite
-- **`innovator-portal`**: Dedicated interface for innovators to manage projects and collaborations
-- **`investor-portal`**: Investment platform for discovering and funding opportunities  
-- **`hub-portal`**: Community and collaboration hub for entrepreneurship ecosystems
-- **`landing-page`**: Public-facing marketing and information site
-- **`admin-portal`**: ⭐ **NEW** - Administrative interface for managing all platform portals
-- **`docs`**: Documentation site built with Next.js
-- **`api`**: Backend API server built with Python/FastAPI
+- **`web-vite`**: Main platform application built with React + Vite ⚡
+- **`innovator-portal`**: Dedicated interface for innovators to manage projects and collaborations 🚀
+- **`investor-portal`**: Investment platform for discovering and funding opportunities 💰
+- **`hub-portal`**: Community and collaboration hub for entrepreneurship ecosystems 🌐
+- **`landing-page`**: Public-facing marketing and information site 📱
+- **`admin-portal`**: ⭐ **NEW** - Administrative interface for managing all platform portals 🛠️
+- **`docs`**: Documentation site built with Next.js 📚
+- **`api`**: Backend API server built with Python/FastAPI 🐍
 
 ### Packages
 
-- **`@esal/ui`**: Shared React component library with Tailwind CSS
-- **`@esal/auth`**: Authentication and authorization utilities
-- **`@esal/database`**: Database models and utilities
-- **`@esal/ai-client`**: AI integration and client utilities
-- **`@esal/config`**: Shared configuration management
-- **`@esal/eslint-config`**: ESLint configurations for consistent code quality
-- **`@esal/typescript-config`**: Shared TypeScript configurations
+- **`@esal/ui`**: Shared React component library with Tailwind CSS 🎨
+- **`@esal/auth`**: Authentication and authorization utilities 🔐
+- **`@esal/database`**: Database models and utilities 🗄️
+- **`@esal/ai-client`**: AI integration and client utilities 🤖
+- **`@esal/config`**: Shared configuration management ⚙️
+- **`@esal/eslint-config`**: ESLint configurations for consistent code quality ✅
+- **`@esal/typescript-config`**: Shared TypeScript configurations 📝
 
 ## Quick Start
 

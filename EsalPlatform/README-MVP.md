@@ -1,34 +1,71 @@
 
-# ESAL Platform MVP
+# 🚀 ESAL Platform MVP
 
-ESAL Platform is a streamlined solution focused on the innovator journey, helping entrepreneurs to create, refine, and present their pitches with AI assistance.
+**Version**: 1.0.0 | **Status**: ✅ **Production Ready** | **Updated**: May 28, 2025
 
-## Project Structure
+A streamlined entrepreneurship platform focused on the innovator journey, empowering entrepreneurs to create, refine, and present their ideas with AI-powered assistance.
 
-This monorepo contains:
+## 🎯 MVP Focus
 
-- **Web Application** (`/apps/web-vite`): The main innovator portal with all core features
-- **API** (`/apps/api`): Backend services including AI analysis and matching
-- **Shared Packages** (`/packages`): Reusable components and utilities
+The ESAL Platform MVP concentrates on delivering core value through:
 
-## Getting Started
+- **🚀 Innovator-Centric Design**: Streamlined user experience for entrepreneurs
+- **🤖 AI-Powered Insights**: Intelligent pitch analysis and improvement suggestions  
+- **💡 Idea Development**: Comprehensive tools for refining business concepts
+- **📊 Smart Matching**: AI-driven connections with potential investors
+- **📈 Progress Tracking**: Analytics and metrics for business development
 
-1. **Prerequisites**
-   - Node.js 18 or newer
-   - PNPM 10 or newer
-   - Python 3.10 or newer (for API)
+## 📁 Project Architecture
 
-2. **Installation**
-   ```bash
-   # Install dependencies
-   pnpm install
+### Core Applications
 
-   # Set up API environment
-   cd apps/api
-   python -m venv .venv
-   .\.venv\Scripts\activate  # On Windows
-   pip install -r requirements.txt
-   ```
+```
+📦 ESAL Platform MVP
+├── 🌐 web-vite/          # Main innovator platform (Port 3333)
+├── 🛠️ admin-portal/      # Administrative interface (Port 3001)  
+├── 🔧 api/               # FastAPI backend services (Port 8000)
+└── 📚 docs/              # Platform documentation
+```
+
+### Shared Resources
+
+```
+📦 packages/
+├── 🎨 ui/                # Shared React components
+├── 🔐 auth/              # Authentication utilities
+├── 🗄️ database/          # Database models & utilities
+├── 🤖 ai-client/         # AI integration services
+└── ⚙️ config/            # Shared configuration
+```
+
+## 🛠️ Quick Start Guide
+
+### Prerequisites
+
+- **Node.js** 18+
+- **pnpm** 8+  
+- **Python** 3.8+
+
+### Installation & Setup
+
+```powershell
+# 1. Clone and install dependencies
+pnpm install
+
+# 2. Configure environment
+cp .env.example .env
+# Edit .env with your API keys and configuration
+
+# 3. Setup Python API environment
+cd apps/api
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+cd ../..
+
+# 4. Start the platform
+pnpm run dev:all
+```
 
 3. **Development**
    ```bash
