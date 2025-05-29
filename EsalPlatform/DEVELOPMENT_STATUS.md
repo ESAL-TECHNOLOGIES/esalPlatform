@@ -47,7 +47,6 @@ GEMINI_API_KEY=AIzaSyCld3F3DGo0bBzFpmIWb7NSD3nFVnTCHUk
 # Supabase Integration
 SUPABASE_URL=https://ppvkucdspgoeqsxxydxg.supabase.co
 SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 # Observability
 TELEMETRY_ENABLED=true

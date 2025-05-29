@@ -23,19 +23,21 @@ const Login: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
-
     try {
-      // API call to backend
-      const response = await fetch("http://localhost:8000/api/v1/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
-          username: formData.email,
-          password: formData.password,
-        }),
-      });
+      // API call to backend using JSON endpoint
+      const response = await fetch(
+        "http://localhost:8000/api/v1/auth/login-json",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+          }),
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();

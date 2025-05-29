@@ -75,7 +75,6 @@ Edit `.env` with your configuration:
 # Supabase Configuration
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 # Database Configuration
 DATABASE_URL=postgresql://username:password@localhost:5432/esal_platform
@@ -201,7 +200,6 @@ Ensure all required environment variables are set in production:
 ```env
 SUPABASE_URL=your-production-supabase-url
 SUPABASE_ANON_KEY=your-production-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-production-service-key
 DATABASE_URL=your-production-database-url
 GEMINI_API_KEY=your-gemini-api-key
 JWT_SECRET_KEY=your-strong-production-secret

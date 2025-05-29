@@ -21,14 +21,18 @@ class JWTAuthMiddleware:
     
     def __init__(self, app):
         self.app = app
-    
-    async def __call__(self, scope, receive, send):
+      async def __call__(self, scope, receive, send):
         """Process incoming request."""
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return
         
         request = Request(scope, receive)
+        
+        # Skip authentication for CORS preflight requests
+        if request.method == "OPTIONS":
+            await self.app(scope, receive, send)
+            return
         
         # Skip authentication for certain paths
         if self._should_skip_auth(request.url.path):
@@ -58,12 +62,16 @@ class JWTAuthMiddleware:
             
         Returns:
             True if authentication should be skipped
-        """
-        skip_paths = [
+        """        skip_paths = [
+            "/",
+            "/docs",
+            "/redoc", 
+            "/openapi.json",
+            "/health",
+            "/api/health",
             "/api/docs",
             "/api/redoc",
             "/api/openapi.json",
-            "/api/health",
             "/api/v1/auth/register",
             "/api/v1/auth/login",
             "/api/v1/auth/refresh"

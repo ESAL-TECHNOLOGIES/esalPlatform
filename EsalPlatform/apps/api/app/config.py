@@ -8,28 +8,35 @@ import os
 
 class Settings(BaseSettings):
     """Application settings"""
-    
-    # Database
-    SUPABASE_URL: str = "https://your-project.supabase.co"
-    SUPABASE_ANON_KEY: str = "your-supabase-anon-key"
-    SUPABASE_SERVICE_ROLE_KEY: str = "your-supabase-service-role-key"
+      # Database
+    SUPABASE_URL: str = "https://ppvkucdspgoeqsxxydxg.supabase.co"    # Security: Using only anonymous key for client-side authentication
+    # Service role key is intentionally omitted for security best practices
+    SUPABASE_ANON_KEY: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBwdmt1Y2RzcGdvZXFzeHh5ZHhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxNTkzMzAsImV4cCI6MjA2MzczNTMzMH0.6VVpA6qEcjNPJvPvn0dMh7CUNkNTCYGWsMwb6WS0XGE"
     DATABASE_URL: str = "sqlite:///./esal_dev.db"  # Default to SQLite for development
-    
-    # Gemini AI
+      # AI APIs
     GEMINI_API_KEY: str = "your-gemini-api-key"
-    
-    # JWT
-    JWT_SECRET_KEY: str = "your-super-secret-jwt-key-change-in-production"
+    OPENAI_API_KEY: str = ""  # Optional OpenAI API key
+      # JWT
+    JWT_SECRET_KEY: str = "hzuQ0vV09u6lDiKEb7a+5SG0uNRpepuaImQW7F/8+pePoatdth4/YyJWkgB/IjnwH6qYTMJWgny1bs0fB/nS8A=="
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRATION_TIME: int = 3600  # 1 hour
-    
-    # CORS - Handle as string and convert to list
+      # CORS - Handle as string and convert to list
     ALLOWED_ORIGINS: Union[str, List[str]] = [
-        "http://localhost:3000",
-        "http://localhost:5173", 
-        "http://localhost:8080",
-        "http://localhost:5000",
-        "https://esal-platform.vercel.app"
+        "http://localhost:3000",  # Landing page
+        "http://localhost:3001",  # Innovator portal
+        "http://localhost:3002",  # Investor portal
+        "http://localhost:3003",  # Hub portal
+        "http://localhost:3004",  # Admin portal
+        "http://localhost:5173",  # Vite default dev server
+        "http://localhost:8080",  # Alternative dev server
+        "http://localhost:5000",  # Alternative dev server
+        "http://127.0.0.1:3000",  # Landing page (127.0.0.1)
+        "http://127.0.0.1:3001",  # Innovator portal (127.0.0.1)
+        "http://127.0.0.1:3002",  # Investor portal (127.0.0.1)
+        "http://127.0.0.1:3003",  # Hub portal (127.0.0.1)
+        "http://127.0.0.1:3004",  # Admin portal (127.0.0.1)
+        "http://127.0.0.1:5173",  # Vite default (127.0.0.1)
+        "https://esal-platform.vercel.app"  # Production deployment
     ]
     
     # App
@@ -37,6 +44,7 @@ class Settings(BaseSettings):
     
     class Config:
         env_file = ".env"
+        extra = "ignore"  # Ignore extra environment variables
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

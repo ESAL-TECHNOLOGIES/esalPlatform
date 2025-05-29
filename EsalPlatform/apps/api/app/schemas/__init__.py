@@ -33,6 +33,12 @@ class UserLogin(BaseModel):
     password: str
 
 
+class UserLoginForm(BaseModel):
+    """For OAuth2 form compatibility"""
+    username: EmailStr  # OAuth2 uses 'username' field for email
+    password: str
+
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str

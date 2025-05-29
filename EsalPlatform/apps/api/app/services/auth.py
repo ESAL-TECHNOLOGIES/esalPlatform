@@ -6,24 +6,37 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from typing import Dict, Any
 import uuid
+import logging
 
 from app.config import settings
 from app.schemas import UserCreate, UserLogin, TokenResponse, UserResponse
 from app.models import User
 from app.utils.jwt import create_access_token
 
+logger = logging.getLogger(__name__)
+
 
 class AuthService:
     def __init__(self, db: Session):
         self.db = db
-        self.supabase: Client = create_client(
-            settings.SUPABASE_URL,
-            settings.SUPABASE_ANON_KEY
-        )
-    
+        try:
+            self.supabase: Client = create_client(
+                settings.SUPABASE_URL,
+                settings.SUPABASE_ANON_KEY
+            )
+        except Exception as e:
+            logger.warning(f"Failed to initialize Supabase client: {e}")
+            self.supabase = None
+
     async def signup(self, user_data: UserCreate) -> TokenResponse:
         """Register a new user with Supabase and create local user record"""
         try:
+            if not self.supabase:
+                raise HTTPException(
+                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    detail="Authentication service is not available"
+                )
+
             # Create user in Supabase Auth
             auth_response = self.supabase.auth.sign_up({
                 "email": user_data.email,

@@ -43,7 +43,7 @@ const Signup: React.FC = () => {
       // Create request body
       const requestBody = {
         email: formData.email,
-        name: formData.name,
+        full_name: formData.name, // Backend expects 'full_name' not 'name'
         password: formData.password,
         role: "innovator",
       };
