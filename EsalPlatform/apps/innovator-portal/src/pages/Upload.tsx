@@ -3,32 +3,55 @@ import { Card, CardHeader, CardTitle, CardContent, Button } from "@esal/ui";
 
 interface UploadFormData {
   title: string;
-  problem: string;
-  solution: string;
-  target_market: string;
-  industry: string;
-  stage: string;
-  fundingNeeded: string;
-  teamSize: string;
-  document: File | null;
+  description: string;
+  category: string;
+  tags: string;
+  status: string;
+  visibility: string;
+  documents: File[];
 }
 
 const Upload: React.FC = () => {
   const [formData, setFormData] = useState<UploadFormData>({
     title: "",
-    problem: "",
-    solution: "",
-    target_market: "",
-    industry: "",
-    stage: "",
-    fundingNeeded: "",
-    teamSize: "",
-    document: null,
+    description: "",
+    category: "",
+    tags: "",
+    status: "draft",
+    visibility: "private",
+    documents: [],
   });
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
+
+  // Form validation function
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+
+    if (!formData.title.trim()) {
+      errors.title = "Title is required";
+    } else if (formData.title.length < 5) {
+      errors.title = "Title must be at least 5 characters long";
+    }
+
+    if (!formData.description.trim()) {
+      errors.description = "Description is required";
+    } else if (formData.description.length < 50) {
+      errors.description = "Description must be at least 50 characters long";
+    }
+
+    if (!formData.category) {
+      errors.category = "Please select a category";
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -38,27 +61,36 @@ const Upload: React.FC = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    setFormData((prev) => ({ ...prev, document: file }));
+    const files = Array.from(e.target.files || []);
+    setFormData((prev) => ({ ...prev, documents: files }));
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
     setSuccessMessage(null);
-
+    if (!validateForm()) {
+      setIsLoading(false);
+      return;
+    }
     try {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      } // Create idea data structure matching backend schema
+      }
+
+      // Create idea data structure matching backend schema
       const ideaData = {
         title: formData.title,
-        problem: formData.problem,
-        solution: formData.solution,
-        target_market: formData.target_market,
+        description: formData.description,
+        category: formData.category,
+        tags: formData.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0),
+        status: formData.status,
+        visibility: formData.visibility,
       };
 
       const response = await fetch(
@@ -72,29 +104,58 @@ const Upload: React.FC = () => {
           body: JSON.stringify(ideaData),
         }
       );
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || "Failed to upload idea");
       }
 
-      await response.json(); // Success response
+      const ideaResult = await response.json();
+
+      // Upload files if any
+      if (formData.documents.length > 0) {
+        for (const file of formData.documents) {
+          const fileFormData = new FormData();
+          fileFormData.append("file", file);
+          fileFormData.append("idea_id", ideaResult.id.toString());
+          fileFormData.append("description", `Document for ${formData.title}`);
+
+          const fileResponse = await fetch(
+            "http://localhost:8000/api/v1/innovator/upload-file",
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              body: fileFormData,
+            }
+          );
+
+          if (!fileResponse.ok) {
+            console.warn(`Failed to upload file: ${file.name}`);
+          }
+        }
+      }
+
       setSuccessMessage(
         "Idea uploaded successfully! You can now track its progress in your dashboard."
-      ); // Reset form
+      );
+
+      // Reset form
       setFormData({
         title: "",
-        problem: "",
-        solution: "",
-        target_market: "",
-        industry: "",
-        stage: "",
-        fundingNeeded: "",
-        teamSize: "",
-        document: null,
+        description: "",
+        category: "",
+        tags: "",
+        status: "draft",
+        visibility: "private",
+        documents: [],
       });
 
       // Reset file input
-      const fileInput = document.getElementById("document") as HTMLInputElement;
+      const fileInput = document.getElementById(
+        "documents"
+      ) as HTMLInputElement;
       if (fileInput) {
         fileInput.value = "";
       }
@@ -113,17 +174,27 @@ const Upload: React.FC = () => {
     setIsLoading(true);
     setError(null);
     setSuccessMessage(null);
-
+    if (!validateForm()) {
+      setIsLoading(false);
+      return;
+    }
     try {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      } // Create idea data structure matching backend schema
+      }
+
+      // Create idea data structure for draft
       const draftData = {
         title: formData.title,
-        problem: formData.problem,
-        solution: formData.solution,
-        target_market: formData.target_market,
+        description: formData.description,
+        category: formData.category,
+        tags: formData.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0),
+        status: "draft",
+        visibility: "private",
       };
 
       const response = await fetch(
@@ -207,7 +278,7 @@ const Upload: React.FC = () => {
       <Card>
         <CardHeader>
           <CardTitle>Startup Details</CardTitle>
-        </CardHeader>
+        </CardHeader>{" "}
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
@@ -215,7 +286,7 @@ const Upload: React.FC = () => {
                 htmlFor="title"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Startup Title *
+                Idea Title *
               </label>
               <input
                 type="text"
@@ -225,175 +296,184 @@ const Upload: React.FC = () => {
                 value={formData.title}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter your startup name or title"
+                placeholder="Enter your startup idea title"
               />
-            </div>{" "}
+              {validationErrors.title && (
+                <p className="text-xs text-red-600 mt-1">
+                  {validationErrors.title}
+                </p>
+              )}
+            </div>
+
             <div>
               <label
-                htmlFor="problem"
+                htmlFor="description"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Problem Statement *
+                Description *
               </label>
               <textarea
-                id="problem"
-                name="problem"
+                id="description"
+                name="description"
                 required
-                rows={3}
-                value={formData.problem}
+                rows={4}
+                value={formData.description}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Describe the specific problem your startup solves"
+                placeholder="Describe your idea in detail - the problem it solves, your solution, target market, etc."
               />
+              {validationErrors.description && (
+                <p className="text-xs text-red-600 mt-1">
+                  {validationErrors.description}
+                </p>
+              )}
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="category"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Category *
+                </label>
+                <select
+                  id="category"
+                  name="category"
+                  required
+                  value={formData.category}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select Category</option>
+                  <option value="Technology">Technology</option>
+                  <option value="Healthcare">Healthcare</option>
+                  <option value="Finance">Finance</option>
+                  <option value="Education">Education</option>
+                  <option value="Retail">Retail</option>
+                  <option value="Energy">Energy</option>
+                  <option value="Environment">Environment</option>
+                  <option value="Transportation">Transportation</option>
+                  <option value="Entertainment">Entertainment</option>
+                  <option value="Food & Beverage">Food & Beverage</option>
+                  <option value="Real Estate">Real Estate</option>
+                  <option value="Agriculture">Agriculture</option>
+                  <option value="Manufacturing">Manufacturing</option>
+                  <option value="Other">Other</option>
+                </select>
+                {validationErrors.category && (
+                  <p className="text-xs text-red-600 mt-1">
+                    {validationErrors.category}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="visibility"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Visibility *
+                </label>
+                <select
+                  id="visibility"
+                  name="visibility"
+                  required
+                  value={formData.visibility}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="private">Private (Only me)</option>
+                  <option value="public">Public (Visible to investors)</option>
+                  <option value="limited">Limited (Selected viewers)</option>
+                </select>
+              </div>
+            </div>
+
             <div>
               <label
-                htmlFor="solution"
+                htmlFor="tags"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Solution *
-              </label>
-              <textarea
-                id="solution"
-                name="solution"
-                required
-                rows={3}
-                value={formData.solution}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Explain your solution and how it addresses the problem"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="target_market"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Target Market *
+                Tags
               </label>
               <input
                 type="text"
-                id="target_market"
-                name="target_market"
-                required
-                value={formData.target_market}
+                id="tags"
+                name="tags"
+                value={formData.tags}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Who is your target market? (e.g., small businesses, students, healthcare providers)"
+                placeholder="Enter tags separated by commas (e.g., AI, Machine Learning, SaaS)"
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Add relevant keywords to help investors find your idea
+              </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label
-                  htmlFor="industry"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Industry *
-                </label>
-                <select
-                  id="industry"
-                  name="industry"
-                  required
-                  value={formData.industry}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Select Industry</option>
-                  <option value="technology">Technology</option>
-                  <option value="healthcare">Healthcare</option>
-                  <option value="finance">Finance</option>
-                  <option value="education">Education</option>
-                  <option value="retail">Retail</option>
-                  <option value="energy">Energy</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
 
-              <div>
-                <label
-                  htmlFor="stage"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Current Stage *
-                </label>
-                <select
-                  id="stage"
-                  name="stage"
-                  required
-                  value={formData.stage}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Select Stage</option>
-                  <option value="idea">Idea Stage</option>
-                  <option value="prototype">Prototype</option>
-                  <option value="mvp">MVP</option>
-                  <option value="early-revenue">Early Revenue</option>
-                  <option value="growth">Growth Stage</option>
-                </select>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label
-                  htmlFor="fundingNeeded"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Funding Needed
-                </label>
-                <input
-                  type="text"
-                  id="fundingNeeded"
-                  name="fundingNeeded"
-                  value={formData.fundingNeeded}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., $100,000"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="teamSize"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Team Size
-                </label>
-                <input
-                  type="number"
-                  id="teamSize"
-                  name="teamSize"
-                  value={formData.teamSize}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Number of team members"
-                />
-              </div>
-            </div>{" "}
             <div>
               <label
-                htmlFor="document"
+                htmlFor="status"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Upload Pitch Deck or Business Plan
-                <span className="text-sm text-gray-500 ml-2">
-                  (Coming Soon)
-                </span>
+                Status
+              </label>
+              <select
+                id="status"
+                name="status"
+                value={formData.status}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="draft">Draft (Work in progress)</option>
+                <option value="active">Active (Ready for review)</option>
+                <option value="published">
+                  Published (Visible to investors)
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="documents"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Upload Supporting Documents
+                <span className="text-sm text-gray-500 ml-2">(Optional)</span>
               </label>
               <input
                 type="file"
-                id="document"
-                name="document"
+                id="documents"
+                name="documents"
                 onChange={handleFileChange}
-                accept=".pdf,.ppt,.pptx,.doc,.docx"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 opacity-50"
-                disabled
+                accept=".pdf,.ppt,.pptx,.doc,.docx,.jpg,.jpeg,.png"
+                multiple
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <p className="text-xs text-gray-500 mt-1">
-                File upload feature will be available in a future update. For
-                now, please include key details in the form above.
+                Upload pitch decks, business plans, prototypes, or other
+                relevant documents. Accepted formats: PDF, PPT, DOC, Images. Max
+                10MB per file.
               </p>
-            </div>{" "}
+              {formData.documents.length > 0 && (
+                <div className="mt-2">
+                  <p className="text-sm font-medium text-gray-700">
+                    Selected files:
+                  </p>
+                  <ul className="text-sm text-gray-600">
+                    {formData.documents.map((file, index) => (
+                      <li key={index} className="flex items-center space-x-2">
+                        <span>📄</span>
+                        <span>{file.name}</span>
+                        <span className="text-gray-400">
+                          ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
             <div className="flex space-x-4">
               <Button type="submit" className="flex-1" disabled={isLoading}>
                 {isLoading ? "Submitting..." : "Submit Idea"}

@@ -1,247 +1,156 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent, Button } from "@esal/ui";
 
+interface Idea {
+  id: string;
+  title: string;
+  description: string;
+  problem?: string;
+  solution?: string;
+  target_market?: string;
+}
+
+interface AIResponse {
+  response_text: string;
+  suggestions?: string[];
+  confidence_score?: number;
+  generated_at: string;
+}
+
+interface AIJudgment {
+  overall_score: number;
+  strengths: string[];
+  weaknesses: string[];
+  improvement_suggestions: string[];
+  market_viability: number;
+  technical_feasibility: number;
+  business_potential: number;
+  generated_at: string;
+}
+
 const AIGenerator: React.FC = () => {
-  const [formData, setFormData] = useState({
+  // Active tab state
+  const [activeTab, setActiveTab] = useState<
+    "generate" | "finetune" | "judge" | "recommendations"
+  >("generate");
+
+  // Form states for different tabs
+  const [generateForm, setGenerateForm] = useState({
     interests: "",
     skills: "",
     industry: "",
-    problemArea: "",
-    targetMarket: "",
+    problem_area: "",
+    target_market: "",
   });
-  const [generatedIdea, setGeneratedIdea] = useState<string | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
+
+  const [finetuneForm, setFinetuneForm] = useState({
+    idea_id: "",
+    current_content: "",
+    improvement_focus: "problem_statement",
+    additional_context: "",
+  });
+
+  const [judgeForm, setJudgeForm] = useState({
+    idea_id: "",
+    title: "",
+    problem: "",
+    solution: "",
+    target_market: "",
+  });
+
+  const [recommendationsForm, setRecommendationsForm] = useState({
+    focus_area: "general",
+  });
+
+  // Response states
+  const [aiResponse, setAiResponse] = useState<AIResponse | null>(null);
+  const [aiJudgment, setAiJudgment] = useState<AIJudgment | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  }; // Industry-based idea templates
-  const industryIdeas: Record<
-    string,
-    { problems: string[]; solutions: string[] }
-  > = {
-    technology: {
-      problems: [
-        "Software deployment complexity",
-        "Data privacy concerns",
-        "Digital accessibility barriers",
-        "Remote team collaboration inefficiencies",
-        "API integration difficulties",
-      ],
-      solutions: [
-        "One-click deployment platform with automated CI/CD",
-        "Zero-knowledge privacy-preserving analytics",
-        "AI-powered accessibility testing and remediation",
-        "Virtual reality workspace for remote teams",
-        "Universal API gateway with smart routing",
-      ],
-    },
-    healthcare: {
-      problems: [
-        "Mental health stigma and access barriers",
-        "Medical record fragmentation",
-        "Medication adherence issues",
-        "Healthcare cost transparency",
-        "Elder care coordination",
-      ],
-      solutions: [
-        "Anonymous peer support network with AI matching",
-        "Blockchain-based unified health records",
-        "Smart pill dispenser with family notifications",
-        "Real-time healthcare pricing comparison platform",
-        "Comprehensive elder care management system",
-      ],
-    },
-    finance: {
-      problems: [
-        "Financial literacy gaps",
-        "Small business cash flow management",
-        "Investment accessibility for beginners",
-        "Cross-border payment complexity",
-        "Retirement planning confusion",
-      ],
-      solutions: [
-        "Gamified financial education platform",
-        "AI-powered cash flow prediction and optimization",
-        "Micro-investing with automated portfolio rebalancing",
-        "Instant cross-border payments with transparent fees",
-        "Personalized retirement planning with scenario modeling",
-      ],
-    },
-    education: {
-      problems: [
-        "Personalized learning gaps",
-        "Student engagement in remote learning",
-        "Skills-to-career pathway confusion",
-        "Educational resource accessibility",
-        "Teacher workload and burnout",
-      ],
-      solutions: [
-        "AI-adaptive learning platform with real-time adjustments",
-        "Immersive VR classrooms with interactive experiences",
-        "Career pathway mapping with industry partnerships",
-        "Open-source educational content marketplace",
-        "Automated grading and feedback system for teachers",
-      ],
-    },
-    retail: {
-      problems: [
-        "Inventory management inefficiencies",
-        "Customer experience personalization",
-        "Sustainable packaging challenges",
-        "Local business discovery",
-        "Return and exchange complexity",
-      ],
-      solutions: [
-        "Predictive inventory management with demand forecasting",
-        "AR try-before-buy experiences",
-        "Biodegradable packaging subscription service",
-        "Hyperlocal business discovery and rewards platform",
-        "Streamlined returns with instant refunds and sustainability tracking",
-      ],
-    },
-    energy: {
-      problems: [
-        "Home energy efficiency optimization",
-        "Renewable energy adoption barriers",
-        "Grid stability with distributed generation",
-        "EV charging infrastructure gaps",
-        "Energy storage cost and efficiency",
-      ],
-      solutions: [
-        "AI-powered home energy optimization system",
-        "Community solar sharing platform",
-        "Peer-to-peer energy trading marketplace",
-        "Dynamic EV charging network with predictive availability",
-        "Modular home battery systems with grid integration",
-      ],
-    },
-    entertainment: {
-      problems: [
-        "Content discovery overwhelm",
-        "Creator monetization challenges",
-        "Live event accessibility",
-        "Gaming addiction and mental health",
-        "Interactive content creation barriers",
-      ],
-      solutions: [
-        "AI curator that learns deep preferences",
-        "Direct fan-to-creator micropayment platform",
-        "VR live events with global accessibility",
-        "Mindful gaming platform with wellness integration",
-        "No-code interactive story and game creation platform",
-      ],
-    },
-  };
-
-  const generatePersonalizedIdea = (
-    interests: string,
-    skills: string,
-    industry: string,
-    problemArea: string,
-    targetMarket: string
-  ) => {
-    const selectedIndustry = industry || "technology";
-    const industryData =
-      industryIdeas[selectedIndustry] || industryIdeas.technology;
-
-    // Select a random problem and solution from the industry
-    const randomProblem =
-      industryData.problems[
-        Math.floor(Math.random() * industryData.problems.length)
-      ];
-    const randomSolution =
-      industryData.solutions[
-        Math.floor(Math.random() * industryData.solutions.length)
-      ];
-
-    // Generate a dynamic title based on the solution
-    const titleWords = randomSolution.split(" ").slice(0, 3);
-    const title =
-      titleWords
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join("") + " Platform";
-
-    return `**${title}**
-
-**Problem Statement:** ${randomProblem}${problemArea ? ` Additionally, addressing ${problemArea.toLowerCase()} in this space.` : ""}
-
-**Solution:** ${randomSolution}${skills ? ` Leveraging your skills in ${skills} to build a comprehensive solution.` : ""}
-
-**Target Market:** ${targetMarket || `Professionals and businesses in the ${selectedIndustry} sector`}${interests ? ` who are interested in ${interests.toLowerCase()}.` : "."}
-
-**Key Features:**
-- Intelligent problem detection and analysis
-- Automated solution recommendations
-- Real-time performance tracking
-- Integration with existing workflows
-- Mobile-first responsive design
-
-**Revenue Model:**
-- Freemium SaaS model ($29-$299/month)
-- Enterprise licensing for large organizations
-- API access for third-party integrations
-- Premium consulting and implementation services
-
-**Competitive Advantage:**
-${skills ? `- Unique combination of ${skills} expertise` : "- Technical innovation"}
-${interests ? `- Deep understanding of ${interests} market needs` : "- Market-focused approach"}
-- First-mover advantage in solving ${randomProblem.toLowerCase()}
-- Scalable technology platform
-
-**Next Steps:**
-1. Validate the problem with 50+ potential users
-2. Build an MVP focusing on core functionality
-3. Conduct user testing and iterate based on feedback
-4. Secure initial funding or bootstrap development
-5. Launch beta program with early adopters
-
-This personalized startup idea combines your interests and skills with a real market opportunity in the ${selectedIndustry} industry.`;
-  };
-
-  const handleGenerate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsGenerating(true);
-    setError(null);
-    setSuccessMessage(null);
-
+  // User ideas for dropdowns
+  const [userIdeas, setUserIdeas] = useState<Idea[]>([]); // Fetch user ideas for dropdowns
+  const fetchUserIdeas = async () => {
     try {
-      // Generate idea using intelligent fallback system (no API call needed)
-      const generatedIdea = generatePersonalizedIdea(
-        formData.interests,
-        formData.skills,
-        formData.industry,
-        formData.problemArea,
-        formData.targetMarket
+      const token = localStorage.getItem("access_token");
+      if (!token) return;
+
+      const response = await fetch(
+        "http://localhost:8000/api/v1/innovator/view-ideas",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
 
-      setGeneratedIdea(generatedIdea);
-      setSuccessMessage(
-        "AI has generated a personalized startup idea for you!"
-      );
+      if (response.ok) {
+        const ideas = await response.json();
+        setUserIdeas(ideas);
+      }
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "An error occurred while generating ideas"
-      );
-    } finally {
-      setIsGenerating(false);
+      console.error("Error fetching user ideas:", err);
     }
   };
-  const handleSaveIdea = async () => {
-    if (!generatedIdea) {
-      setError("No idea to save");
-      return;
-    }
 
-    setIsGenerating(true);
+  useEffect(() => {
+    fetchUserIdeas();
+  }, []);
+
+  // Generic form change handler
+  const handleFormChange = (
+    formType: "generate" | "finetune" | "judge" | "recommendations",
+    field: string,
+    value: string
+  ) => {
+    switch (formType) {
+      case "generate":
+        setGenerateForm((prev) => ({ ...prev, [field]: value }));
+        break;
+      case "finetune":
+        setFinetuneForm((prev) => ({ ...prev, [field]: value }));
+        break;
+      case "judge":
+        setJudgeForm((prev) => ({ ...prev, [field]: value }));
+        break;
+      case "recommendations":
+        setRecommendationsForm((prev) => ({ ...prev, [field]: value }));
+        break;
+    }
+  };
+
+  // Handle idea selection for finetune and judge tabs
+  const handleIdeaSelection = (
+    ideaId: string,
+    formType: "finetune" | "judge"
+  ) => {
+    const selectedIdea = userIdeas.find((idea) => idea.id === ideaId);
+    if (selectedIdea) {
+      if (formType === "finetune") {
+        setFinetuneForm((prev) => ({
+          ...prev,
+          idea_id: ideaId,
+          current_content: selectedIdea.description || "",
+        }));
+      } else {
+        setJudgeForm((prev) => ({
+          ...prev,
+          idea_id: ideaId,
+          title: selectedIdea.title,
+          problem: selectedIdea.problem || "",
+          solution: selectedIdea.solution || "",
+          target_market: selectedIdea.target_market || "",
+        }));
+      }
+    }
+  };
+
+  // API call handlers
+  const handleGenerateIdea = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
     setError(null);
     setSuccessMessage(null);
 
@@ -249,92 +158,192 @@ This personalized startup idea combines your interests and skills with a real ma
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      } // Parse the generated idea to extract title, problem, and solution
-      const titleMatch = generatedIdea.match(/\*\*(.*?)\*\*/);
-      const title = titleMatch ? titleMatch[1] : "AI Generated Startup Idea";
-
-      // Extract problem statement
-      const problemMatch = generatedIdea.match(
-        /\*\*Problem Statement:\*\*\s*(.*?)(?=\*\*|$)/s
-      );
-      const problem = problemMatch
-        ? problemMatch[1].trim()
-        : "Problem to be defined";
-
-      // Extract solution
-      const solutionMatch = generatedIdea.match(
-        /\*\*Solution:\*\*\s*(.*?)(?=\*\*|$)/s
-      );
-      const solution = solutionMatch
-        ? solutionMatch[1].trim()
-        : "Solution to be developed";
-
-      // Extract target market
-      const targetMarketMatch = generatedIdea.match(
-        /\*\*Target Market:\*\*\s*(.*?)(?=\*\*|$)/s
-      );
-      const target_market = targetMarketMatch
-        ? targetMarketMatch[1].trim()
-        : formData.targetMarket || "To be determined";
-
-      // Create idea data structure matching backend schema
-      const ideaData = {
-        title: title,
-        problem: problem,
-        solution: solution,
-        target_market: target_market,
-      };
+      }
 
       const response = await fetch(
-        "http://localhost:8000/api/v1/innovator/submit-idea",
+        "http://localhost:8000/api/v1/innovator/ai/generate-idea",
         {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(ideaData),
+          body: JSON.stringify(generateForm),
         }
       );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to save idea");
+        throw new Error(errorData.detail || "Failed to generate idea");
       }
 
-      await response.json(); // Consume response
-      setSuccessMessage(
-        "Idea saved successfully! You can view it in your My Ideas page."
-      );
-
-      // Clear the generated idea to encourage generating new ones
-      setTimeout(() => {
-        setGeneratedIdea(null);
-        setSuccessMessage(null);
-      }, 3000);
+      const result = await response.json();
+      setAiResponse(result);
+      setSuccessMessage("AI has generated a new startup idea for you!");
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "An error occurred while saving the idea"
+          : "An error occurred while generating the idea"
       );
     } finally {
-      setIsGenerating(false);
+      setIsLoading(false);
     }
   };
 
+  const handleFineTuneIdea = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+    setSuccessMessage(null);
+
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Authentication required");
+      }
+
+      const response = await fetch(
+        "http://localhost:8000/api/v1/innovator/ai/fine-tune",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(finetuneForm),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to fine-tune idea");
+      }
+
+      const result = await response.json();
+      setAiResponse(result);
+      setSuccessMessage("AI has provided suggestions to improve your idea!");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred while fine-tuning the idea"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleJudgeIdea = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+    setSuccessMessage(null);
+
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Authentication required");
+      }
+
+      const response = await fetch(
+        "http://localhost:8000/api/v1/innovator/ai/judge-idea",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(judgeForm),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to judge idea");
+      }
+
+      const result = await response.json();
+      setAiJudgment(result);
+      setSuccessMessage(
+        "AI has evaluated your idea and provided detailed feedback!"
+      );
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred while judging the idea"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGetRecommendations = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+    setSuccessMessage(null);
+
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Authentication required");
+      }
+
+      const response = await fetch(
+        "http://localhost:8000/api/v1/innovator/ai/recommendations",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(recommendationsForm),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to get recommendations");
+      }
+
+      const result = await response.json();
+      setAiResponse(result);
+      setSuccessMessage(
+        "AI has generated personalized recommendations based on your idea portfolio!"
+      );
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred while getting recommendations"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const clearResults = () => {
+    setAiResponse(null);
+    setAiJudgment(null);
+    setSuccessMessage(null);
+    setError(null);
+  };
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {" "}
+    <div className="max-w-6xl mx-auto space-y-6">
+      {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">
-          AI Startup Idea Generator
+        <h1 className="text-3xl font-bold text-gray-900">
+          AI-Powered Innovation Hub
         </h1>
-        <p className="text-gray-600">
-          Let AI help you discover innovative startup opportunities based on
-          your interests and skills.
+        <p className="text-gray-600 mt-2">
+          Get comprehensive AI assistance for your startup ideas - from
+          generation to evaluation and optimization.
         </p>
       </div>
+
+      {/* Error and Success Messages */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
           <div className="flex">
@@ -353,6 +362,7 @@ This personalized startup idea combines your interests and skills with a real ma
           </div>
         </div>
       )}
+
       {successMessage && (
         <div className="bg-green-50 border border-green-200 rounded-md p-4">
           <div className="flex">
@@ -371,218 +381,573 @@ This personalized startup idea combines your interests and skills with a real ma
           </div>
         </div>
       )}
+
+      {/* Tab Navigation */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          {[
+            { id: "generate", name: "Generate Ideas", icon: "🧠" },
+            { id: "finetune", name: "Fine-tune Ideas", icon: "🔧" },
+            { id: "judge", name: "Judge Ideas", icon: "⚖️" },
+            { id: "recommendations", name: "Get Recommendations", icon: "💡" },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id as typeof activeTab);
+                clearResults();
+              }}
+              className={`${
+                activeTab === tab.id
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              } whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
+            >
+              <span>{tab.icon}</span>
+              {tab.name}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Tab Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Input Form */}
         <Card>
           <CardHeader>
-            <CardTitle>Tell Us About Yourself</CardTitle>
+            <CardTitle>
+              {activeTab === "generate" && "Generate New Ideas"}
+              {activeTab === "finetune" && "Fine-tune Existing Ideas"}
+              {activeTab === "judge" && "Judge Your Ideas"}
+              {activeTab === "recommendations" &&
+                "Get Personalized Recommendations"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleGenerate} className="space-y-4">
-              <div>
-                <label
-                  htmlFor="interests"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Your Interests *
-                </label>
-                <textarea
-                  id="interests"
-                  name="interests"
-                  required
-                  rows={2}
-                  value={formData.interests}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., sustainability, technology, healthcare, education"
-                />
-              </div>
+            {/* Generate Tab */}
+            {activeTab === "generate" && (
+              <form onSubmit={handleGenerateIdea} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Your Interests *
+                  </label>
+                  <textarea
+                    value={generateForm.interests}
+                    onChange={(e) =>
+                      handleFormChange("generate", "interests", e.target.value)
+                    }
+                    required
+                    rows={2}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g., sustainability, technology, healthcare, education"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Your Skills *
+                  </label>
+                  <textarea
+                    value={generateForm.skills}
+                    onChange={(e) =>
+                      handleFormChange("generate", "skills", e.target.value)
+                    }
+                    required
+                    rows={2}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g., software development, marketing, data analysis, design"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Preferred Industry
+                  </label>
+                  <select
+                    value={generateForm.industry}
+                    onChange={(e) =>
+                      handleFormChange("generate", "industry", e.target.value)
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Any Industry</option>
+                    <option value="technology">Technology</option>
+                    <option value="healthcare">Healthcare</option>
+                    <option value="finance">Finance</option>
+                    <option value="education">Education</option>
+                    <option value="retail">Retail</option>
+                    <option value="energy">Energy</option>
+                    <option value="entertainment">Entertainment</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Problem Areas You Care About
+                  </label>
+                  <textarea
+                    value={generateForm.problem_area}
+                    onChange={(e) =>
+                      handleFormChange(
+                        "generate",
+                        "problem_area",
+                        e.target.value
+                      )
+                    }
+                    rows={2}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g., climate change, accessibility, productivity, communication"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Preferred Target Market
+                  </label>
+                  <input
+                    type="text"
+                    value={generateForm.target_market}
+                    onChange={(e) =>
+                      handleFormChange(
+                        "generate",
+                        "target_market",
+                        e.target.value
+                      )
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g., small businesses, students, seniors, developers"
+                  />
+                </div>
+                <Button type="submit" disabled={isLoading} className="w-full">
+                  {isLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Generating Ideas...
+                    </>
+                  ) : (
+                    "Generate New Ideas"
+                  )}
+                </Button>
+              </form>
+            )}
 
-              <div>
-                <label
-                  htmlFor="skills"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+            {/* Fine-tune Tab */}
+            {activeTab === "finetune" && (
+              <form onSubmit={handleFineTuneIdea} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Select Idea to Fine-tune *
+                  </label>
+                  <select
+                    value={finetuneForm.idea_id}
+                    onChange={(e) =>
+                      handleIdeaSelection(e.target.value, "finetune")
+                    }
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Choose an idea...</option>
+                    {userIdeas.map((idea) => (
+                      <option key={idea.id} value={idea.id}>
+                        {idea.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Current Content
+                  </label>
+                  <textarea
+                    value={finetuneForm.current_content}
+                    onChange={(e) =>
+                      handleFormChange(
+                        "finetune",
+                        "current_content",
+                        e.target.value
+                      )
+                    }
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Current idea description will appear here..."
+                    readOnly
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Improvement Focus
+                  </label>
+                  <select
+                    value={finetuneForm.improvement_focus}
+                    onChange={(e) =>
+                      handleFormChange(
+                        "finetune",
+                        "improvement_focus",
+                        e.target.value
+                      )
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="problem_statement">Problem Statement</option>
+                    <option value="solution_design">Solution Design</option>
+                    <option value="target_market">Target Market</option>
+                    <option value="business_model">Business Model</option>
+                    <option value="competitive_advantage">
+                      Competitive Advantage
+                    </option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Additional Context
+                  </label>
+                  <textarea
+                    value={finetuneForm.additional_context}
+                    onChange={(e) =>
+                      handleFormChange(
+                        "finetune",
+                        "additional_context",
+                        e.target.value
+                      )
+                    }
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Any specific guidance or areas you want to focus on..."
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  disabled={isLoading || !finetuneForm.idea_id}
+                  className="w-full"
                 >
-                  Your Skills *
-                </label>
-                <textarea
-                  id="skills"
-                  name="skills"
-                  required
-                  rows={2}
-                  value={formData.skills}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., software development, marketing, data analysis, design"
-                />
-              </div>
+                  {isLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Fine-tuning...
+                    </>
+                  ) : (
+                    "Fine-tune Idea"
+                  )}
+                </Button>
+              </form>
+            )}
 
-              <div>
-                <label
-                  htmlFor="industry"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+            {/* Judge Tab */}
+            {activeTab === "judge" && (
+              <form onSubmit={handleJudgeIdea} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Select Idea to Judge *
+                  </label>
+                  <select
+                    value={judgeForm.idea_id}
+                    onChange={(e) =>
+                      handleIdeaSelection(e.target.value, "judge")
+                    }
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Choose an idea...</option>
+                    {userIdeas.map((idea) => (
+                      <option key={idea.id} value={idea.id}>
+                        {idea.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    value={judgeForm.title}
+                    onChange={(e) =>
+                      handleFormChange("judge", "title", e.target.value)
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    readOnly
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Problem Statement
+                  </label>
+                  <textarea
+                    value={judgeForm.problem}
+                    onChange={(e) =>
+                      handleFormChange("judge", "problem", e.target.value)
+                    }
+                    rows={2}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Solution
+                  </label>
+                  <textarea
+                    value={judgeForm.solution}
+                    onChange={(e) =>
+                      handleFormChange("judge", "solution", e.target.value)
+                    }
+                    rows={2}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Target Market
+                  </label>
+                  <input
+                    type="text"
+                    value={judgeForm.target_market}
+                    onChange={(e) =>
+                      handleFormChange("judge", "target_market", e.target.value)
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  disabled={isLoading || !judgeForm.idea_id}
+                  className="w-full"
                 >
-                  Preferred Industry
-                </label>
-                <select
-                  id="industry"
-                  name="industry"
-                  value={formData.industry}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Any Industry</option>
-                  <option value="technology">Technology</option>
-                  <option value="healthcare">Healthcare</option>
-                  <option value="finance">Finance</option>
-                  <option value="education">Education</option>
-                  <option value="retail">Retail</option>
-                  <option value="energy">Energy</option>
-                  <option value="entertainment">Entertainment</option>
-                </select>
-              </div>
+                  {isLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Judging...
+                    </>
+                  ) : (
+                    "Judge Idea"
+                  )}
+                </Button>
+              </form>
+            )}
 
-              <div>
-                <label
-                  htmlFor="problemArea"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Problem Areas You Care About
-                </label>
-                <textarea
-                  id="problemArea"
-                  name="problemArea"
-                  rows={2}
-                  value={formData.problemArea}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., climate change, accessibility, productivity, communication"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="targetMarket"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Preferred Target Market
-                </label>
-                <input
-                  type="text"
-                  id="targetMarket"
-                  name="targetMarket"
-                  value={formData.targetMarket}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., small businesses, students, seniors, developers"
-                />
-              </div>
-
-              <Button type="submit" disabled={isGenerating} className="w-full">
-                {isGenerating ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Generating Ideas...
-                  </>
-                ) : (
-                  "Generate Startup Ideas"
-                )}
-              </Button>
-            </form>
+            {/* Recommendations Tab */}
+            {activeTab === "recommendations" && (
+              <form onSubmit={handleGetRecommendations} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Focus Area
+                  </label>
+                  <select
+                    value={recommendationsForm.focus_area}
+                    onChange={(e) =>
+                      handleFormChange(
+                        "recommendations",
+                        "focus_area",
+                        e.target.value
+                      )
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="general">General Recommendations</option>
+                    <option value="market_analysis">Market Analysis</option>
+                    <option value="competition">Competitive Landscape</option>
+                    <option value="funding">Funding Opportunities</option>
+                    <option value="team_building">Team Building</option>
+                    <option value="product_development">
+                      Product Development
+                    </option>
+                    <option value="marketing_strategy">
+                      Marketing Strategy
+                    </option>
+                  </select>
+                </div>
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <p className="text-sm text-blue-700">
+                    💡 <strong>Portfolio Analysis:</strong> AI will analyze your
+                    current ideas portfolio ({userIdeas.length} ideas) to
+                    provide personalized recommendations for improvement and
+                    growth.
+                  </p>
+                </div>
+                <Button type="submit" disabled={isLoading} className="w-full">
+                  {isLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Analyzing Portfolio...
+                    </>
+                  ) : (
+                    "Get Recommendations"
+                  )}
+                </Button>
+              </form>
+            )}
           </CardContent>
         </Card>
 
-        {/* Generated Idea */}
+        {/* Results Panel */}
         <Card>
           <CardHeader>
-            <CardTitle>Generated Startup Idea</CardTitle>
+            <CardTitle>AI Results</CardTitle>
           </CardHeader>
           <CardContent>
-            {!generatedIdea && !isGenerating && (
+            {!aiResponse && !aiJudgment && !isLoading && (
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">🤖</div>
                 <p className="text-gray-600">
-                  Fill out the form and click "Generate Startup Ideas" to see
-                  AI-powered suggestions!
+                  Choose an AI feature and submit the form to see intelligent
+                  insights and suggestions!
                 </p>
               </div>
             )}
 
-            {isGenerating && (
+            {isLoading && (
               <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
                 <p className="text-gray-600">
-                  Our AI is analyzing your profile and generating personalized
-                  startup ideas...
+                  AI is analyzing your request and generating personalized
+                  insights...
                 </p>
               </div>
             )}
 
-            {generatedIdea && (
+            {/* AI Response Display */}
+            {aiResponse && (
               <div className="space-y-4">
                 <div className="bg-gray-50 p-4 rounded-lg">
-                  <pre className="whitespace-pre-wrap text-sm text-gray-800 font-mono">
-                    {generatedIdea}
-                  </pre>
-                </div>{" "}
-                <div className="flex space-x-2">
-                  <Button
-                    onClick={handleSaveIdea}
-                    size="sm"
-                    disabled={isGenerating}
-                  >
-                    {isGenerating ? (
-                      <>
-                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-2"></div>
-                        Saving...
-                      </>
-                    ) : (
-                      "Save Idea"
-                    )}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleGenerate}
-                    disabled={isGenerating}
-                  >
-                    Generate Another
-                  </Button>
-                  <Button variant="secondary" size="sm" disabled={isGenerating}>
-                    Refine Idea
-                  </Button>
+                  <h3 className="font-semibold text-gray-800 mb-2">
+                    AI Response
+                  </h3>
+                  <div className="whitespace-pre-wrap text-sm text-gray-700">
+                    {aiResponse.response_text}
+                  </div>
+                  {aiResponse.confidence_score && (
+                    <div className="mt-3 text-xs text-gray-500">
+                      Confidence:{" "}
+                      {Math.round(aiResponse.confidence_score * 100)}%
+                    </div>
+                  )}
                 </div>
+                {aiResponse.suggestions &&
+                  aiResponse.suggestions.length > 0 && (
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <h4 className="font-semibold text-blue-800 mb-2">
+                        Additional Suggestions
+                      </h4>
+                      <ul className="list-disc list-inside text-sm text-blue-700 space-y-1">
+                        {aiResponse.suggestions.map((suggestion, index) => (
+                          <li key={index}>{suggestion}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+              </div>
+            )}
+
+            {/* AI Judgment Display */}
+            {aiJudgment && (
+              <div className="space-y-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-gray-800 mb-3">
+                    AI Evaluation Score
+                  </h3>
+                  <div className="text-center">
+                    <div className="text-4xl font-bold text-blue-600 mb-2">
+                      {aiJudgment.overall_score}/10
+                    </div>
+                    <div className="text-sm text-gray-600">Overall Score</div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 mt-4 text-center">
+                    <div>
+                      <div className="text-lg font-semibold text-green-600">
+                        {aiJudgment.market_viability}/10
+                      </div>
+                      <div className="text-xs text-gray-600">Market</div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-semibold text-blue-600">
+                        {aiJudgment.technical_feasibility}/10
+                      </div>
+                      <div className="text-xs text-gray-600">Technical</div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-semibold text-purple-600">
+                        {aiJudgment.business_potential}/10
+                      </div>
+                      <div className="text-xs text-gray-600">Business</div>
+                    </div>
+                  </div>
+                </div>
+
+                {aiJudgment.strengths.length > 0 && (
+                  <div className="bg-green-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-green-800 mb-2">
+                      💪 Strengths
+                    </h4>
+                    <ul className="list-disc list-inside text-sm text-green-700 space-y-1">
+                      {aiJudgment.strengths.map((strength, index) => (
+                        <li key={index}>{strength}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {aiJudgment.weaknesses.length > 0 && (
+                  <div className="bg-red-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-red-800 mb-2">
+                      ⚠️ Areas for Improvement
+                    </h4>
+                    <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
+                      {aiJudgment.weaknesses.map((weakness, index) => (
+                        <li key={index}>{weakness}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {aiJudgment.improvement_suggestions.length > 0 && (
+                  <div className="bg-yellow-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-yellow-800 mb-2">
+                      💡 Improvement Suggestions
+                    </h4>
+                    <ul className="list-disc list-inside text-sm text-yellow-700 space-y-1">
+                      {aiJudgment.improvement_suggestions.map(
+                        (suggestion, index) => (
+                          <li key={index}>{suggestion}</li>
+                        )
+                      )}
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
         </Card>
       </div>
+
       {/* Tips Section */}
       <Card>
         <CardHeader>
-          <CardTitle>Tips for Better Results</CardTitle>
+          <CardTitle>AI Interaction Tips</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
             <div className="flex items-start space-x-2">
-              <span className="text-blue-600">💡</span>
+              <span className="text-blue-600">🧠</span>
               <div>
-                <strong>Be Specific:</strong> The more detailed your interests
-                and skills, the better the AI can tailor ideas to you.
+                <strong>Generate:</strong> Be specific about your interests and
+                skills for more targeted idea generation.
               </div>
             </div>
             <div className="flex items-start space-x-2">
-              <span className="text-green-600">🎯</span>
+              <span className="text-green-600">🔧</span>
               <div>
-                <strong>Problem-Focused:</strong> Mention specific problems
-                you've observed or experienced personally.
+                <strong>Fine-tune:</strong> Provide clear context about what
+                aspects you want to improve.
               </div>
             </div>
             <div className="flex items-start space-x-2">
-              <span className="text-purple-600">🔄</span>
+              <span className="text-purple-600">⚖️</span>
               <div>
-                <strong>Iterate:</strong> Generate multiple ideas and combine
-                elements from different suggestions.
+                <strong>Judge:</strong> Ensure your idea details are complete
+                for accurate evaluation.
+              </div>
+            </div>
+            <div className="flex items-start space-x-2">
+              <span className="text-orange-600">💡</span>
+              <div>
+                <strong>Recommendations:</strong> Review different focus areas
+                to get comprehensive insights.
               </div>
             </div>
           </div>

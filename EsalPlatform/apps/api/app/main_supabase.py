@@ -76,23 +76,22 @@ async def root():
         "message": "Welcome to ESAL Innovation Platform API",
         "version": "1.0.0",
         "database": "supabase",
-        "docs_url": "/api/docs",
-        "endpoints": {
+        "docs_url": "/api/docs",        "endpoints": {
             "authentication": "/api/auth",
-            "innovator": "/api/innovator",
-            "hub": "/api/hub", 
-            "investor": "/api/investor",
-            "admin": "/api/admin"
+            "innovator": "/api/v1/innovator",
+            "hub": "/api/v1/hub", 
+            "investor": "/api/v1/investor",
+            "admin": "/api/v1/admin"
         }
     }
 
 
 # Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
-app.include_router(innovator.router, prefix="/api/innovator", tags=["Innovator"])
-app.include_router(hub.router, prefix="/api/hub", tags=["Hub"])
-app.include_router(investor.router, prefix="/api/investor", tags=["Investor"])
-app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
+app.include_router(innovator.router, prefix="/api/v1/innovator", tags=["Innovator"])
+app.include_router(hub.router, prefix="/api/v1/hub", tags=["Hub"])
+app.include_router(investor.router, prefix="/api/v1/investor", tags=["Investor"])
+app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])
 
 
 # Request logging middleware (optional)

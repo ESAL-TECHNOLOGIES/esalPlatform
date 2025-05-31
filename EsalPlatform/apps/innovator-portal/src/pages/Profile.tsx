@@ -5,15 +5,26 @@ import ProfileCard from "../components/ProfileCard";
 interface UserProfile {
   id: string;
   email: string;
+  username?: string;
   full_name?: string;
   role: string;
   bio?: string;
   location?: string;
-  expertise?: string[];
-  website?: string;
-  linkedin?: string;
-  twitter?: string;
+  company?: string;
+  position?: string;
+  skills?: string[];
+  interests?: string[];
+  website_url?: string;
+  linkedin_url?: string;
+  twitter_url?: string;
+  github_url?: string;
+  phone?: string;
   avatar_url?: string;
+  experience_years?: number;
+  education?: string;
+  total_ideas: number;
+  total_views: number;
+  total_interests: number;
   is_active: boolean;
   is_blocked: boolean;
   created_at: string;
@@ -21,12 +32,12 @@ interface UserProfile {
 }
 
 interface ProfileStats {
-  ideasCount: number;
-  totalViews: number;
-  totalInterests: number;
+  total_ideas: number;
+  total_views: number;
+  total_interests: number;
 }
 
-// Modal component for profile management features
+// Enhanced Modal component for profile management features
 const Modal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
@@ -36,24 +47,39 @@ const Modal: React.FC<{
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            ✕
-          </button>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-xl">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-2 transition-colors"
+              aria-label="Close modal"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
-        {children}
+        <div className="px-6 py-4">{children}</div>
       </div>
     </div>
   );
 };
 
-// Toggle Switch component
+// Enhanced Toggle Switch component
 const Toggle: React.FC<{
   checked: boolean;
   onChange: () => void;
@@ -61,19 +87,20 @@ const Toggle: React.FC<{
 }> = ({ checked, onChange, label }) => {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-sm text-gray-700">{label}</span>
+      <span className="text-sm font-medium text-gray-700">{label}</span>{" "}
       <button
         type="button"
         onClick={onChange}
         className={`${
           checked ? "bg-blue-600" : "bg-gray-200"
-        } relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+        } relative inline-flex items-center h-6 rounded-full w-11 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:shadow-md`}
+        aria-label={`Toggle ${label}`}
       >
         <span className="sr-only">Toggle {label}</span>
         <span
           className={`${
             checked ? "translate-x-6" : "translate-x-1"
-          } inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
+          } inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200 ease-in-out shadow-sm`}
         />
       </button>
     </div>
@@ -83,22 +110,30 @@ const Toggle: React.FC<{
 const Profile: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [stats, setStats] = useState<ProfileStats>({
-    ideasCount: 0,
-    totalViews: 0,
-    totalInterests: 0,
+    total_ideas: 0,
+    total_views: 0,
+    total_interests: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
+    username: "",
     full_name: "",
     bio: "",
     location: "",
-    website: "",
-    linkedin: "",
-    twitter: "",
-    expertise: [] as string[],
+    company: "",
+    position: "",
+    website_url: "",
+    linkedin_url: "",
+    twitter_url: "",
+    github_url: "",
+    phone: "",
+    skills: [] as string[],
+    interests: [] as string[],
+    experience_years: 0,
+    education: "",
   });
 
   const [isEditing, setIsEditing] = useState(false);
@@ -144,8 +179,26 @@ const Profile: React.FC = () => {
         throw new Error("Authentication required");
       }
 
-      // Use the dashboard endpoint which includes user profile and stats
-      const response = await fetch(
+      // Fetch profile data
+      const profileResponse = await fetch(
+        "http://localhost:8000/api/v1/innovator/profile",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!profileResponse.ok) {
+        throw new Error("Failed to fetch profile");
+      }
+
+      const profileData = await profileResponse.json();
+
+      // Also fetch dashboard stats
+      const dashboardResponse = await fetch(
         "http://localhost:8000/api/v1/innovator/dashboard",
         {
           method: "GET",
@@ -156,29 +209,34 @@ const Profile: React.FC = () => {
         }
       );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to fetch profile");
+      let statsData = { total_ideas: 0, total_views: 0, total_interests: 0 };
+      if (dashboardResponse.ok) {
+        const dashboardData = await dashboardResponse.json();
+        statsData = dashboardData.stats;
       }
 
-      const dashboardData = await response.json();
-      setProfile(dashboardData.user);
+      // Set profile data
+      const profileInfo = profileData.profile;
+      setProfile(profileInfo);
+      setStats(statsData);
 
-      // Set stats from dashboard data
-      setStats({
-        ideasCount: dashboardData.stats.total_ideas,
-        totalViews: dashboardData.stats.total_views,
-        totalInterests: dashboardData.stats.total_interests,
-      });
-      // Initialize form data with current profile values
+      // Update form data with current profile values
       setFormData({
-        full_name: dashboardData.user.full_name || "",
-        bio: dashboardData.user.bio || "",
-        location: dashboardData.user.location || "",
-        website: dashboardData.user.website || "",
-        linkedin: dashboardData.user.linkedin || "",
-        twitter: dashboardData.user.twitter || "",
-        expertise: dashboardData.user.expertise || [],
+        username: profileInfo.username || "",
+        full_name: profileInfo.full_name || "",
+        bio: profileInfo.bio || "",
+        location: profileInfo.location || "",
+        company: profileInfo.company || "",
+        position: profileInfo.position || "",
+        website_url: profileInfo.website_url || "",
+        linkedin_url: profileInfo.linkedin_url || "",
+        twitter_url: profileInfo.twitter_url || "",
+        github_url: profileInfo.github_url || "",
+        phone: profileInfo.phone || "",
+        skills: profileInfo.skills || [],
+        interests: profileInfo.interests || [],
+        experience_years: profileInfo.experience_years || 0,
+        education: profileInfo.education || "",
       });
     } catch (err) {
       setError(
@@ -201,19 +259,31 @@ const Profile: React.FC = () => {
       [name]: value,
     }));
   };
-
-  const handleExpertiseChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const expertiseString = e.target.value;
+  const handleSkillsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const skillsString = e.target.value;
     // Split by commas and trim each item
-    const expertiseArray = expertiseString
+    const skillsArray = skillsString
       .split(",")
-      .map((item) => item.trim());
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0);
     setFormData((prev) => ({
       ...prev,
-      expertise: expertiseArray,
+      skills: skillsArray,
     }));
   };
 
+  const handleInterestsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const interestsString = e.target.value;
+    // Split by commas and trim each item
+    const interestsArray = interestsString
+      .split(",")
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0);
+    setFormData((prev) => ({
+      ...prev,
+      interests: interestsArray,
+    }));
+  };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -226,7 +296,7 @@ const Profile: React.FC = () => {
       }
 
       const response = await fetch(
-        "http://localhost:8000/api/v1/users/profile",
+        "http://localhost:8000/api/v1/innovator/profile",
         {
           method: "PUT",
           headers: {
@@ -242,8 +312,8 @@ const Profile: React.FC = () => {
         throw new Error(errorData.detail || "Failed to update profile");
       }
 
-      const updatedProfile = await response.json();
-      setProfile(updatedProfile);
+      const result = await response.json();
+      setProfile(result.profile);
       setIsEditing(false);
       setSuccessMessage("Profile updated successfully!");
 
@@ -412,7 +482,6 @@ const Profile: React.FC = () => {
       setExportLoading(false);
     }
   };
-
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -420,13 +489,21 @@ const Profile: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
           <p className="text-gray-600">Loading your profile information...</p>
         </div>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="flex flex-col items-center justify-center h-64 space-y-4">
+          <div className="relative">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent absolute top-0 left-0"></div>
+          </div>
+          <div className="text-center space-y-2">
+            <p className="text-lg font-medium text-gray-700">Loading Profile</p>
+            <p className="text-sm text-gray-500">
+              Fetching your profile data and statistics...
+            </p>
+          </div>
         </div>
       </div>
     );
   }
-
   if (error) {
     return (
       <div className="space-y-6">
@@ -436,19 +513,27 @@ const Profile: React.FC = () => {
             There was a problem loading your profile.
           </p>
         </div>
-        <Card>
-          <CardContent>
-            <div className="bg-red-50 border border-red-200 rounded-md p-4">
-              <div className="flex">
-                <div className="text-red-600 text-sm">❌ Error: {error}</div>
-              </div>
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="text-center py-12">
+            <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+              <span className="text-red-600 text-2xl">⚠️</span>
             </div>
+            <h3 className="text-lg font-semibold text-red-900 mb-2">
+              Profile Load Error
+            </h3>
+            <p className="text-red-700 mb-6">{error}</p>
+            <Button
+              onClick={fetchProfile}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              <span className="mr-2">🔄</span>
+              Try Again
+            </Button>
           </CardContent>
         </Card>
       </div>
     );
   }
-
   if (!profile) {
     return (
       <div className="space-y-6">
@@ -456,186 +541,422 @@ const Profile: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
           <p className="text-gray-600">Profile not found.</p>
         </div>
-        <Card>
-          <CardContent className="text-center py-8">
-            <p className="text-lg mb-4">
-              Unable to find your profile information.
+        <Card className="border-yellow-200 bg-yellow-50">
+          <CardContent className="text-center py-12">
+            <div className="mx-auto w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
+              <span className="text-yellow-600 text-2xl">❓</span>
+            </div>
+            <h3 className="text-lg font-semibold text-yellow-900 mb-2">
+              Profile Not Found
+            </h3>
+            <p className="text-yellow-700 mb-6">
+              Unable to find your profile information. This might be a temporary
+              issue.
             </p>
-            <Button onClick={fetchProfile}>Try Again</Button>
+            <Button
+              onClick={fetchProfile}
+              className="bg-yellow-600 hover:bg-yellow-700"
+            >
+              <span className="mr-2">🔄</span>
+              Try Again
+            </Button>
           </CardContent>
         </Card>
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
+          <p className="text-gray-600 mt-1">
             Manage your personal information and preferences
           </p>
         </div>
+        <div className="flex items-center space-x-3">
+          <div className="text-right">
+            <p className="text-sm text-gray-500">Member since</p>
+            <p className="text-sm font-medium text-gray-900">
+              {new Date(profile.created_at).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+              })}
+            </p>
+          </div>
+        </div>
       </div>
+      {/* Enhanced Success Message */}
       {successMessage && (
-        <div className="bg-green-50 border border-green-200 rounded-md p-4">
-          <div className="flex">
-            <div className="text-green-400">
-              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 shadow-sm">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                <svg
+                  className="h-5 w-5 text-green-600"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
             </div>
             <div className="ml-3">
+              <h4 className="text-sm font-medium text-green-800">Success!</h4>
               <p className="text-sm text-green-700">{successMessage}</p>
             </div>
           </div>
         </div>
       )}
+      {/* Profile Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 hover:shadow-lg transition-all duration-200 cursor-pointer group">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-blue-600 group-hover:text-blue-700">
+                  Total Ideas
+                </p>
+                <p className="text-3xl font-bold text-blue-900">
+                  {stats.total_ideas}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                <span className="text-blue-600 text-xl">💡</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 hover:shadow-lg transition-all duration-200 cursor-pointer group">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-green-600 group-hover:text-green-700">
+                  Total Views
+                </p>
+                <p className="text-3xl font-bold text-green-900">
+                  {stats.total_views}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                <span className="text-green-600 text-xl">👁️</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200 hover:shadow-lg transition-all duration-200 cursor-pointer group">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-purple-600 group-hover:text-purple-700">
+                  Total Interests
+                </p>
+                <p className="text-3xl font-bold text-purple-900">
+                  {stats.total_interests}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                <span className="text-purple-600 text-xl">❤️</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Card */}
         <div className="lg:col-span-2">
+          {" "}
           <ProfileCard
             profile={profile}
             onEdit={() => setIsEditing(true)}
             showEditButton={!isEditing}
-            ideasCount={stats.ideasCount}
-            viewsCount={stats.totalViews}
-            interestsCount={stats.totalInterests}
+            ideasCount={stats.total_ideas}
+            viewsCount={stats.total_views}
+            interestsCount={stats.total_interests}
           />
-        </div>
-
+        </div>{" "}
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Edit Form */}
+          {/* Enhanced Edit Form */}
           {isEditing && (
-            <Card>
+            <Card className="shadow-lg border-blue-200">
               <CardHeader>
-                <CardTitle>Edit Profile</CardTitle>
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200 -mx-6 -mt-6 px-6 pt-6 pb-4 rounded-t-lg">
+                  <CardTitle>
+                    <div className="text-blue-900 flex items-center">
+                      <span className="mr-2">✏️</span>
+                      Edit Profile
+                    </div>
+                  </CardTitle>
+                </div>
               </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      name="full_name"
-                      value={formData.full_name}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter your full name"
-                    />
+              <CardContent className="p-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Full Name
+                      </label>
+                      <input
+                        type="text"
+                        name="full_name"
+                        value={formData.full_name}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        placeholder="Enter your full name"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Username
+                      </label>
+                      <input
+                        type="text"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        placeholder="Choose a username"
+                      />
+                    </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Bio
+                      <span className="text-gray-500 text-xs ml-1">
+                        (Tell people about yourself)
+                      </span>
                     </label>
                     <textarea
                       name="bio"
                       value={formData.bio}
                       onChange={handleInputChange}
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Tell us about yourself"
+                      rows={4}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+                      placeholder="Tell us about yourself, your background, and your innovation interests..."
                     />
                   </div>
 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Location
+                      </label>
+                      <input
+                        type="text"
+                        name="location"
+                        value={formData.location}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        placeholder="City, Country"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Company
+                      </label>
+                      <input
+                        type="text"
+                        name="company"
+                        value={formData.company}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        placeholder="Your company or organization"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Position
+                      </label>
+                      <input
+                        type="text"
+                        name="position"
+                        value={formData.position}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        placeholder="Your job title or role"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Years of Experience
+                      </label>
+                      <input
+                        type="number"
+                        name="experience_years"
+                        value={formData.experience_years}
+                        onChange={handleInputChange}
+                        min="0"
+                        max="50"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        placeholder="Years of experience"
+                      />
+                    </div>
+                  </div>
+
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Location
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Education
                     </label>
                     <input
                       type="text"
-                      name="location"
-                      value={formData.location}
+                      name="education"
+                      value={formData.education}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="City, Country"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      placeholder="Your educational background"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Expertise (comma separated)
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Skills
+                      <span className="text-gray-500 text-xs ml-1">
+                        (comma separated)
+                      </span>
                     </label>
                     <input
                       type="text"
-                      name="expertise"
-                      value={formData.expertise.join(", ")}
-                      onChange={handleExpertiseChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="e.g. AI, Healthcare, Marketing"
+                      value={formData.skills.join(", ")}
+                      onChange={handleSkillsChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      placeholder="e.g. JavaScript, React, AI, Machine Learning"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Website
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Interests
+                      <span className="text-gray-500 text-xs ml-1">
+                        (comma separated)
+                      </span>
                     </label>
                     <input
-                      type="url"
-                      name="website"
-                      value={formData.website}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="https://your-website.com"
+                      type="text"
+                      value={formData.interests.join(", ")}
+                      onChange={handleInterestsChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      placeholder="e.g. Healthcare, FinTech, Sustainability, IoT"
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      LinkedIn
-                    </label>
-                    <input
-                      type="url"
-                      name="linkedin"
-                      value={formData.linkedin}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="https://linkedin.com/in/username"
-                    />
-                  </div>
+                  <div className="border-t pt-4">
+                    <h4 className="text-sm font-medium text-gray-900 mb-4">
+                      Social Links
+                    </h4>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Website URL
+                        </label>
+                        <input
+                          type="url"
+                          name="website_url"
+                          value={formData.website_url}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                          placeholder="https://your-website.com"
+                        />
+                      </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Twitter
-                    </label>
-                    <input
-                      type="url"
-                      name="twitter"
-                      value={formData.twitter}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="https://twitter.com/username"
-                    />
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          LinkedIn URL
+                        </label>
+                        <input
+                          type="url"
+                          name="linkedin_url"
+                          value={formData.linkedin_url}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                          placeholder="https://linkedin.com/in/username"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Twitter URL
+                        </label>
+                        <input
+                          type="url"
+                          name="twitter_url"
+                          value={formData.twitter_url}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                          placeholder="https://twitter.com/username"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          GitHub URL
+                        </label>
+                        <input
+                          type="url"
+                          name="github_url"
+                          value={formData.github_url}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                          placeholder="https://github.com/username"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Phone Number
+                        </label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                          placeholder="+1 (555) 123-4567"
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   {formError && (
-                    <div className="text-red-600 text-sm">
-                      Error: {formError}
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                      <div className="flex items-center">
+                        <span className="text-red-600 mr-2">⚠️</span>
+                        <span className="text-red-700 text-sm font-medium">
+                          Error: {formError}
+                        </span>
+                      </div>
                     </div>
                   )}
 
-                  <div className="flex flex-col space-y-2 pt-4">
+                  <div className="flex flex-col space-y-3 pt-6 border-t">
                     <Button
                       type="submit"
                       disabled={isSaving}
-                      className="w-full"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-medium"
                     >
                       {isSaving ? (
                         <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          Saving...
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                          Saving Changes...
                         </>
                       ) : (
-                        "Save Changes"
+                        <>
+                          <span className="mr-2">💾</span>
+                          Save Changes
+                        </>
                       )}
                     </Button>
                     <Button
@@ -646,16 +967,24 @@ const Profile: React.FC = () => {
                         setFormError(null);
                         // Reset form data to current profile values
                         setFormData({
+                          username: profile.username || "",
                           full_name: profile.full_name || "",
                           bio: profile.bio || "",
                           location: profile.location || "",
-                          website: profile.website || "",
-                          linkedin: profile.linkedin || "",
-                          twitter: profile.twitter || "",
-                          expertise: profile.expertise || [],
+                          company: profile.company || "",
+                          position: profile.position || "",
+                          website_url: profile.website_url || "",
+                          linkedin_url: profile.linkedin_url || "",
+                          twitter_url: profile.twitter_url || "",
+                          github_url: profile.github_url || "",
+                          phone: profile.phone || "",
+                          skills: profile.skills || [],
+                          interests: profile.interests || [],
+                          experience_years: profile.experience_years || 0,
+                          education: profile.education || "",
                         });
                       }}
-                      className="w-full"
+                      className="w-full py-3 text-lg"
                     >
                       Cancel
                     </Button>
@@ -663,290 +992,502 @@ const Profile: React.FC = () => {
                 </form>
               </CardContent>
             </Card>
-          )}
-
-          {/* Account Status */}
-          <Card>
+          )}{" "}
+          {/* Enhanced Account Status */}{" "}
+          <Card className="shadow-lg">
             <CardHeader>
-              <CardTitle>Account Status</CardTitle>
+              <div className="bg-gradient-to-r from-gray-50 to-slate-50 border-b border-gray-200 -mx-6 -mt-6 px-6 pt-6 pb-4 rounded-t-lg">
+                <CardTitle>
+                  <div className="text-gray-900 flex items-center">
+                    <span className="mr-2">📊</span>
+                    Account Status
+                  </div>
+                </CardTitle>
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Status:</span>
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <span className="text-sm font-medium text-gray-700">
+                    Status:
+                  </span>
                   <span
-                    className={`px-3 py-1 text-sm rounded-full ${
+                    className={`px-4 py-2 text-sm font-medium rounded-full ${
                       profile.is_active && !profile.is_blocked
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
+                        ? "bg-green-100 text-green-800 border border-green-200"
+                        : "bg-red-100 text-red-800 border border-red-200"
                     }`}
                   >
                     {profile.is_active && !profile.is_blocked
-                      ? "Active"
-                      : "Inactive"}
+                      ? "✅ Active"
+                      : "❌ Inactive"}
                   </span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Account ID:</span>
-                  <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded">
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <span className="text-sm font-medium text-gray-700">
+                    Account ID:
+                  </span>
+                  <span className="text-xs font-mono bg-white px-3 py-1 rounded border">
                     {profile.id.substring(0, 8)}...
+                  </span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <span className="text-sm font-medium text-gray-700">
+                    Role:
+                  </span>
+                  <span className="text-sm font-medium text-blue-600 capitalize">
+                    {profile.role} Innovator
                   </span>
                 </div>
               </div>
 
-              {/* Status Messages */}
+              {/* Enhanced Status Messages */}
               {profile.is_blocked && (
-                <div className="mt-4 p-4 bg-red-50 rounded-lg">
-                  <p className="text-sm text-red-700">
-                    ⚠️ Your account has been blocked. Please contact support for
-                    assistance.
-                  </p>
+                <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex items-start">
+                    <span className="text-red-600 text-lg mr-3">⚠️</span>
+                    <div>
+                      <h4 className="text-red-800 font-medium mb-1">
+                        Account Blocked
+                      </h4>
+                      <p className="text-sm text-red-700">
+                        Your account has been blocked. Please contact support
+                        for assistance.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
-              {!profile.is_active && (
-                <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
-                  <p className="text-sm text-yellow-700">
-                    ⚠️ Your account is inactive. Please contact support to
-                    reactivate your account.
-                  </p>
+              {!profile.is_active && !profile.is_blocked && (
+                <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div className="flex items-start">
+                    <span className="text-yellow-600 text-lg mr-3">⚠️</span>
+                    <div>
+                      <h4 className="text-yellow-800 font-medium mb-1">
+                        Account Inactive
+                      </h4>
+                      <p className="text-sm text-yellow-700">
+                        Your account is inactive. Please contact support to
+                        reactivate your account.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
               {profile.is_active && !profile.is_blocked && (
-                <div className="mt-4 p-4 bg-green-50 rounded-lg">
-                  <p className="text-sm text-green-700">
-                    ✅ Your account is active and you have full access to all
-                    platform features.
-                  </p>
+                <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-start">
+                    <span className="text-green-600 text-lg mr-3">✅</span>
+                    <div>
+                      <h4 className="text-green-800 font-medium mb-1">
+                        Account Active
+                      </h4>
+                      <p className="text-sm text-green-700">
+                        Your account is active and you have full access to all
+                        platform features.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
             </CardContent>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card>
+          </Card>{" "}
+          {/* Enhanced Quick Actions */}{" "}
+          <Card className="shadow-lg">
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
+              <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-indigo-200 -mx-6 -mt-6 px-6 pt-6 pb-4 rounded-t-lg">
+                <CardTitle>
+                  <div className="text-indigo-900 flex items-center">
+                    <span className="mr-2">⚡</span>
+                    Quick Actions
+                  </div>
+                </CardTitle>
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
+            <CardContent className="p-6">
+              <div className="space-y-3">
                 <Button
-                  className="w-full text-left justify-start"
+                  className="w-full text-left justify-start h-14 bg-white hover:bg-red-50 border-red-200 hover:border-red-300 text-red-700 hover:text-red-800 transition-all duration-200 group"
                   variant="outline"
                   onClick={() => setShowChangePasswordModal(true)}
                 >
-                  <span className="mr-2">🔒</span> Change Password
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-red-100 group-hover:bg-red-200 rounded-full flex items-center justify-center mr-3 transition-colors">
+                      <span className="text-red-600 text-lg">🔒</span>
+                    </div>
+                    <div>
+                      <div className="font-medium">Change Password</div>
+                      <div className="text-xs text-red-600">
+                        Update your account security
+                      </div>
+                    </div>
+                  </div>
                 </Button>
+
                 <Button
-                  className="w-full text-left justify-start"
+                  className="w-full text-left justify-start h-14 bg-white hover:bg-blue-50 border-blue-200 hover:border-blue-300 text-blue-700 hover:text-blue-800 transition-all duration-200 group"
                   variant="outline"
                   onClick={() => setShowNotificationsModal(true)}
                 >
-                  <span className="mr-2">📧</span> Manage Notifications
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-blue-100 group-hover:bg-blue-200 rounded-full flex items-center justify-center mr-3 transition-colors">
+                      <span className="text-blue-600 text-lg">📧</span>
+                    </div>
+                    <div>
+                      <div className="font-medium">Manage Notifications</div>
+                      <div className="text-xs text-blue-600">
+                        Configure your preferences
+                      </div>
+                    </div>
+                  </div>
                 </Button>
+
                 <Button
-                  className="w-full text-left justify-start"
+                  className="w-full text-left justify-start h-14 bg-white hover:bg-green-50 border-green-200 hover:border-green-300 text-green-700 hover:text-green-800 transition-all duration-200 group"
                   variant="outline"
                   onClick={() => setShowExportModal(true)}
                 >
-                  <span className="mr-2">🔄</span> Export My Data
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-green-100 group-hover:bg-green-200 rounded-full flex items-center justify-center mr-3 transition-colors">
+                      <span className="text-green-600 text-lg">📦</span>
+                    </div>
+                    <div>
+                      <div className="font-medium">Export My Data</div>
+                      <div className="text-xs text-green-600">
+                        Download your information
+                      </div>
+                    </div>
+                  </div>
                 </Button>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>{" "}
-      {/* Change Password Modal */}
+      {/* Enhanced Change Password Modal */}
       <Modal
         isOpen={showChangePasswordModal}
         onClose={() => setShowChangePasswordModal(false)}
-        title="Change Password"
+        title="🔒 Change Password"
       >
-        <form onSubmit={handleChangePassword} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Current Password
-            </label>
-            <input
-              type="password"
-              name="currentPassword"
-              value={passwordData.currentPassword}
-              onChange={(e) =>
-                setPasswordData({
-                  ...passwordData,
-                  currentPassword: e.target.value,
-                })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your current password"
-              required
-            />
+        <div className="space-y-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <h4 className="text-blue-800 font-medium mb-2">
+              Password Requirements
+            </h4>
+            <ul className="text-sm text-blue-700 space-y-1">
+              <li>• At least 8 characters long</li>
+              <li>• Include uppercase and lowercase letters</li>
+              <li>• Include at least one number</li>
+              <li>• Include at least one special character</li>
+            </ul>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              New Password
-            </label>
-            <input
-              type="password"
-              name="newPassword"
-              value={passwordData.newPassword}
-              onChange={(e) =>
-                setPasswordData({
-                  ...passwordData,
-                  newPassword: e.target.value,
-                })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter a new password"
-              required
-            />
-          </div>
+          <form onSubmit={handleChangePassword} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Current Password
+              </label>
+              <input
+                type="password"
+                name="currentPassword"
+                value={passwordData.currentPassword}
+                onChange={(e) =>
+                  setPasswordData({
+                    ...passwordData,
+                    currentPassword: e.target.value,
+                  })
+                }
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                placeholder="Enter your current password"
+                required
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Confirm New Password
-            </label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={passwordData.confirmPassword}
-              onChange={(e) =>
-                setPasswordData({
-                  ...passwordData,
-                  confirmPassword: e.target.value,
-                })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Confirm your new password"
-              required
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                New Password
+              </label>
+              <input
+                type="password"
+                name="newPassword"
+                value={passwordData.newPassword}
+                onChange={(e) =>
+                  setPasswordData({
+                    ...passwordData,
+                    newPassword: e.target.value,
+                  })
+                }
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                placeholder="Enter a strong new password"
+                required
+              />
+            </div>
 
-          {passwordError && (
-            <div className="text-red-600 text-sm">Error: {passwordError}</div>
-          )}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Confirm New Password
+              </label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={passwordData.confirmPassword}
+                onChange={(e) =>
+                  setPasswordData({
+                    ...passwordData,
+                    confirmPassword: e.target.value,
+                  })
+                }
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                placeholder="Confirm your new password"
+                required
+              />
+            </div>
 
-          <div className="flex flex-col space-y-2 pt-4">
-            <Button type="submit" disabled={passwordLoading} className="w-full">
-              {passwordLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Changing...
-                </>
-              ) : (
-                "Change Password"
-              )}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setShowChangePasswordModal(false)}
-              className="w-full"
-            >
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </Modal>
-      {/* Manage Notifications Modal */}
+            {passwordError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div className="flex items-center">
+                  <span className="text-red-600 mr-2">⚠️</span>
+                  <span className="text-red-700 text-sm font-medium">
+                    Error: {passwordError}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-col space-y-3 pt-4">
+              <Button
+                type="submit"
+                disabled={passwordLoading}
+                className="w-full bg-red-600 hover:bg-red-700 text-white py-3 text-lg font-medium"
+              >
+                {passwordLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Changing Password...
+                  </>
+                ) : (
+                  <>
+                    <span className="mr-2">🔒</span>
+                    Change Password
+                  </>
+                )}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowChangePasswordModal(false)}
+                className="w-full py-3 text-lg"
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </div>
+      </Modal>{" "}
+      {/* Enhanced Manage Notifications Modal */}
       <Modal
         isOpen={showNotificationsModal}
         onClose={() => setShowNotificationsModal(false)}
-        title="Manage Notifications"
+        title="📧 Manage Notifications"
       >
-        <div className="space-y-4">
-          <Toggle
-            checked={notifications.emailUpdates}
-            onChange={() =>
-              setNotifications({
-                ...notifications,
-                emailUpdates: !notifications.emailUpdates,
-              })
-            }
-            label="Email Updates"
-          />
+        <div className="space-y-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <p className="text-blue-800 text-sm">
+              Configure how you'd like to receive updates about your ideas,
+              investor interest, and platform activity.
+            </p>
+          </div>
 
-          <Toggle
-            checked={notifications.pushNotifications}
-            onChange={() =>
-              setNotifications({
-                ...notifications,
-                pushNotifications: !notifications.pushNotifications,
-              })
-            }
-            label="Push Notifications"
-          />
+          <div className="space-y-4">
+            <div className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+              <Toggle
+                checked={notifications.emailUpdates}
+                onChange={() =>
+                  setNotifications({
+                    ...notifications,
+                    emailUpdates: !notifications.emailUpdates,
+                  })
+                }
+                label="Email Updates"
+              />
+              <p className="text-xs text-gray-500 mt-1 ml-0">
+                Receive email notifications for important updates and activity
+              </p>
+            </div>
 
-          <Toggle
-            checked={notifications.weeklyDigest}
-            onChange={() =>
-              setNotifications({
-                ...notifications,
-                weeklyDigest: !notifications.weeklyDigest,
-              })
-            }
-            label="Weekly Digest"
-          />
+            <div className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+              <Toggle
+                checked={notifications.pushNotifications}
+                onChange={() =>
+                  setNotifications({
+                    ...notifications,
+                    pushNotifications: !notifications.pushNotifications,
+                  })
+                }
+                label="Push Notifications"
+              />
+              <p className="text-xs text-gray-500 mt-1 ml-0">
+                Receive instant browser notifications for real-time updates
+              </p>
+            </div>
 
-          <div className="flex flex-col space-y-2 pt-4">
+            <div className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+              <Toggle
+                checked={notifications.weeklyDigest}
+                onChange={() =>
+                  setNotifications({
+                    ...notifications,
+                    weeklyDigest: !notifications.weeklyDigest,
+                  })
+                }
+                label="Weekly Digest"
+              />
+              <p className="text-xs text-gray-500 mt-1 ml-0">
+                Get a weekly summary of your ideas' performance and platform
+                activity
+              </p>
+            </div>
+
+            <div className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+              <Toggle
+                checked={notifications.investorInterest}
+                onChange={() =>
+                  setNotifications({
+                    ...notifications,
+                    investorInterest: !notifications.investorInterest,
+                  })
+                }
+                label="Investor Interest Alerts"
+              />
+              <p className="text-xs text-gray-500 mt-1 ml-0">
+                Get notified immediately when investors show interest in your
+                ideas
+              </p>
+            </div>
+
+            <div className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+              <Toggle
+                checked={notifications.systemAlerts}
+                onChange={() =>
+                  setNotifications({
+                    ...notifications,
+                    systemAlerts: !notifications.systemAlerts,
+                  })
+                }
+                label="System Alerts"
+              />
+              <p className="text-xs text-gray-500 mt-1 ml-0">
+                Receive notifications about system maintenance and important
+                announcements
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col space-y-3 pt-6 border-t">
             <Button
               onClick={handleNotificationsChange}
               disabled={notificationsLoading}
-              className="w-full"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-medium"
             >
               {notificationsLoading ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Saving...
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  Saving Preferences...
                 </>
               ) : (
-                "Save Changes"
+                <>
+                  <span className="mr-2">💾</span>
+                  Save Preferences
+                </>
               )}
             </Button>
             <Button
               type="button"
               variant="outline"
               onClick={() => setShowNotificationsModal(false)}
-              className="w-full"
+              className="w-full py-3 text-lg"
             >
               Cancel
             </Button>
           </div>
         </div>
-      </Modal>
-      {/* Export Data Modal */}
+      </Modal>{" "}
+      {/* Enhanced Export Data Modal */}
       <Modal
         isOpen={showExportModal}
         onClose={() => setShowExportModal(false)}
-        title="Export My Data"
+        title="📦 Export My Data"
       >
-        <div className="space-y-4">
-          <p className="text-sm text-gray-500">
-            Your data export will include all your profile information, ideas,
-            and activity. A download link will be sent to your registered email
-            address.
-          </p>
+        <div className="space-y-6">
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <h4 className="text-green-800 font-medium mb-2">
+              What's included in your export:
+            </h4>
+            <ul className="text-sm text-green-700 space-y-1">
+              <li>• Complete profile information</li>
+              <li>• All your submitted ideas and descriptions</li>
+              <li>• Ideas engagement analytics</li>
+              <li>• Uploaded files and documents</li>
+              <li>• Account activity history</li>
+            </ul>
+          </div>
 
-          <div className="flex flex-col space-y-2 pt-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-start">
+              <span className="text-blue-600 text-lg mr-3">ℹ️</span>
+              <div>
+                <h4 className="text-blue-800 font-medium mb-1">
+                  Export Process
+                </h4>
+                <p className="text-sm text-blue-700">
+                  Your data export will be processed and compiled into a
+                  comprehensive ZIP file. A secure download link will be sent to
+                  your registered email address within 24 hours.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="flex items-start">
+              <span className="text-yellow-600 text-lg mr-3">⚠️</span>
+              <div>
+                <h4 className="text-yellow-800 font-medium mb-1">
+                  Important Note
+                </h4>
+                <p className="text-sm text-yellow-700">
+                  The download link will expire after 7 days for security
+                  purposes. Make sure to download your data within this
+                  timeframe.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col space-y-3 pt-4">
             <Button
               onClick={handleExportData}
               disabled={exportLoading}
-              className="w-full"
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-lg font-medium"
             >
               {exportLoading ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Exporting...
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  Preparing Export...
                 </>
               ) : (
-                "Export My Data"
+                <>
+                  <span className="mr-2">📦</span>
+                  Export My Data
+                </>
               )}
             </Button>
             <Button
               type="button"
               variant="outline"
               onClick={() => setShowExportModal(false)}
-              className="w-full"
+              className="w-full py-3 text-lg"
             >
               Cancel
             </Button>

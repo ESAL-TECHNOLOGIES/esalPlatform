@@ -77,7 +77,9 @@ const Settings: React.FC = () => {
       setSettings(settingsData);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "An error occurred fetching settings"
+        err instanceof Error
+          ? err.message
+          : "An error occurred fetching settings"
       );
       console.error("Error fetching settings:", err);
     } finally {
@@ -87,32 +89,34 @@ const Settings: React.FC = () => {
 
   const handleNotificationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
-    setSettings(prev => ({
+    setSettings((prev) => ({
       ...prev,
       notifications: {
         ...prev.notifications,
         [name]: checked,
-      }
+      },
     }));
   };
 
-  const handlePrivacyChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handlePrivacyChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     const isCheckbox = e.target.type === "checkbox";
-    
-    setSettings(prev => ({
+
+    setSettings((prev) => ({
       ...prev,
       privacy: {
         ...prev.privacy,
         [name]: isCheckbox ? (e.target as HTMLInputElement).checked : value,
-      }
+      },
     }));
   };
 
   const handleSaveSettings = async () => {
     setIsSaving(true);
     setError(null);
-    
+
     try {
       const token = localStorage.getItem("access_token");
       if (!token) {
@@ -139,12 +143,11 @@ const Settings: React.FC = () => {
       const updatedSettings = await response.json();
       setSettings(updatedSettings);
       setSuccessMessage("Settings saved successfully!");
-      
+
       // Clear success message after 3 seconds
       setTimeout(() => {
         setSuccessMessage(null);
       }, 3000);
-      
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An error occurred saving settings"
@@ -162,7 +165,11 @@ const Settings: React.FC = () => {
   };
 
   const handleDeleteAccount = async () => {
-    if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+    if (
+      window.confirm(
+        "Are you sure you want to delete your account? This action cannot be undone."
+      )
+    ) {
       try {
         const token = localStorage.getItem("access_token");
         if (!token) {
@@ -189,10 +196,11 @@ const Settings: React.FC = () => {
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
         window.location.href = "/login";
-        
       } catch (err) {
         setError(
-          err instanceof Error ? err.message : "An error occurred deleting your account"
+          err instanceof Error
+            ? err.message
+            : "An error occurred deleting your account"
         );
         console.error("Error deleting account:", err);
       }
@@ -217,15 +225,15 @@ const Settings: React.FC = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600">Manage your account settings and preferences</p>
+        <p className="text-gray-600">
+          Manage your account settings and preferences
+        </p>
       </div>
 
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
           <div className="flex">
-            <div className="text-red-600 text-sm">
-              ❌ Error: {error}
-            </div>
+            <div className="text-red-600 text-sm">❌ Error: {error}</div>
           </div>
         </div>
       )}
@@ -302,8 +310,12 @@ const Settings: React.FC = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-medium text-gray-900">Email Notifications</h3>
-                    <p className="text-sm text-gray-500">Receive email notifications for important updates</p>
+                    <h3 className="font-medium text-gray-900">
+                      Email Notifications
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      Receive email notifications for important updates
+                    </p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -316,12 +328,17 @@ const Settings: React.FC = () => {
                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                   </label>
                 </div>
-                
+
                 <div className="border-t pt-4 space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-medium text-gray-900">Comment Notifications</h3>
-                      <p className="text-sm text-gray-500">Receive notifications when someone comments on your ideas</p>
+                      <h3 className="font-medium text-gray-900">
+                        Comment Notifications
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Receive notifications when someone comments on your
+                        ideas
+                      </p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -332,14 +349,21 @@ const Settings: React.FC = () => {
                         onChange={handleNotificationChange}
                         disabled={!settings.notifications.email_notifications}
                       />
-                      <div className={`w-11 h-6 ${settings.notifications.email_notifications ? 'bg-gray-200' : 'bg-gray-100'} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}></div>
+                      <div
+                        className={`w-11 h-6 ${settings.notifications.email_notifications ? "bg-gray-200" : "bg-gray-100"} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}
+                      ></div>
                     </label>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-medium text-gray-900">Interest Notifications</h3>
-                      <p className="text-sm text-gray-500">Receive notifications when someone shows interest in your ideas</p>
+                      <h3 className="font-medium text-gray-900">
+                        Interest Notifications
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Receive notifications when someone shows interest in
+                        your ideas
+                      </p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -350,14 +374,21 @@ const Settings: React.FC = () => {
                         onChange={handleNotificationChange}
                         disabled={!settings.notifications.email_notifications}
                       />
-                      <div className={`w-11 h-6 ${settings.notifications.email_notifications ? 'bg-gray-200' : 'bg-gray-100'} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}></div>
+                      <div
+                        className={`w-11 h-6 ${settings.notifications.email_notifications ? "bg-gray-200" : "bg-gray-100"} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}
+                      ></div>
                     </label>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-medium text-gray-900">Platform Updates</h3>
-                      <p className="text-sm text-gray-500">Receive notifications about platform updates and new features</p>
+                      <h3 className="font-medium text-gray-900">
+                        Platform Updates
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Receive notifications about platform updates and new
+                        features
+                      </p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -368,14 +399,21 @@ const Settings: React.FC = () => {
                         onChange={handleNotificationChange}
                         disabled={!settings.notifications.email_notifications}
                       />
-                      <div className={`w-11 h-6 ${settings.notifications.email_notifications ? 'bg-gray-200' : 'bg-gray-100'} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}></div>
+                      <div
+                        className={`w-11 h-6 ${settings.notifications.email_notifications ? "bg-gray-200" : "bg-gray-100"} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}
+                      ></div>
                     </label>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-medium text-gray-900">Marketing Emails</h3>
-                      <p className="text-sm text-gray-500">Receive marketing and promotional emails about our services</p>
+                      <h3 className="font-medium text-gray-900">
+                        Marketing Emails
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Receive marketing and promotional emails about our
+                        services
+                      </p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -386,17 +424,16 @@ const Settings: React.FC = () => {
                         onChange={handleNotificationChange}
                         disabled={!settings.notifications.email_notifications}
                       />
-                      <div className={`w-11 h-6 ${settings.notifications.email_notifications ? 'bg-gray-200' : 'bg-gray-100'} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}></div>
+                      <div
+                        className={`w-11 h-6 ${settings.notifications.email_notifications ? "bg-gray-200" : "bg-gray-100"} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}
+                      ></div>
                     </label>
                   </div>
                 </div>
               </div>
-              
+
               <div className="mt-6 pt-6 border-t">
-                <Button 
-                  onClick={handleSaveSettings}
-                  disabled={isSaving}
-                >
+                <Button onClick={handleSaveSettings} disabled={isSaving}>
                   {isSaving ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -410,7 +447,6 @@ const Settings: React.FC = () => {
             </CardContent>
           </Card>
         )}
-
         {activeTab === "privacy" && (
           <Card>
             <CardHeader>
@@ -429,19 +465,27 @@ const Settings: React.FC = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="public">Public - Visible to everyone</option>
-                    <option value="registered">Registered Users - Only visible to platform members</option>
-                    <option value="private">Private - Only visible to you</option>
+                    <option value="registered">
+                      Registered Users - Only visible to platform members
+                    </option>
+                    <option value="private">
+                      Private - Only visible to you
+                    </option>
                   </select>
                   <p className="mt-1 text-sm text-gray-500">
                     Control who can see your profile information
                   </p>
                 </div>
-                
+
                 <div className="border-t pt-4">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <h3 className="font-medium text-gray-900">Show Contact Information</h3>
-                      <p className="text-sm text-gray-500">Allow others to see your contact information</p>
+                      <h3 className="font-medium text-gray-900">
+                        Show Contact Information
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Allow others to see your contact information
+                      </p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -454,11 +498,15 @@ const Settings: React.FC = () => {
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                     </label>
                   </div>
-                  
+
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <h3 className="font-medium text-gray-900">Allow Direct Messages</h3>
-                      <p className="text-sm text-gray-500">Allow other users to send you direct messages</p>
+                      <h3 className="font-medium text-gray-900">
+                        Allow Direct Messages
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Allow other users to send you direct messages
+                      </p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -471,11 +519,15 @@ const Settings: React.FC = () => {
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                     </label>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-medium text-gray-900">Show My Ideas</h3>
-                      <p className="text-sm text-gray-500">Make your startup ideas visible in your public profile</p>
+                      <h3 className="font-medium text-gray-900">
+                        Show My Ideas
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Make your startup ideas visible in your public profile
+                      </p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -490,12 +542,9 @@ const Settings: React.FC = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="mt-6 pt-6 border-t">
-                <Button 
-                  onClick={handleSaveSettings}
-                  disabled={isSaving}
-                >
+                <Button onClick={handleSaveSettings} disabled={isSaving}>
                   {isSaving ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -509,7 +558,6 @@ const Settings: React.FC = () => {
             </CardContent>
           </Card>
         )}
-
         {activeTab === "security" && (
           <Card>
             <CardHeader>
@@ -518,7 +566,9 @@ const Settings: React.FC = () => {
             <CardContent>
               <div className="space-y-6">
                 <div>
-                  <h3 className="font-medium text-gray-900 mb-4">Change Password</h3>
+                  <h3 className="font-medium text-gray-900 mb-4">
+                    Change Password
+                  </h3>
                   <form className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -530,7 +580,7 @@ const Settings: React.FC = () => {
                         placeholder="Enter your current password"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         New Password
@@ -541,7 +591,7 @@ const Settings: React.FC = () => {
                         placeholder="Enter new password"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Confirm New Password
@@ -552,15 +602,17 @@ const Settings: React.FC = () => {
                         placeholder="Confirm new password"
                       />
                     </div>
-                    
+
                     <Button type="button" onClick={handleChangePassword}>
                       Change Password
                     </Button>
                   </form>
                 </div>
-                
+
                 <div className="border-t pt-6">
-                  <h3 className="font-medium text-gray-900 mb-4">Two-Factor Authentication</h3>
+                  <h3 className="font-medium text-gray-900 mb-4">
+                    Two-Factor Authentication
+                  </h3>
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-700 mb-1">
@@ -570,31 +622,35 @@ const Settings: React.FC = () => {
                         Protect your account with an additional security layer
                       </p>
                     </div>
-                    <Button variant="outline">
-                      Enable 2FA
-                    </Button>
+                    <Button variant="outline">Enable 2FA</Button>
                   </div>
                 </div>
-                
+
                 <div className="border-t pt-6">
-                  <h3 className="font-medium text-gray-900 mb-4">Session Management</h3>
+                  <h3 className="font-medium text-gray-900 mb-4">
+                    Session Management
+                  </h3>
                   <div>
                     <p className="text-sm text-gray-700 mb-4">
                       You're currently logged in on these devices:
                     </p>
-                    
+
                     <div className="space-y-3">
                       <div className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
                         <div>
                           <p className="font-medium">Current Device</p>
-                          <p className="text-sm text-gray-600">Windows • Chrome • IP: 192.168.1.1</p>
+                          <p className="text-sm text-gray-600">
+                            Windows • Chrome • IP: 192.168.1.1
+                          </p>
                         </div>
                       </div>
-                      
+
                       <div className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
                         <div>
                           <p className="font-medium">Mobile Device</p>
-                          <p className="text-sm text-gray-600">iOS • Safari • Last active: 2 days ago</p>
+                          <p className="text-sm text-gray-600">
+                            iOS • Safari • Last active: 2 days ago
+                          </p>
                         </div>
                         <Button variant="outline" size="sm">
                           Log Out
@@ -606,31 +662,36 @@ const Settings: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-        )}
-
+        )}{" "}
         {activeTab === "danger" && (
           <Card className="border-red-200">
             <CardHeader>
-              <CardTitle className="text-red-600">Danger Zone</CardTitle>
+              <CardTitle>
+                <div className="text-red-600">Danger Zone</div>
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
                 <div>
-                  <h3 className="font-medium text-gray-900 mb-2">Export Your Data</h3>
+                  <h3 className="font-medium text-gray-900 mb-2">
+                    Export Your Data
+                  </h3>
                   <p className="text-sm text-gray-500 mb-4">
-                    Download all your personal data and startup ideas in a portable format
+                    Download all your personal data and startup ideas in a
+                    portable format
                   </p>
-                  <Button variant="outline">
-                    Export My Data
-                  </Button>
+                  <Button variant="outline">Export My Data</Button>
                 </div>
-                
+
                 <div className="border-t pt-6">
-                  <h3 className="font-medium text-red-600 mb-2">Delete Account</h3>
+                  <h3 className="font-medium text-red-600 mb-2">
+                    Delete Account
+                  </h3>
                   <p className="text-sm text-gray-500 mb-4">
-                    Permanently delete your account and all associated data. This action cannot be undone.
+                    Permanently delete your account and all associated data.
+                    This action cannot be undone.
                   </p>
-                  <Button 
+                  <Button
                     variant="outline"
                     className="border-red-300 text-red-600 hover:bg-red-50"
                     onClick={handleDeleteAccount}
