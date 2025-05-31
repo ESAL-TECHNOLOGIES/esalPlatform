@@ -7,18 +7,33 @@ import AIGenerator from "./pages/AIGenerator";
 import Metrics from "./pages/Metrics";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import EmailConfirmed from "./pages/EmailConfirmed";
+// New page imports
+import IdeaDetails from "./pages/IdeaDetails";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import MyIdeas from "./pages/MyIdeas";
 
 const sidebarItems = [
   { label: "Dashboard", href: "/", icon: "📊" },
+  { label: "My Ideas", href: "/my-ideas", icon: "💡" },
   { label: "Upload Idea", href: "/upload", icon: "📤" },
   { label: "AI Generator", href: "/ai-generator", icon: "🤖" },
   { label: "Metrics", href: "/metrics", icon: "📈" },
+  { label: "Profile", href: "/profile", icon: "👤" },
+  { label: "Settings", href: "/settings", icon: "⚙️" },
 ];
 
 // Auth guard component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem("access_token");
   return token ? <>{children}</> : <Navigate to="/login" replace />;
+};
+
+// Auth redirect component - prevents logged-in users from accessing login/signup
+const AuthRedirect = ({ children }: { children: React.ReactNode }) => {
+  const token = localStorage.getItem("access_token");
+  return token ? <Navigate to="/" replace /> : <>{children}</>;
 };
 
 // Auth layout component
@@ -29,18 +44,39 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
 function App() {
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
     // Check for existing token and get user info
     const token = localStorage.getItem("access_token");
     if (token) {
-      // TODO: Fetch user data from backend with token
-      // For now, use placeholder data
-      setUser({
-        name: "John Doe",
-        role: "Innovator",
-        email: "john@example.com",
-      });
+      // Fetch user data from backend with token
+      fetch("http://localhost:8000/api/v1/auth/me", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error("Failed to fetch user data");
+          }
+        })
+        .then((userData) => {
+          setUser({
+            name: userData.full_name || userData.email,
+            role: userData.role,
+            email: userData.email,
+          });
+        })
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+          // Clear invalid token
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("refresh_token");
+          setUser(null);
+        });
     }
     setIsLoading(false);
   }, []);
@@ -62,21 +98,28 @@ function App() {
 
   return (
     <Routes>
+      {/* Public routes */}
+      <Route path="/email-confirmed" element={<EmailConfirmed />} />
+
       {/* Auth routes */}
       <Route
         path="/login"
         element={
-          <AuthLayout>
-            <Login />
-          </AuthLayout>
+          <AuthRedirect>
+            <AuthLayout>
+              <Login />
+            </AuthLayout>
+          </AuthRedirect>
         }
       />
       <Route
         path="/signup"
         element={
-          <AuthLayout>
-            <Signup />
-          </AuthLayout>
+          <AuthRedirect>
+            <AuthLayout>
+              <Signup />
+            </AuthLayout>
+          </AuthRedirect>
         }
       />
 
@@ -105,6 +148,10 @@ function App() {
                 <Route path="/upload" element={<Upload />} />
                 <Route path="/ai-generator" element={<AIGenerator />} />
                 <Route path="/metrics" element={<Metrics />} />
+                <Route path="/ideas/:ideaId" element={<IdeaDetails />} />
+                <Route path="/my-ideas" element={<MyIdeas />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/settings" element={<Settings />} />
               </Routes>
             </Layout>
           </ProtectedRoute>

@@ -1,0 +1,38 @@
+# ESAL Platform Backend - Supabase Only Requirements
+
+# Core Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Validation & Serialization  
+pydantic==2.5.1
+pydantic-settings==2.1.0
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+python-multipart==0.0.6
+PyJWT==2.8.0
+
+# Supabase Integration (Primary Database)
+supabase==2.7.4
+
+# HTTP Client
+httpx>=0.24.0,<0.25.0
+requests==2.31.0
+
+# AI Integration
+google-generativeai==0.3.2
+
+# Environment Variables
+python-dotenv==1.0.0
+
+# Rate Limiting
+slowapi==0.1.9
+
+# Development & Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+
+# Optional: Keep SQLAlchemy for backward compatibility (can be removed)
+# sqlalchemy==2.0.23
+# psycopg2-binary==2.9.9

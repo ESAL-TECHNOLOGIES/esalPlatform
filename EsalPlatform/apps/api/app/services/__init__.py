@@ -1,6 +1,6 @@
 """
 Services module initialization
 """
-from . import auth, gemini_ai, idea_logic
+from . import auth, auth_supabase, gemini_ai, idea_logic
 
-__all__ = ["auth", "gemini_ai", "idea_logic"]
+__all__ = ["auth", "auth_supabase", "gemini_ai", "idea_logic"]

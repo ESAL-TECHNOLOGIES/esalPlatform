@@ -4,7 +4,6 @@ Pydantic schemas for request/response validation
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import datetime
-from uuid import UUID
 
 
 # Base schemas
@@ -19,10 +18,10 @@ class UserCreate(UserBase):
 
 
 class UserResponse(UserBase):
-    id: UUID
+    id: str  # Supabase uses string IDs
     is_active: bool
     is_blocked: bool
-    created_at: datetime
+    created_at: str  # Supabase returns datetime as string
     
     class Config:
         from_attributes = True
@@ -66,7 +65,7 @@ class IdeaUpdate(BaseModel):
 
 class IdeaResponse(IdeaBase):
     id: int
-    user_id: UUID
+    user_id: str  # Changed from UUID to string
     ai_pitch: Optional[str] = None
     status: str
     created_at: datetime
@@ -74,6 +73,11 @@ class IdeaResponse(IdeaBase):
     
     class Config:
         from_attributes = True
+
+
+# Comment schemas
+class CommentCreate(BaseModel):
+    content: str
 
 
 # AI Pitch schemas

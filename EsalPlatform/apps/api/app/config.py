@@ -7,12 +7,24 @@ import os
 
 
 class Settings(BaseSettings):
-    """Application settings"""
-      # Database
-    SUPABASE_URL: str = "https://ppvkucdspgoeqsxxydxg.supabase.co"    # Security: Using only anonymous key for client-side authentication
-    # Service role key is intentionally omitted for security best practices
+    """Application settings"""    # Supabase Configuration (Primary Database)
+    SUPABASE_URL: str = "https://ppvkucdspgoeqsxxydxg.supabase.co"    
     SUPABASE_ANON_KEY: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBwdmt1Y2RzcGdvZXFzeHh5ZHhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxNTkzMzAsImV4cCI6MjA2MzczNTMzMH0.6VVpA6qEcjNPJvPvn0dMh7CUNkNTCYGWsMwb6WS0XGE"
-    DATABASE_URL: str = "sqlite:///./esal_dev.db"  # Default to SQLite for development
+    
+    # Local Database (Optional - can be disabled)
+    USE_LOCAL_DB: bool = False  # Set to False to use only Supabase
+    DATABASE_URL: str = "sqlite:///./esal_dev.db"  # Kept for backward compatibility
+      # Email Configuration (deprecated - email confirmation disabled)
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM_EMAIL: str = "noreply@esalplatform.com"
+    SMTP_FROM_NAME: str = "ESAL Platform"
+    
+    # Site Configuration
+    SITE_URL: str = "http://localhost:3001"
+    # CONFIRM_EMAIL_REDIRECT_URL removed - email confirmation disabled
       # AI APIs
     GEMINI_API_KEY: str = "your-gemini-api-key"
     OPENAI_API_KEY: str = ""  # Optional OpenAI API key

@@ -37,6 +37,14 @@ class AuthService:
                     detail="Authentication service is not available"
                 )
 
+            # Check if user already exists in local database
+            existing_user = self.db.query(User).filter(User.email == user_data.email).first()
+            if existing_user:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="An account with this email already exists. Please use a different email or try logging in."
+                )
+
             # Create user in Supabase Auth
             auth_response = self.supabase.auth.sign_up({
                 "email": user_data.email,
@@ -56,16 +64,24 @@ class AuthService:
                 )
             
             # Create user in local database
-            db_user = User(
-                id=uuid.UUID(auth_response.user.id),
-                email=user_data.email,
-                full_name=user_data.full_name,
-                role=user_data.role
-            )
-            
-            self.db.add(db_user)
-            self.db.commit()
-            self.db.refresh(db_user)
+            try:
+                db_user = User(
+                    id=uuid.UUID(auth_response.user.id),
+                    email=user_data.email,
+                    full_name=user_data.full_name,
+                    role=user_data.role
+                )
+                self.db.add(db_user)
+                self.db.commit()
+                self.db.refresh(db_user)
+            except Exception as db_error:
+                # If local DB creation fails, we should ideally clean up Supabase user
+                # For now, we'll just log and raise an error
+                logger.error(f"Failed to create user in local database: {db_error}")
+                self.db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Account created in authentication service but failed to save locally. Please contact support."                )
             
             # Create JWT token
             access_token = create_access_token({
@@ -79,13 +95,40 @@ class AuthService:
                 token_type="bearer",
                 user=UserResponse.model_validate(db_user)
             )
-            
+        except HTTPException:
+            self.db.rollback()
+            raise
         except Exception as e:
             self.db.rollback()
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Registration failed: {str(e)}"
-            )
+            error_msg = str(e)
+            
+            # Handle specific database errors
+            if "UNIQUE constraint failed: users.email" in error_msg:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="An account with this email already exists. Please use a different email or try logging in."
+                )
+            # Handle specific Supabase errors
+            elif "Email address" in error_msg and "is invalid" in error_msg:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Please provide a valid email address. Avoid using test domains like 'example.com'."
+                )
+            elif "User already registered" in error_msg:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="An account with this email already exists. Please use a different email or try logging in."
+                )
+            elif "Password" in error_msg:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Password must be at least 6 characters long."
+                )
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Registration failed: {error_msg}"
+                )
     
     async def login(self, credentials: UserLogin) -> TokenResponse:
         """Login user with Supabase Auth"""
@@ -125,16 +168,17 @@ class AuthService:
                 "email": db_user.email,
                 "role": db_user.role
             })
-            
             return TokenResponse(
                 access_token=access_token,
                 token_type="bearer",
                 user=UserResponse.model_validate(db_user)
             )
-            
         except HTTPException:
             raise
         except Exception as e:
+            logger.error(f"Login error: {e}")
+            import traceback
+            logger.error(f"Login traceback: {traceback.format_exc()}")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail=f"Login failed: {str(e)}"

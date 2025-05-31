@@ -2,12 +2,18 @@ import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent, Button } from "@esal/ui";
 
 interface RecentIdea {
-  id: string;
+  id: number;
   title: string;
+  problem: string;
+  solution: string;
+  target_market: string;
+  user_id: string;
+  ai_pitch?: string;
   status: string;
   created_at: string;
-  views_count: number;
-  interests_count: number;
+  updated_at: string;
+  views_count?: number;
+  interests_count?: number;
 }
 
 interface DashboardStats {
@@ -19,10 +25,12 @@ interface DashboardStats {
 
 interface UserProfile {
   id: string;
-  name: string;
   email: string;
+  full_name?: string;
   role: string;
-  is_approved: boolean;
+  is_active: boolean;
+  is_blocked: boolean;
+  created_at: string;
 }
 
 const Dashboard: React.FC = () => {
@@ -40,7 +48,6 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     fetchDashboardData();
   }, []);
-
   const fetchDashboardData = async () => {
     setIsLoading(true);
     setError(null);
@@ -56,94 +63,37 @@ const Dashboard: React.FC = () => {
         "Content-Type": "application/json",
       };
 
-      // Fetch user profile
-      const profileResponse = await fetch("http://localhost:8000/api/v1/me", {
-        method: "GET",
-        headers,
-      });
-
-      if (profileResponse.ok) {
-        const profileData = await profileResponse.json();
-        setUserProfile(profileData);
-      }
-
-      // Fetch recent ideas
-      const ideasResponse = await fetch(
-        "http://localhost:8000/api/v1/ideas/my-ideas?page=1&per_page=5",
+      // Fetch dashboard data (includes user profile, ideas, and stats)
+      const dashboardResponse = await fetch(
+        "http://localhost:8000/api/v1/innovator/dashboard",
         {
           method: "GET",
           headers,
         }
       );
 
-      if (ideasResponse.ok) {
-        const ideasData = await ideasResponse.json();
-        setRecentIdeas(ideasData.ideas || []);
+      if (dashboardResponse.ok) {
+        const dashboardData = await dashboardResponse.json();
 
-        // Calculate stats from ideas data
-        const totalIdeas = ideasData.total || 0;
-        const approvedIdeas =
-          ideasData.ideas?.filter(
-            (idea: RecentIdea) =>
-              idea.status === "featured" || idea.status === "active"
-          ).length || 0;
-        const totalViews =
-          ideasData.ideas?.reduce(
-            (sum: number, idea: RecentIdea) => sum + idea.views_count,
-            0
-          ) || 0;
-        const totalInterests =
-          ideasData.ideas?.reduce(
-            (sum: number, idea: RecentIdea) => sum + idea.interests_count,
-            0
-          ) || 0;
+        // Set user profile
+        setUserProfile(dashboardData.user);
 
+        // Set recent ideas
+        setRecentIdeas(dashboardData.recent_ideas || []);
+
+        // Set stats
         setStats({
-          totalIdeas,
-          approvedIdeas,
-          totalViews,
-          totalInterests,
+          totalIdeas: dashboardData.stats.total_ideas,
+          approvedIdeas: dashboardData.stats.active_ideas,
+          totalViews: dashboardData.stats.total_views,
+          totalInterests: dashboardData.stats.total_interests,
         });
       } else {
         throw new Error("Failed to fetch dashboard data");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
-
-      // Fallback to mock data
-      const mockIdeas: RecentIdea[] = [
-        {
-          id: "1",
-          title: "AI-Powered Healthcare App",
-          status: "under_review",
-          created_at: "2024-01-15T10:00:00Z",
-          views_count: 456,
-          interests_count: 12,
-        },
-        {
-          id: "2",
-          title: "Sustainable Energy Solution",
-          status: "active",
-          created_at: "2024-01-10T10:00:00Z",
-          views_count: 342,
-          interests_count: 8,
-        },
-        {
-          id: "3",
-          title: "EdTech Platform",
-          status: "draft",
-          created_at: "2024-01-08T10:00:00Z",
-          views_count: 234,
-          interests_count: 5,
-        },
-      ];
-      setRecentIdeas(mockIdeas);
-      setStats({
-        totalIdeas: 12,
-        approvedIdeas: 8,
-        totalViews: 1032,
-        totalInterests: 25,
-      });
+      // Don't set fallback data - show proper error state instead
     } finally {
       setIsLoading(false);
     }
@@ -229,23 +179,22 @@ const Dashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>{" "}
         <p className="text-gray-600">
-          Welcome back{userProfile?.name ? `, ${userProfile.name}` : ""}! Here's
+          Welcome back
+          {userProfile?.full_name ? `, ${userProfile.full_name}` : ""}! Here's
           what's happening with your startup ideas.
         </p>
-      </div>
-
+      </div>{" "}
       {error && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+        <div className="bg-red-50 border border-red-200 rounded-md p-4">
           <div className="flex">
-            <div className="text-yellow-600 text-sm">
-              ⚠️ Using demo data: {error}
+            <div className="text-red-600 text-sm">
+              ❌ Error loading dashboard data: {error}
             </div>
           </div>
         </div>
       )}
-
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {formatStatsData().map((stat, index) => (
@@ -260,7 +209,6 @@ const Dashboard: React.FC = () => {
           </Card>
         ))}
       </div>
-
       {/* Quick Actions */}
       <Card>
         <CardHeader>
@@ -291,7 +239,6 @@ const Dashboard: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-
       {/* Recent Ideas */}
       <Card>
         <CardHeader>
@@ -313,10 +260,10 @@ const Dashboard: React.FC = () => {
                       </h3>
                       <p className="text-sm text-gray-600">
                         Submitted on {formatDate(idea.created_at)}
-                      </p>
+                      </p>{" "}
                       <div className="mt-2 flex items-center space-x-4 text-sm text-gray-500">
-                        <span>👀 {idea.views_count} views</span>
-                        <span>🤝 {idea.interests_count} interests</span>
+                        <span>👀 {idea.views_count || 0} views</span>
+                        <span>🤝 {idea.interests_count || 0} interests</span>
                       </div>
                     </div>
                     <div className="flex items-center space-x-4">
@@ -352,40 +299,96 @@ const Dashboard: React.FC = () => {
             )}
           </div>
         </CardContent>
-      </Card>
-
+      </Card>{" "}
       {/* User Status & Profile */}
       {userProfile && (
         <Card>
           <CardHeader>
-            <CardTitle>Profile Status</CardTitle>
+            <CardTitle>Profile Information</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Basic Info */}
               <div>
-                <p className="font-medium">{userProfile.name}</p>
-                <p className="text-sm text-gray-600">{userProfile.email}</p>
-                <p className="text-sm text-gray-500 capitalize">
-                  Role: {userProfile.role}
-                </p>
+                <h3 className="text-lg font-medium text-gray-900 mb-3">
+                  Account Details
+                </h3>
+                <div className="space-y-2">
+                  <div>
+                    <span className="text-sm text-gray-500">Name:</span>
+                    <p className="font-medium">
+                      {userProfile.full_name || "Not provided"}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-500">Email:</span>
+                    <p className="font-medium">{userProfile.email}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-500">Role:</span>
+                    <p className="font-medium capitalize">{userProfile.role}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-500">Member since:</span>
+                    <p className="font-medium">
+                      {formatDate(userProfile.created_at)}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="text-right">
-                <span
-                  className={`px-3 py-1 text-sm rounded-full ${
-                    userProfile.is_approved
-                      ? "bg-green-100 text-green-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  }`}
-                >
-                  {userProfile.is_approved ? "Approved" : "Pending Approval"}
-                </span>
+
+              {/* Status Info */}
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-3">
+                  Account Status
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500">Status:</span>
+                    <span
+                      className={`px-3 py-1 text-sm rounded-full ${
+                        userProfile.is_active && !userProfile.is_blocked
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {userProfile.is_active && !userProfile.is_blocked
+                        ? "Active"
+                        : "Inactive"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500">Account ID:</span>
+                    <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded">
+                      {userProfile.id.substring(0, 8)}...
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
-            {!userProfile.is_approved && (
-              <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                <p className="text-sm text-blue-700">
-                  Your account is pending approval. Once approved, you'll have
-                  full access to all platform features.
+
+            {/* Status Messages */}
+            {userProfile.is_blocked && (
+              <div className="mt-4 p-4 bg-red-50 rounded-lg">
+                <p className="text-sm text-red-700">
+                  ⚠️ Your account has been blocked. Please contact support for
+                  assistance.
+                </p>
+              </div>
+            )}
+            {!userProfile.is_active && (
+              <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
+                <p className="text-sm text-yellow-700">
+                  ⚠️ Your account is inactive. Please contact support to
+                  reactivate your account.
+                </p>
+              </div>
+            )}
+            {userProfile.is_active && !userProfile.is_blocked && (
+              <div className="mt-4 p-4 bg-green-50 rounded-lg">
+                <p className="text-sm text-green-700">
+                  ✅ Your account is active and you have full access to all
+                  platform features.
                 </p>
               </div>
             )}

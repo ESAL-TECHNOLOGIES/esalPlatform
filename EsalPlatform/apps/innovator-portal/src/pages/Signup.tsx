@@ -12,6 +12,7 @@ const Signup: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -25,6 +26,7 @@ const Signup: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
+    setSuccess("");
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
@@ -59,14 +61,25 @@ const Signup: React.FC = () => {
         },
         body: JSON.stringify(requestBody),
       });
-
       if (response.ok) {
         const data = await response.json();
-        // Store token in localStorage
+
+        // Store token in localStorage and redirect directly
         localStorage.setItem("access_token", data.access_token);
-        localStorage.setItem("refresh_token", data.refresh_token);
-        // Redirect to dashboard
-        navigate("/");
+        if (data.refresh_token) {
+          localStorage.setItem("refresh_token", data.refresh_token);
+        }
+
+        // Show success message and redirect
+        setSuccess(
+          data.message ||
+            "Account created successfully! Redirecting to dashboard..."
+        );
+
+        // Redirect to dashboard after a short delay
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
       } else if (response.status === 500) {
         // Most likely the backend error with the User.created_at attribute
         console.error("Server error - likely the 'created_at' attribute issue");
@@ -100,7 +113,9 @@ const Signup: React.FC = () => {
       }
     } catch (err) {
       console.error("Network error details:", err);
-      setError(`Network error: ${err.message || "Please try again."}`);
+      setError(
+        `Network error: ${err instanceof Error ? err.message : "Please try again."}`
+      );
     } finally {
       setIsLoading(false);
     }
@@ -121,10 +136,17 @@ const Signup: React.FC = () => {
             <CardTitle>Sign Up</CardTitle>
           </CardHeader>
           <CardContent>
+            {" "}
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
                   {error}
+                </div>
+              )}
+
+              {success && (
+                <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
+                  {success}
                 </div>
               )}
 
@@ -210,7 +232,6 @@ const Signup: React.FC = () => {
                 {isLoading ? "Creating Account..." : "Create Account"}
               </Button>
             </form>
-
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 Already have an account?{" "}

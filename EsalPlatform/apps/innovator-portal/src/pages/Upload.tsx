@@ -3,7 +3,9 @@ import { Card, CardHeader, CardTitle, CardContent, Button } from "@esal/ui";
 
 interface UploadFormData {
   title: string;
-  description: string;
+  problem: string;
+  solution: string;
+  target_market: string;
   industry: string;
   stage: string;
   fundingNeeded: string;
@@ -14,7 +16,9 @@ interface UploadFormData {
 const Upload: React.FC = () => {
   const [formData, setFormData] = useState<UploadFormData>({
     title: "",
-    description: "",
+    problem: "",
+    solution: "",
+    target_market: "",
     industry: "",
     stage: "",
     fundingNeeded: "",
@@ -49,29 +53,23 @@ const Upload: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }
-
-      // Create FormData for file upload
-      const uploadData = new FormData();
-      uploadData.append("title", formData.title);
-      uploadData.append("description", formData.description);
-      uploadData.append("industry", formData.industry);
-      uploadData.append("stage", formData.stage);
-      uploadData.append("funding_needed", formData.fundingNeeded);
-      uploadData.append("team_size", formData.teamSize);
-
-      if (formData.document) {
-        uploadData.append("document", formData.document);
-      }
+      } // Create idea data structure matching backend schema
+      const ideaData = {
+        title: formData.title,
+        problem: formData.problem,
+        solution: formData.solution,
+        target_market: formData.target_market,
+      };
 
       const response = await fetch(
-        "http://localhost:8000/api/v1/ideas/upload",
+        "http://localhost:8000/api/v1/innovator/submit-idea",
         {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
-          body: uploadData,
+          body: JSON.stringify(ideaData),
         }
       );
       if (!response.ok) {
@@ -82,12 +80,12 @@ const Upload: React.FC = () => {
       await response.json(); // Success response
       setSuccessMessage(
         "Idea uploaded successfully! You can now track its progress in your dashboard."
-      );
-
-      // Reset form
+      ); // Reset form
       setFormData({
         title: "",
-        description: "",
+        problem: "",
+        solution: "",
+        target_market: "",
         industry: "",
         stage: "",
         fundingNeeded: "",
@@ -120,23 +118,16 @@ const Upload: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }
-
-      // Create idea data without document for draft
+      } // Create idea data structure matching backend schema
       const draftData = {
         title: formData.title,
-        description: formData.description,
-        industry: formData.industry,
-        stage: formData.stage,
-        funding_needed: formData.fundingNeeded
-          ? parseFloat(formData.fundingNeeded.replace(/[^0-9.]/g, ""))
-          : undefined,
-        team_size: formData.teamSize ? parseInt(formData.teamSize) : undefined,
-        status: "draft",
+        problem: formData.problem,
+        solution: formData.solution,
+        target_market: formData.target_market,
       };
 
       const response = await fetch(
-        "http://localhost:8000/api/v1/ideas/upload",
+        "http://localhost:8000/api/v1/innovator/submit-idea",
         {
           method: "POST",
           headers: {
@@ -236,23 +227,59 @@ const Upload: React.FC = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter your startup name or title"
               />
+            </div>{" "}
+            <div>
+              <label
+                htmlFor="problem"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Problem Statement *
+              </label>
+              <textarea
+                id="problem"
+                name="problem"
+                required
+                rows={3}
+                value={formData.problem}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Describe the specific problem your startup solves"
+              />
             </div>
             <div>
               <label
-                htmlFor="description"
+                htmlFor="solution"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Description *
+                Solution *
               </label>
               <textarea
-                id="description"
-                name="description"
+                id="solution"
+                name="solution"
                 required
-                rows={4}
-                value={formData.description}
+                rows={3}
+                value={formData.solution}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Describe your startup idea, problem it solves, and target market"
+                placeholder="Explain your solution and how it addresses the problem"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="target_market"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Target Market *
+              </label>
+              <input
+                type="text"
+                id="target_market"
+                name="target_market"
+                required
+                value={formData.target_market}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Who is your target market? (e.g., small businesses, students, healthcare providers)"
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -342,13 +369,16 @@ const Upload: React.FC = () => {
                   placeholder="Number of team members"
                 />
               </div>
-            </div>
+            </div>{" "}
             <div>
               <label
                 htmlFor="document"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
                 Upload Pitch Deck or Business Plan
+                <span className="text-sm text-gray-500 ml-2">
+                  (Coming Soon)
+                </span>
               </label>
               <input
                 type="file"
@@ -356,10 +386,12 @@ const Upload: React.FC = () => {
                 name="document"
                 onChange={handleFileChange}
                 accept=".pdf,.ppt,.pptx,.doc,.docx"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 opacity-50"
+                disabled
               />
               <p className="text-xs text-gray-500 mt-1">
-                Supported formats: PDF, PPT, PPTX, DOC, DOCX (Max 10MB)
+                File upload feature will be available in a future update. For
+                now, please include key details in the form above.
               </p>
             </div>{" "}
             <div className="flex space-x-4">

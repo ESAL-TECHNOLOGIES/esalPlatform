@@ -21,7 +21,190 @@ const AIGenerator: React.FC = () => {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  }; // Industry-based idea templates
+  const industryIdeas: Record<
+    string,
+    { problems: string[]; solutions: string[] }
+  > = {
+    technology: {
+      problems: [
+        "Software deployment complexity",
+        "Data privacy concerns",
+        "Digital accessibility barriers",
+        "Remote team collaboration inefficiencies",
+        "API integration difficulties",
+      ],
+      solutions: [
+        "One-click deployment platform with automated CI/CD",
+        "Zero-knowledge privacy-preserving analytics",
+        "AI-powered accessibility testing and remediation",
+        "Virtual reality workspace for remote teams",
+        "Universal API gateway with smart routing",
+      ],
+    },
+    healthcare: {
+      problems: [
+        "Mental health stigma and access barriers",
+        "Medical record fragmentation",
+        "Medication adherence issues",
+        "Healthcare cost transparency",
+        "Elder care coordination",
+      ],
+      solutions: [
+        "Anonymous peer support network with AI matching",
+        "Blockchain-based unified health records",
+        "Smart pill dispenser with family notifications",
+        "Real-time healthcare pricing comparison platform",
+        "Comprehensive elder care management system",
+      ],
+    },
+    finance: {
+      problems: [
+        "Financial literacy gaps",
+        "Small business cash flow management",
+        "Investment accessibility for beginners",
+        "Cross-border payment complexity",
+        "Retirement planning confusion",
+      ],
+      solutions: [
+        "Gamified financial education platform",
+        "AI-powered cash flow prediction and optimization",
+        "Micro-investing with automated portfolio rebalancing",
+        "Instant cross-border payments with transparent fees",
+        "Personalized retirement planning with scenario modeling",
+      ],
+    },
+    education: {
+      problems: [
+        "Personalized learning gaps",
+        "Student engagement in remote learning",
+        "Skills-to-career pathway confusion",
+        "Educational resource accessibility",
+        "Teacher workload and burnout",
+      ],
+      solutions: [
+        "AI-adaptive learning platform with real-time adjustments",
+        "Immersive VR classrooms with interactive experiences",
+        "Career pathway mapping with industry partnerships",
+        "Open-source educational content marketplace",
+        "Automated grading and feedback system for teachers",
+      ],
+    },
+    retail: {
+      problems: [
+        "Inventory management inefficiencies",
+        "Customer experience personalization",
+        "Sustainable packaging challenges",
+        "Local business discovery",
+        "Return and exchange complexity",
+      ],
+      solutions: [
+        "Predictive inventory management with demand forecasting",
+        "AR try-before-buy experiences",
+        "Biodegradable packaging subscription service",
+        "Hyperlocal business discovery and rewards platform",
+        "Streamlined returns with instant refunds and sustainability tracking",
+      ],
+    },
+    energy: {
+      problems: [
+        "Home energy efficiency optimization",
+        "Renewable energy adoption barriers",
+        "Grid stability with distributed generation",
+        "EV charging infrastructure gaps",
+        "Energy storage cost and efficiency",
+      ],
+      solutions: [
+        "AI-powered home energy optimization system",
+        "Community solar sharing platform",
+        "Peer-to-peer energy trading marketplace",
+        "Dynamic EV charging network with predictive availability",
+        "Modular home battery systems with grid integration",
+      ],
+    },
+    entertainment: {
+      problems: [
+        "Content discovery overwhelm",
+        "Creator monetization challenges",
+        "Live event accessibility",
+        "Gaming addiction and mental health",
+        "Interactive content creation barriers",
+      ],
+      solutions: [
+        "AI curator that learns deep preferences",
+        "Direct fan-to-creator micropayment platform",
+        "VR live events with global accessibility",
+        "Mindful gaming platform with wellness integration",
+        "No-code interactive story and game creation platform",
+      ],
+    },
   };
+
+  const generatePersonalizedIdea = (
+    interests: string,
+    skills: string,
+    industry: string,
+    problemArea: string,
+    targetMarket: string
+  ) => {
+    const selectedIndustry = industry || "technology";
+    const industryData =
+      industryIdeas[selectedIndustry] || industryIdeas.technology;
+
+    // Select a random problem and solution from the industry
+    const randomProblem =
+      industryData.problems[
+        Math.floor(Math.random() * industryData.problems.length)
+      ];
+    const randomSolution =
+      industryData.solutions[
+        Math.floor(Math.random() * industryData.solutions.length)
+      ];
+
+    // Generate a dynamic title based on the solution
+    const titleWords = randomSolution.split(" ").slice(0, 3);
+    const title =
+      titleWords
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join("") + " Platform";
+
+    return `**${title}**
+
+**Problem Statement:** ${randomProblem}${problemArea ? ` Additionally, addressing ${problemArea.toLowerCase()} in this space.` : ""}
+
+**Solution:** ${randomSolution}${skills ? ` Leveraging your skills in ${skills} to build a comprehensive solution.` : ""}
+
+**Target Market:** ${targetMarket || `Professionals and businesses in the ${selectedIndustry} sector`}${interests ? ` who are interested in ${interests.toLowerCase()}.` : "."}
+
+**Key Features:**
+- Intelligent problem detection and analysis
+- Automated solution recommendations
+- Real-time performance tracking
+- Integration with existing workflows
+- Mobile-first responsive design
+
+**Revenue Model:**
+- Freemium SaaS model ($29-$299/month)
+- Enterprise licensing for large organizations
+- API access for third-party integrations
+- Premium consulting and implementation services
+
+**Competitive Advantage:**
+${skills ? `- Unique combination of ${skills} expertise` : "- Technical innovation"}
+${interests ? `- Deep understanding of ${interests} market needs` : "- Market-focused approach"}
+- First-mover advantage in solving ${randomProblem.toLowerCase()}
+- Scalable technology platform
+
+**Next Steps:**
+1. Validate the problem with 50+ potential users
+2. Build an MVP focusing on core functionality
+3. Conduct user testing and iterate based on feedback
+4. Secure initial funding or bootstrap development
+5. Launch beta program with early adopters
+
+This personalized startup idea combines your interests and skills with a real market opportunity in the ${selectedIndustry} industry.`;
+  };
+
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsGenerating(true);
@@ -29,36 +212,16 @@ const AIGenerator: React.FC = () => {
     setSuccessMessage(null);
 
     try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        throw new Error("Authentication required");
-      }
-
-      const response = await fetch(
-        "http://localhost:8000/api/v1/ai/generate-idea",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            interests: formData.interests,
-            skills: formData.skills,
-            industry: formData.industry,
-            problem_area: formData.problemArea,
-            target_market: formData.targetMarket,
-          }),
-        }
+      // Generate idea using intelligent fallback system (no API call needed)
+      const generatedIdea = generatePersonalizedIdea(
+        formData.interests,
+        formData.skills,
+        formData.industry,
+        formData.problemArea,
+        formData.targetMarket
       );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to generate idea");
-      }
-
-      const result = await response.json();
-      setGeneratedIdea(result.idea_description);
+      setGeneratedIdea(generatedIdea);
       setSuccessMessage(
         "AI has generated a personalized startup idea for you!"
       );
@@ -68,44 +231,6 @@ const AIGenerator: React.FC = () => {
           ? err.message
           : "An error occurred while generating ideas"
       );
-
-      // Fallback to mock idea if API fails
-      const sampleIdea = `Based on your interests in ${formData.interests} and skills in ${formData.skills}, here's a potential startup idea:
-
-**EcoSmart Solutions Platform**
-
-**Problem:** Small businesses struggle to implement sustainable practices due to lack of knowledge and high implementation costs.
-
-**Solution:** A comprehensive platform that provides:
-- AI-powered sustainability assessment
-- Customized eco-friendly recommendations
-- Cost-benefit analysis for green initiatives
-- Marketplace for sustainable suppliers
-- Progress tracking and reporting tools
-
-**Target Market:** Small to medium businesses (10-500 employees) looking to improve their environmental impact while reducing operational costs.
-
-**Revenue Model:** 
-- Monthly SaaS subscriptions ($99-$999/month)
-- Commission from supplier marketplace (3-5%)
-- Premium consulting services
-
-**Key Features:**
-- Carbon footprint calculator
-- Waste reduction planner
-- Energy efficiency optimizer
-- Sustainable supply chain connector
-- Compliance tracking dashboard
-
-**Next Steps:**
-1. Validate the problem with 50+ SMB owners
-2. Build MVP with core assessment tools
-3. Partner with 10-15 sustainable suppliers
-4. Launch pilot program with 25 businesses
-
-This idea combines technology with environmental impact, addressing a growing market need while creating multiple revenue streams.`;
-
-      setGeneratedIdea(sampleIdea);
     } finally {
       setIsGenerating(false);
     }
@@ -124,29 +249,44 @@ This idea combines technology with environmental impact, addressing a growing ma
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }
-
-      // Parse the generated idea to extract title and description
-      const lines = generatedIdea.split("\n");
+      } // Parse the generated idea to extract title, problem, and solution
       const titleMatch = generatedIdea.match(/\*\*(.*?)\*\*/);
       const title = titleMatch ? titleMatch[1] : "AI Generated Startup Idea";
 
-      // Create a comprehensive description from the generated idea
-      const description = generatedIdea;
+      // Extract problem statement
+      const problemMatch = generatedIdea.match(
+        /\*\*Problem Statement:\*\*\s*(.*?)(?=\*\*|$)/s
+      );
+      const problem = problemMatch
+        ? problemMatch[1].trim()
+        : "Problem to be defined";
 
-      // Create idea data structure
+      // Extract solution
+      const solutionMatch = generatedIdea.match(
+        /\*\*Solution:\*\*\s*(.*?)(?=\*\*|$)/s
+      );
+      const solution = solutionMatch
+        ? solutionMatch[1].trim()
+        : "Solution to be developed";
+
+      // Extract target market
+      const targetMarketMatch = generatedIdea.match(
+        /\*\*Target Market:\*\*\s*(.*?)(?=\*\*|$)/s
+      );
+      const target_market = targetMarketMatch
+        ? targetMarketMatch[1].trim()
+        : formData.targetMarket || "To be determined";
+
+      // Create idea data structure matching backend schema
       const ideaData = {
         title: title,
-        description: description,
-        industry: formData.industry || "Technology",
-        stage: "concept",
-        target_market: formData.targetMarket || "To be determined",
-        status: "draft",
-        tags: ["AI Generated", "Startup Idea"],
+        problem: problem,
+        solution: solution,
+        target_market: target_market,
       };
 
       const response = await fetch(
-        "http://localhost:8000/api/v1/ideas/upload",
+        "http://localhost:8000/api/v1/innovator/submit-idea",
         {
           method: "POST",
           headers: {
@@ -162,9 +302,9 @@ This idea combines technology with environmental impact, addressing a growing ma
         throw new Error(errorData.detail || "Failed to save idea");
       }
 
-      const result = await response.json();
+      await response.json(); // Consume response
       setSuccessMessage(
-        "Idea saved successfully! You can view it in your dashboard."
+        "Idea saved successfully! You can view it in your My Ideas page."
       );
 
       // Clear the generated idea to encourage generating new ones

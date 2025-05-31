@@ -18,11 +18,11 @@ const Login: React.FC = () => {
       [name]: value,
     }));
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
+
     try {
       // API call to backend using JSON endpoint
       const response = await fetch(
@@ -48,7 +48,8 @@ const Login: React.FC = () => {
         navigate("/");
       } else {
         const errorData = await response.json();
-        setError(errorData.detail || "Login failed");
+        const errorMessage = errorData.detail || "Login failed";
+        setError(errorMessage);
       }
     } catch (err) {
       setError("Network error. Please try again.");
@@ -74,13 +75,13 @@ const Login: React.FC = () => {
             <CardTitle>Sign In</CardTitle>
           </CardHeader>
           <CardContent>
+            {" "}
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
                   {error}
                 </div>
               )}
-
               <div>
                 <label
                   htmlFor="email"
@@ -99,7 +100,6 @@ const Login: React.FC = () => {
                   placeholder="Enter your email"
                 />
               </div>
-
               <div>
                 <label
                   htmlFor="password"
@@ -118,12 +118,10 @@ const Login: React.FC = () => {
                   placeholder="Enter your password"
                 />
               </div>
-
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Signing In..." : "Sign In"}
               </Button>
             </form>
-
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 Don't have an account?{" "}
