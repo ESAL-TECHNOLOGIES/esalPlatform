@@ -18,11 +18,22 @@ logger = logging.getLogger(__name__)
 class SupabaseFileService:
     def __init__(self):
         try:
-            self.supabase: Client = create_client(
-                settings.SUPABASE_URL,
-                settings.SUPABASE_ANON_KEY
-            )
-        except Exception as e:
+            # Use service role key for file operations (bypasses RLS)
+            service_key = getattr(settings, 'SUPABASE_SERVICE_ROLE_KEY', None)
+            if service_key:
+                self.supabase: Client = create_client(
+                    settings.SUPABASE_URL,
+                    service_key
+                )
+                logger.info("File service using service role key (bypasses RLS)")
+            else:
+                # Fallback to anon key if service role not available
+                self.supabase: Client = create_client(
+                    settings.SUPABASE_URL,
+                    settings.SUPABASE_ANON_KEY
+                )
+                logger.warning("File service using anon key - may have RLS issues")
+        except Exception as e:            
             logger.error(f"Failed to initialize Supabase client: {e}")
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -34,7 +45,9 @@ class SupabaseFileService:
         user_id: str, 
         file: UploadFile, 
         bucket_name: str = "uploads",
-        folder: str = "ideas"
+        folder: str = "ideas",
+        idea_id: Optional[int] = None,
+        description: Optional[str] = None
     ) -> Dict[str, Any]:
         """Upload a file to Supabase Storage"""
         try:
@@ -80,12 +93,10 @@ class SupabaseFileService:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Failed to upload file to storage"
-                )
-
-            # Get public URL
+                )            # Get public URL (for convenience, not stored in DB)
             public_url = self.supabase.storage.from_(bucket_name).get_public_url(file_path)
-
-            # Save file metadata to database
+            
+            # Save file metadata to database (matching actual schema)
             file_record = {
                 "id": str(uuid.uuid4()),
                 "user_id": user_id,
@@ -94,16 +105,21 @@ class SupabaseFileService:
                 "file_path": file_path,
                 "file_size": file_size,
                 "content_type": content_type,
-                "public_url": public_url,
-                "bucket_name": bucket_name,
-                "uploaded_at": datetime.utcnow().isoformat()
+                "created_at": datetime.utcnow().isoformat()
             }
+              # Add optional fields if provided
+            if idea_id is not None:
+                file_record["idea_id"] = idea_id
+            if description is not None:
+                file_record["description"] = description
 
             # Insert into files table
             db_result = self.supabase.table("files").insert(file_record).execute()
 
             if db_result.data:
-                return db_result.data[0]
+                # Enhance with public URL before returning
+                enhanced_file = await self.enhance_file_with_url(db_result.data[0], bucket_name)
+                return enhanced_file
             else:
                 # If database insert fails, cleanup storage
                 self.supabase.storage.from_(bucket_name).remove([file_path])
@@ -119,28 +135,30 @@ class SupabaseFileService:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to upload file"
-            )
-
-    async def get_user_files(self, user_id: str) -> List[Dict[str, Any]]:
-        """Get all files uploaded by a user"""
+            )    
+        async def get_user_files(self, user_id: str) -> List[Dict[str, Any]]:
+            """Get all files uploaded by a user"""
         try:
-            result = self.supabase.table("files").select("*").eq("user_id", user_id).order("uploaded_at", desc=True).execute()
-            return result.data or []
+            result = self.supabase.table("files").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
+            files = result.data or []
+            # Enhance files with public URLs
+            return await self.enhance_files_with_urls(files)
             
         except Exception as e:
             logger.error(f"Error fetching user files: {e}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to fetch files"
-            )
-
-    async def get_file_by_id(self, file_id: str, user_id: str) -> Optional[Dict[str, Any]]:
-        """Get a specific file by ID (only if user owns it)"""
+            )    
+        async def get_file_by_id(self, file_id: str, user_id: str) -> Optional[Dict[str, Any]]:
+            """Get a specific file by ID (only if user owns it)"""
         try:
             result = self.supabase.table("files").select("*").eq("id", file_id).eq("user_id", user_id).execute()
             
             if result.data:
-                return result.data[0]
+                # Enhance with public URL
+                enhanced_file = await self.enhance_file_with_url(result.data[0])
+                return enhanced_file
             return None
             
         except Exception as e:
@@ -149,17 +167,16 @@ class SupabaseFileService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to fetch file"
             )
-
-    async def delete_file(self, file_id: str, user_id: str) -> bool:
-        """Delete a file and its metadata"""
+        async def delete_file(self, file_id: str, user_id: str, bucket_name: str = "uploads") -> bool:
+            """Delete a file and its metadata"""
         try:
             # Get file info first
             file_info = await self.get_file_by_id(file_id, user_id)
             if not file_info:
                 return False
 
-            # Delete from storage
-            storage_result = self.supabase.storage.from_(file_info["bucket_name"]).remove([file_info["file_path"]])
+            # Delete from storage using the file_path
+            storage_result = self.supabase.storage.from_(bucket_name).remove([file_info["file_path"]])
             
             # Delete from database
             db_result = self.supabase.table("files").delete().eq("id", file_id).eq("user_id", user_id).execute()
@@ -171,10 +188,9 @@ class SupabaseFileService:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to delete file"
-            )
-
-    async def associate_file_with_idea(self, file_id: str, idea_id: str, user_id: str) -> bool:
-        """Associate a file with an idea"""
+            )    
+        async def associate_file_with_idea(self, file_id: str, idea_id: str, user_id: str) -> bool:
+            """Associate a file with an idea"""
         try:
             # Verify the user owns both the file and the idea
             file_info = await self.get_file_by_id(file_id, user_id)
@@ -183,8 +199,7 @@ class SupabaseFileService:
 
             # Update file record to include idea_id
             result = self.supabase.table("files").update({
-                "idea_id": idea_id,
-                "updated_at": datetime.utcnow().isoformat()
+                "idea_id": idea_id
             }).eq("id", file_id).eq("user_id", user_id).execute()
             
             return len(result.data) > 0
@@ -193,15 +208,39 @@ class SupabaseFileService:
             logger.error(f"Error associating file with idea: {e}")
             return False
 
-    async def get_idea_files(self, idea_id: str, user_id: str) -> List[Dict[str, Any]]:
-        """Get all files associated with an idea"""
-        try:
-            result = self.supabase.table("files").select("*").eq("idea_id", idea_id).eq("user_id", user_id).execute()
-            return result.data or []
-            
-        except Exception as e:
-            logger.error(f"Error fetching idea files: {e}")
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to fetch idea files"
-            )
+        async def get_idea_files(self, idea_id: str, user_id: str) -> List[Dict[str, Any]]:
+            """Get all files associated with an idea"""
+            try:
+                result = self.supabase.table("files").select("*").eq("idea_id", idea_id).eq("user_id", user_id).execute()
+                files = result.data or []
+                # Enhance files with public URLs
+                return await self.enhance_files_with_urls(files)
+
+            except Exception as e:
+                logger.error(f"Error fetching idea files: {e}")
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Failed to fetch idea files"
+                )
+
+        async def get_file_url(self, file_path: str, bucket_name: str = "uploads") -> str:
+            """Get public URL for a file"""
+            try:
+                return self.supabase.storage.from_(bucket_name).get_public_url(file_path)
+            except Exception as e:
+                logger.error(f"Error getting file URL: {e}")
+                return ""
+
+    async def enhance_file_with_url(self, file_record: Dict[str, Any], bucket_name: str = "uploads") -> Dict[str, Any]:
+        """Add public_url to file record"""
+        if file_record and "file_path" in file_record:
+            file_record["public_url"] = await self.get_file_url(file_record["file_path"], bucket_name)
+        return file_record
+
+    async def enhance_files_with_urls(self, files: List[Dict[str, Any]], bucket_name: str = "uploads") -> List[Dict[str, Any]]:
+        """Add public_urls to list of file records"""
+        enhanced_files = []
+        for file_record in files:
+            enhanced_file = await self.enhance_file_with_url(file_record, bucket_name)
+            enhanced_files.append(enhanced_file)
+        return enhanced_files

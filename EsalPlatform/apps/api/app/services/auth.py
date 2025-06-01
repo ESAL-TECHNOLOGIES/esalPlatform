@@ -20,10 +20,21 @@ class AuthService:
     def __init__(self, db: Session):
         self.db = db
         try:
-            self.supabase: Client = create_client(
-                settings.SUPABASE_URL,
-                settings.SUPABASE_ANON_KEY
-            )
+            # Use service role key for auth operations (bypasses RLS)
+            service_key = getattr(settings, 'SUPABASE_SERVICE_ROLE_KEY', None)
+            if service_key:
+                self.supabase: Client = create_client(
+                    settings.SUPABASE_URL,
+                    service_key
+                )
+                logger.info("Auth service using service role key (bypasses RLS)")
+            else:
+                # Fallback to anon key if service role not available
+                self.supabase: Client = create_client(
+                    settings.SUPABASE_URL,
+                    settings.SUPABASE_ANON_KEY
+                )
+                logger.warning("Auth service using anon key - may have RLS issues")
         except Exception as e:
             logger.warning(f"Failed to initialize Supabase client: {e}")
             self.supabase = None

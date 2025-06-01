@@ -2,7 +2,7 @@
 Pydantic schemas for request/response validation
 """
 from pydantic import BaseModel, EmailStr
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from datetime import datetime
 
 
@@ -172,3 +172,32 @@ class AIJudgeResponse(BaseModel):
     
     class Config:
         from_attributes = True
+
+
+# User Management schemas
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
+class NotificationPreferences(BaseModel):
+    emailUpdates: bool = True
+    pushNotifications: bool = False
+    weeklyDigest: bool = True
+    investorInterest: bool = True
+    systemAlerts: bool = False
+
+
+class UserSettings(BaseModel):
+    theme: str = "light"
+    language: str = "en"
+    timezone: str = "UTC"
+    notifications: NotificationPreferences = NotificationPreferences()
+
+
+class UserDataExport(BaseModel):
+    profile: Dict[str, Any]
+    ideas: List[Dict[str, Any]]
+    activities: List[Dict[str, Any]]
+    settings: Dict[str, Any]
+    export_date: str

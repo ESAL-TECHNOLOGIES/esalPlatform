@@ -12,19 +12,24 @@ load_dotenv()
 async def apply_migrations():
     """Apply database migrations to Supabase"""
     
-    # Get Supabase credentials
+    # Get Supabase credentials - prefer service role key for migrations
     supabase_url = os.getenv("SUPABASE_URL")
-    supabase_key = os.getenv("SUPABASE_ANON_KEY")
+    service_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+    anon_key = os.getenv("SUPABASE_ANON_KEY")
+    
+    # Use service role key if available, fallback to anon key
+    supabase_key = service_key if service_key else anon_key
+    key_type = "service role" if service_key else "anon"
     
     if not supabase_url or not supabase_key:
-        print("❌ Error: SUPABASE_URL and SUPABASE_ANON_KEY must be set in .env file")
+        print("❌ Error: SUPABASE_URL and either SUPABASE_SERVICE_ROLE_KEY or SUPABASE_ANON_KEY must be set in .env file")
         return False
     
     try:
         # Create Supabase client
         supabase: Client = create_client(supabase_url, supabase_key)
         
-        print("🔗 Connected to Supabase")
+        print(f"🔗 Connected to Supabase using {key_type} key")
         print("📋 Database migrations should be applied manually in Supabase SQL editor")
         print("📁 Migration file: supabase_migrations.sql")
         print("")

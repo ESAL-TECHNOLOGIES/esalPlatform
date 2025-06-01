@@ -2,6 +2,7 @@
 Innovator router - Supabase + AI integration
 """
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
+from fastapi.security import HTTPBearer
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import logging
@@ -32,6 +33,7 @@ else:
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+security = HTTPBearer()
 
 
 @router.post("/submit-idea", response_model=IdeaResponse)
@@ -41,11 +43,16 @@ async def submit_idea(
 ):
     """Submit a new innovation idea"""
     try:
+        logger.info(f"User {current_user.id} submitting idea: {idea_data.title}")
+        logger.debug(f"Idea data: {idea_data.model_dump()}")
+        
         ideas_service = SupabaseIdeasService()
         idea = await ideas_service.create_idea(current_user.id, idea_data)
+        
+        logger.info(f"Successfully created idea {idea.get('id')} for user {current_user.id}")
         return idea
     except Exception as e:
-        logger.error(f"Error creating idea: {str(e)}")
+        logger.error(f"Error creating idea for user {current_user.id}: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
@@ -260,16 +267,52 @@ async def delete_file(
 # Profile Management Endpoints
 @router.get("/profile")
 async def get_profile(
-    current_user: UserResponse = Depends(require_role("innovator"))
+    current_user: UserResponse = Depends(require_role("innovator")),
+    token = Depends(security)
 ):
     """Get user profile information"""
     try:
-        profile_service = SupabaseProfileService()
+        # Extract token string from HTTPBearer object
+        token_str = token.credentials
+        profile_service = SupabaseProfileService(user_token=token_str)
         profile = await profile_service.get_or_create_profile(current_user.id, {
             "email": current_user.email,
-            "username": current_user.username or current_user.email.split("@")[0]
+            "full_name": current_user.full_name or "",
+            "username": current_user.email.split("@")[0],
+            "role": current_user.role
         })
-        return {"profile": profile}
+        
+        # Ensure profile has all the fields frontend expects
+        complete_profile = {
+            "id": profile.get("id", current_user.id),
+            "email": current_user.email,
+            "username": profile.get("username") or current_user.email.split("@")[0],
+            "full_name": profile.get("full_name") or current_user.full_name or "",
+            "role": current_user.role,
+            "bio": profile.get("bio"),
+            "location": profile.get("location"),
+            "company": profile.get("company"),
+            "position": profile.get("position"),
+            "skills": profile.get("skills", []),
+            "interests": profile.get("interests", []),
+            "website_url": profile.get("website_url"),
+            "linkedin_url": profile.get("linkedin_url"),
+            "twitter_url": profile.get("twitter_url"),
+            "github_url": profile.get("github_url"),
+            "phone": profile.get("phone"),
+            "avatar_url": profile.get("avatar_url"),
+            "experience_years": profile.get("experience_years", 0),
+            "education": profile.get("education"),
+            "total_ideas": 0,  # Will be populated by frontend from dashboard
+            "total_views": 0,
+            "total_interests": 0,
+            "is_active": True,
+            "is_blocked": False,
+            "created_at": profile.get("created_at"),
+            "updated_at": profile.get("updated_at")
+        }
+        
+        return {"profile": complete_profile}
     except Exception as e:
         logger.error(f"Error fetching profile: {str(e)}")
         raise HTTPException(
@@ -281,11 +324,14 @@ async def get_profile(
 @router.put("/profile")
 async def update_profile(
     profile_data: dict,
-    current_user: UserResponse = Depends(require_role("innovator"))
+    current_user: UserResponse = Depends(require_role("innovator")),
+    token = Depends(security)
 ):
     """Update user profile information"""
     try:
-        profile_service = SupabaseProfileService()
+        # Extract token string from HTTPBearer object
+        token_str = token.credentials
+        profile_service = SupabaseProfileService(user_token=token_str)
         profile = await profile_service.update_profile(current_user.id, profile_data)
         return {"profile": profile}
     except Exception as e:
@@ -299,11 +345,15 @@ async def update_profile(
 @router.post("/profile/avatar")
 async def upload_avatar(
     file: UploadFile = File(...),
-    current_user: UserResponse = Depends(require_role("innovator"))
+    current_user: UserResponse = Depends(require_role("innovator")),
+    token = Depends(security)
 ):
     """Upload user avatar"""
     try:
-        profile_service = SupabaseProfileService()
+        # Extract token string from HTTPBearer object
+        token_str = token.credentials
+        logger.info(f"Token extracted: {token_str[:20]}...")
+        profile_service = SupabaseProfileService(user_token=token_str)
         
         # Read file content
         file_content = await file.read()

@@ -6,6 +6,7 @@ from supabase import create_client, Client
 from fastapi import HTTPException, status
 from typing import Dict, Any, Optional
 import logging
+from datetime import datetime
 
 from app.config import settings
 from app.schemas import UserCreate, UserLogin, TokenResponse, UserResponse
@@ -17,10 +18,21 @@ logger = logging.getLogger(__name__)
 class SupabaseAuthService:     
     def __init__(self):       
         try:
-            self.supabase: Client = create_client(
-                settings.SUPABASE_URL,
-                settings.SUPABASE_ANON_KEY
-            )
+            # Use service role key for auth operations (bypasses RLS)
+            service_key = getattr(settings, 'SUPABASE_SERVICE_ROLE_KEY', None)
+            if service_key:
+                self.supabase: Client = create_client(
+                    settings.SUPABASE_URL,
+                    service_key
+                )
+                logger.info("Auth service using service role key (bypasses RLS)")
+            else:
+                # Fallback to anon key if service role not available
+                self.supabase: Client = create_client(
+                    settings.SUPABASE_URL,
+                    settings.SUPABASE_ANON_KEY
+                )
+                logger.warning("Auth service using anon key - may have RLS issues")
         except Exception as e:
             logger.error(f"Failed to initialize Supabase client: {e}")
             raise HTTPException(
@@ -237,3 +249,30 @@ class SupabaseAuthService:
     async def unblock_user(self, user_id: str) -> bool:
         """Unblock a user by updating their metadata"""
         return await self.update_user_metadata(user_id, {"is_blocked": False})
+    
+    async def change_password(self, current_password: str, new_password: str) -> bool:
+        """Change user password in Supabase"""
+        try:
+            # Update password using Supabase auth
+            response = self.supabase.auth.update_user({
+                "password": new_password
+            })
+            
+            return response.user is not None
+            
+        except Exception as e:
+            logger.error(f"Error changing password: {e}")
+            return False
+    
+    async def delete_user_account(self, user_id: str) -> bool:
+        """Soft delete user account by marking as deleted"""
+        try:
+            # Mark user as deleted in metadata (soft delete)
+            return await self.update_user_metadata(user_id, {
+                "is_deleted": True,
+                "deleted_at": datetime.now().isoformat()
+            })
+            
+        except Exception as e:
+            logger.error(f"Error deleting user account: {e}")
+            return False

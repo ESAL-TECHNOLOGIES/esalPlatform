@@ -47,17 +47,29 @@ class TokenResponse(BaseModel):
 # Ideas schemas
 class IdeaBase(BaseModel):
     title: str
-    description: str
-    industry: str
-    stage: str
-    target_market: str
+    description: Optional[str] = None
+    industry: Optional[str] = None
+    stage: Optional[str] = None
+    target_market: Optional[str] = None
     funding_needed: Optional[str] = None
     problem: Optional[str] = None
     solution: Optional[str] = None
 
 
-class IdeaCreate(IdeaBase):
-    pass
+class IdeaCreate(BaseModel):
+    title: str
+    problem: Optional[str] = None
+    solution: Optional[str] = None
+    target_market: Optional[str] = None
+    # Allow additional optional fields that frontend might send
+    description: Optional[str] = None
+    industry: Optional[str] = None
+    stage: Optional[str] = None
+    funding_needed: Optional[str] = None
+    category: Optional[str] = None
+    tags: Optional[List[str]] = None
+    status: Optional[str] = None
+    visibility: Optional[str] = None
 
 
 class IdeaUpdate(IdeaBase):
@@ -229,3 +241,32 @@ class AIJudgeResponse(BaseModel):
     
     class Config:
         from_attributes = True
+
+
+# User Management schemas
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
+class NotificationPreferences(BaseModel):
+    emailUpdates: bool = True
+    pushNotifications: bool = False
+    weeklyDigest: bool = True
+    investorInterest: bool = True
+    systemAlerts: bool = False
+
+
+class UserSettings(BaseModel):
+    theme: str = "light"
+    language: str = "en"
+    timezone: str = "UTC"
+    notifications: NotificationPreferences = NotificationPreferences()
+
+
+class UserDataExport(BaseModel):
+    profile: Dict[str, Any]
+    ideas: List[Dict[str, Any]]
+    activities: List[Dict[str, Any]]
+    settings: Dict[str, Any]
+    export_date: str

@@ -22,6 +22,7 @@ interface UserProfile {
 interface ProfileCardProps {
   profile: UserProfile;
   onEdit?: () => void;
+  onAvatarEdit?: () => void;
   showEditButton?: boolean;
   ideasCount?: number;
   viewsCount?: number;
@@ -31,6 +32,7 @@ interface ProfileCardProps {
 const ProfileCard: React.FC<ProfileCardProps> = ({
   profile,
   onEdit,
+  onAvatarEdit,
   showEditButton = true,
   ideasCount = 0,
   viewsCount = 0,

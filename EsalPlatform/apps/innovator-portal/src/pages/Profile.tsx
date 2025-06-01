@@ -166,6 +166,13 @@ const Profile: React.FC = () => {
   // Export state
   const [exportLoading, setExportLoading] = useState(false);
 
+  // Avatar upload state
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState("");
+
   useEffect(() => {
     fetchProfile();
   }, []);
@@ -482,6 +489,98 @@ const Profile: React.FC = () => {
       setExportLoading(false);
     }
   };
+
+  // Avatar upload handlers
+  const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        setAvatarError("Please select an image file");
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setAvatarError("File size must be less than 5MB");
+        return;
+      }
+
+      setAvatarFile(file);
+      setAvatarError("");
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setAvatarPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAvatarUpload = async () => {
+    if (!avatarFile) return;
+
+    setAvatarUploading(true);
+    setAvatarError("");
+
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Authentication required");
+      }
+
+      const formData = new FormData();
+      formData.append("file", avatarFile);
+
+      const response = await fetch(
+        "http://localhost:8000/api/v1/innovator/profile/avatar",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to upload avatar");
+      }
+
+      const result = await response.json();
+
+      // Update profile with new avatar URL
+      if (profile) {
+        setProfile({
+          ...profile,
+          avatar_url: result.avatar_url,
+        });
+      }
+
+      setShowAvatarModal(false);
+      setAvatarFile(null);
+      setAvatarPreview(null);
+      setSuccessMessage("Profile picture updated successfully!");
+
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+    } catch (err) {
+      setAvatarError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred uploading avatar"
+      );
+      console.error("Error uploading avatar:", err);
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
+  // Preview avatar image before upload - This function is now replaced by handleAvatarFileChange above
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -1123,7 +1222,6 @@ const Profile: React.FC = () => {
                     </div>
                   </div>
                 </Button>
-
                 <Button
                   className="w-full text-left justify-start h-14 bg-white hover:bg-blue-50 border-blue-200 hover:border-blue-300 text-blue-700 hover:text-blue-800 transition-all duration-200 group"
                   variant="outline"
@@ -1140,8 +1238,24 @@ const Profile: React.FC = () => {
                       </div>
                     </div>
                   </div>
+                </Button>{" "}
+                <Button
+                  className="w-full text-left justify-start h-14 bg-white hover:bg-purple-50 border-purple-200 hover:border-purple-300 text-purple-700 hover:text-purple-800 transition-all duration-200 group"
+                  variant="outline"
+                  onClick={() => setShowAvatarModal(true)}
+                >
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-purple-100 group-hover:bg-purple-200 rounded-full flex items-center justify-center mr-3 transition-colors">
+                      <span className="text-purple-600 text-lg">📸</span>
+                    </div>
+                    <div>
+                      <div className="font-medium">Update Avatar</div>
+                      <div className="text-xs text-purple-600">
+                        Change your profile picture
+                      </div>
+                    </div>
+                  </div>
                 </Button>
-
                 <Button
                   className="w-full text-left justify-start h-14 bg-white hover:bg-green-50 border-green-200 hover:border-green-300 text-green-700 hover:text-green-800 transition-all duration-200 group"
                   variant="outline"
@@ -1487,6 +1601,93 @@ const Profile: React.FC = () => {
               type="button"
               variant="outline"
               onClick={() => setShowExportModal(false)}
+              className="w-full py-3 text-lg"
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </Modal>{" "}
+      {/* Enhanced Avatar Upload Modal */}
+      <Modal
+        isOpen={showAvatarModal}
+        onClose={() => setShowAvatarModal(false)}
+        title="📸 Update Avatar"
+      >
+        <div className="space-y-4">
+          <div className="flex flex-col items-center">
+            {avatarPreview ? (
+              <div className="w-32 h-32 rounded-full overflow-hidden border border-gray-200 mb-4">
+                <img
+                  src={avatarPreview}
+                  alt="Avatar Preview"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ) : (
+              <div className="w-32 h-32 rounded-full bg-gray-100 border border-gray-200 mb-4 flex items-center justify-center">
+                <span className="text-gray-400 text-3xl">📷</span>
+              </div>
+            )}
+            <Button
+              onClick={() => document.getElementById("avatar-upload")?.click()}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-medium"
+            >
+              {avatarUploading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <span className="mr-2">⬆️</span>
+                  Upload Avatar
+                </>
+              )}
+            </Button>{" "}
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarFileChange}
+              className="hidden"
+              title="Upload Avatar Image"
+            />
+          </div>
+
+          {avatarError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex items-center">
+                <span className="text-red-600 mr-2">⚠️</span>
+                <span className="text-red-700 text-sm font-medium">
+                  Error: {avatarError}
+                </span>
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-col space-y-3 pt-4">
+            <Button
+              onClick={handleAvatarUpload}
+              disabled={avatarUploading}
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-lg font-medium"
+            >
+              {avatarUploading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  Uploading Avatar...
+                </>
+              ) : (
+                <>
+                  <span className="mr-2">✅</span>
+                  Save Avatar
+                </>
+              )}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowAvatarModal(false)}
               className="w-full py-3 text-lg"
             >
               Cancel
