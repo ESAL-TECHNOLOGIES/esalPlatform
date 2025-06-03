@@ -445,7 +445,6 @@ const Profile: React.FC = () => {
       setNotificationsLoading(false);
     }
   };
-
   // Export data handler
   const handleExportData = async () => {
     setExportLoading(true);
@@ -462,7 +461,6 @@ const Profile: React.FC = () => {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
           },
         }
       );
@@ -472,11 +470,34 @@ const Profile: React.FC = () => {
         throw new Error(errorData.detail || "Failed to export data");
       }
 
-      // Data export successful
+      // Get the ZIP file as blob
+      const blob = await response.blob();
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+
+      // Generate filename with timestamp
+      const timestamp = new Date()
+        .toISOString()
+        .slice(0, 19)
+        .replace(/[:-]/g, "");
+      link.download = `esal_data_export_${timestamp}.zip`;
+
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      // Show success message
       setExportLoading(false);
       setShowExportModal(false);
       setSuccessMessage(
-        "Data export initiated. Check your email for the download link."
+        "Data export completed successfully! Your ZIP file has been downloaded."
       );
 
       // Clear success message after 3 seconds
@@ -485,6 +506,10 @@ const Profile: React.FC = () => {
       }, 3000);
     } catch (err) {
       console.error("Error exporting data:", err);
+      setSuccessMessage("Failed to export data. Please try again.");
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
     } finally {
       setExportLoading(false);
     }
@@ -1553,11 +1578,11 @@ const Profile: React.FC = () => {
               <div>
                 <h4 className="text-blue-800 font-medium mb-1">
                   Export Process
-                </h4>
+                </h4>{" "}
                 <p className="text-sm text-blue-700">
-                  Your data export will be processed and compiled into a
-                  comprehensive ZIP file. A secure download link will be sent to
-                  your registered email address within 24 hours.
+                  Your data will be compiled into a comprehensive ZIP file and
+                  downloaded automatically to your device. The download will
+                  start immediately after clicking the export button.
                 </p>
               </div>
             </div>
@@ -1569,11 +1594,12 @@ const Profile: React.FC = () => {
               <div>
                 <h4 className="text-yellow-800 font-medium mb-1">
                   Important Note
-                </h4>
+                </h4>{" "}
                 <p className="text-sm text-yellow-700">
-                  The download link will expire after 7 days for security
-                  purposes. Make sure to download your data within this
-                  timeframe.
+                  The ZIP file contains all your data in JSON format plus a
+                  README file with instructions. File download URLs are included
+                  for accessing your uploaded documents stored in our secure
+                  cloud storage.
                 </p>
               </div>
             </div>

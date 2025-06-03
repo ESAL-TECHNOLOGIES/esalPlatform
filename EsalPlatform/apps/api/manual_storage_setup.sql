@@ -5,7 +5,7 @@
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types) 
 VALUES 
     ('avatars', 'avatars', true, 5242880, ARRAY['image/*']),  -- 5MB limit for avatars
-    ('uploads', 'uploads', false, 10485760, NULL)  -- 10MB limit for general uploads
+    ('uploads', 'uploads', false, 3145728, NULL)  -- 3MB limit for general uploads
 ON CONFLICT (id) DO NOTHING;
 
 -- 2. Enable RLS on storage.objects if not already enabled

@@ -15,6 +15,11 @@ interface AIResponse {
   suggestions?: string[];
   confidence_score?: number;
   generated_at: string;
+  metadata?: {
+    saved_to_database?: boolean;
+    saved_idea_id?: string;
+    [key: string]: any;
+  };
 }
 
 interface AIJudgment {
@@ -33,7 +38,6 @@ const AIGenerator: React.FC = () => {
   const [activeTab, setActiveTab] = useState<
     "generate" | "finetune" | "judge" | "recommendations"
   >("generate");
-
   // Form states for different tabs
   const [generateForm, setGenerateForm] = useState({
     interests: "",
@@ -41,6 +45,7 @@ const AIGenerator: React.FC = () => {
     industry: "",
     problem_area: "",
     target_market: "",
+    save_to_database: true,
   });
 
   const [finetuneForm, setFinetuneForm] = useState({
@@ -330,6 +335,82 @@ const AIGenerator: React.FC = () => {
     setSuccessMessage(null);
     setError(null);
   };
+
+  // Handle manual save of AI-generated idea
+  const handleSaveIdeaManually = async () => {
+    if (!aiResponse || !aiResponse.response_text) {
+      setError("No AI-generated idea to save");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Authentication required");
+      }
+
+      // Parse the AI response to extract meaningful parts for idea creation
+      const aiText = aiResponse.response_text;
+
+      // Try to extract title from the AI response (look for bold text or first line)
+      const titleMatch =
+        aiText.match(/\*\*(.*?)\*\*/) || aiText.match(/^([^\n]+)/);
+      const extractedTitle = titleMatch
+        ? titleMatch[1].replace(/[*#]/g, "").trim()
+        : "AI Generated Startup Idea";
+
+      // Create structured idea from AI response
+      const ideaData = {
+        title: extractedTitle.substring(0, 100), // Limit title length
+        description: aiText,
+        problem: `Based on interests: ${generateForm.interests}${generateForm.problem_area ? `. Problem focus: ${generateForm.problem_area}` : ""}`,
+        solution: "AI-generated solution - please review and refine this idea",
+        target_market: generateForm.target_market || "To be determined",
+        category: generateForm.industry || "Technology",
+        tags: [generateForm.industry, "AI-Generated"].filter(Boolean),
+      };
+
+      const response = await fetch(
+        "http://localhost:8000/api/v1/innovator/submit-idea",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(ideaData),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to save idea");
+      }
+      const savedIdea = await response.json();
+
+      // Update the AI response metadata to indicate it's been saved
+      setAiResponse((prev) => ({
+        ...prev!,
+        metadata: {
+          ...prev?.metadata,
+          saved_to_database: true,
+          saved_idea_id: savedIdea.id,
+        },
+      }));
+
+      setSuccessMessage("💾 Idea saved successfully to your portfolio!");
+
+      // Refresh user ideas list
+      fetchUserIdeas();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred while saving the idea"
+      );
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
@@ -388,7 +469,7 @@ const AIGenerator: React.FC = () => {
           {[
             { id: "generate", name: "Generate Ideas", icon: "🧠" },
             { id: "finetune", name: "Fine-tune Ideas", icon: "🔧" },
-            { id: "judge", name: "Judge Ideas", icon: "⚖️" },
+            { id: "judge", name: "Judge Your Ideas", icon: "⚖️" },
             { id: "recommendations", name: "Get Recommendations", icon: "💡" },
           ].map((tab) => (
             <button
@@ -427,9 +508,23 @@ const AIGenerator: React.FC = () => {
             {/* Generate Tab */}
             {activeTab === "generate" && (
               <form onSubmit={handleGenerateIdea} className="space-y-4">
+                <div className="bg-blue-50 p-4 rounded-lg mb-4">
+                  <h4 className="font-semibold text-blue-800 mb-2">
+                    🧠 AI Idea Generator
+                  </h4>
+                  <p className="text-sm text-blue-700">
+                    Provide your interests, skills, and preferences below. Our
+                    AI will analyze this information and generate personalized
+                    startup ideas tailored specifically for you.
+                  </p>
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Your Interests *
+                    <span className="text-xs text-gray-500 ml-1">
+                      (Be specific for better results)
+                    </span>
                   </label>
                   <textarea
                     value={generateForm.interests}
@@ -437,14 +532,21 @@ const AIGenerator: React.FC = () => {
                       handleFormChange("generate", "interests", e.target.value)
                     }
                     required
-                    rows={2}
+                    rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g., sustainability, technology, healthcare, education"
+                    placeholder="e.g., sustainable technology, renewable energy, AI automation, fintech, healthtech, edtech"
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    What topics, industries, or areas are you passionate about?
+                  </p>
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Your Skills *
+                    Your Skills & Expertise *
+                    <span className="text-xs text-gray-500 ml-1">
+                      (Include both technical and soft skills)
+                    </span>
                   </label>
                   <textarea
                     value={generateForm.skills}
@@ -452,35 +554,90 @@ const AIGenerator: React.FC = () => {
                       handleFormChange("generate", "skills", e.target.value)
                     }
                     required
-                    rows={2}
+                    rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g., software development, marketing, data analysis, design"
+                    placeholder="e.g., software development (Python, React), digital marketing, data analysis, UI/UX design, project management"
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    What are you good at? Include programming languages, tools,
+                    and experience.
+                  </p>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Preferred Industry
-                  </label>
-                  <select
-                    value={generateForm.industry}
-                    onChange={(e) =>
-                      handleFormChange("generate", "industry", e.target.value)
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Any Industry</option>
-                    <option value="technology">Technology</option>
-                    <option value="healthcare">Healthcare</option>
-                    <option value="finance">Finance</option>
-                    <option value="education">Education</option>
-                    <option value="retail">Retail</option>
-                    <option value="energy">Energy</option>
-                    <option value="entertainment">Entertainment</option>
-                  </select>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Preferred Industry
+                    </label>
+                    <select
+                      value={generateForm.industry}
+                      onChange={(e) =>
+                        handleFormChange("generate", "industry", e.target.value)
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Any Industry</option>
+                      <option value="technology">Technology & Software</option>
+                      <option value="healthcare">Healthcare & Biotech</option>
+                      <option value="finance">Finance & Fintech</option>
+                      <option value="education">Education & Edtech</option>
+                      <option value="retail">Retail & E-commerce</option>
+                      <option value="energy">Energy & Cleantech</option>
+                      <option value="entertainment">
+                        Entertainment & Media
+                      </option>
+                      <option value="transportation">
+                        Transportation & Mobility
+                      </option>
+                      <option value="agriculture">Agriculture & Food</option>
+                      <option value="real-estate">
+                        Real Estate & Proptech
+                      </option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Preferred Target Market
+                    </label>
+                    <select
+                      value={generateForm.target_market}
+                      onChange={(e) =>
+                        handleFormChange(
+                          "generate",
+                          "target_market",
+                          e.target.value
+                        )
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Any Market</option>
+                      <option value="small businesses">
+                        Small Businesses (SMB)
+                      </option>
+                      <option value="enterprise">
+                        Enterprise / Large Companies
+                      </option>
+                      <option value="consumers">Consumers / B2C</option>
+                      <option value="students">Students & Educators</option>
+                      <option value="developers">
+                        Developers & Technical Users
+                      </option>
+                      <option value="seniors">Seniors (55+)</option>
+                      <option value="millennials">Millennials (25-40)</option>
+                      <option value="gen-z">Gen Z (18-25)</option>
+                      <option value="startups">Startups & Entrepreneurs</option>
+                      <option value="nonprofits">Nonprofits & NGOs</option>
+                    </select>
+                  </div>
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Problem Areas You Care About
+                    <span className="text-xs text-gray-500 ml-1">
+                      (What problems do you want to solve?)
+                    </span>
                   </label>
                   <textarea
                     value={generateForm.problem_area}
@@ -491,39 +648,61 @@ const AIGenerator: React.FC = () => {
                         e.target.value
                       )
                     }
-                    rows={2}
+                    rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g., climate change, accessibility, productivity, communication"
+                    placeholder="e.g., climate change, digital divide, mental health, productivity, remote work challenges, data privacy"
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    What societal, business, or technical problems do you want
+                    to address?
+                  </p>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Preferred Target Market
-                  </label>
+
+                <div className="flex items-center space-x-2 bg-green-50 p-3 rounded-lg">
                   <input
-                    type="text"
-                    value={generateForm.target_market}
+                    type="checkbox"
+                    id="save_to_database"
+                    checked={generateForm.save_to_database}
                     onChange={(e) =>
-                      handleFormChange(
-                        "generate",
-                        "target_market",
-                        e.target.value
-                      )
+                      setGenerateForm((prev) => ({
+                        ...prev,
+                        save_to_database: e.target.checked,
+                      }))
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g., small businesses, students, seniors, developers"
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
+                  <label
+                    htmlFor="save_to_database"
+                    className="text-sm text-green-700"
+                  >
+                    💾{" "}
+                    <strong>Save generated idea to my ideas portfolio</strong>
+                    <span className="block text-xs text-green-600">
+                      Recommended: This will add the AI-generated idea to your
+                      ideas list for future reference
+                    </span>
+                  </label>
                 </div>
-                <Button type="submit" disabled={isLoading} className="w-full">
+
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                >
                   {isLoading ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Generating Ideas...
+                      🧠 Generating Ideas...
                     </>
                   ) : (
-                    "Generate New Ideas"
+                    <>🚀 Generate New Startup Ideas</>
                   )}
                 </Button>
+
+                <div className="text-xs text-gray-500 text-center">
+                  Our AI will analyze your profile and generate 1-3 personalized
+                  startup ideas
+                </div>
               </form>
             )}
 
@@ -800,29 +979,78 @@ const AIGenerator: React.FC = () => {
                 </p>
               </div>
             )}
-
             {/* AI Response Display */}
             {aiResponse && (
               <div className="space-y-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-gray-800 mb-2">
-                    AI Response
-                  </h3>
-                  <div className="whitespace-pre-wrap text-sm text-gray-700">
-                    {aiResponse.response_text}
-                  </div>
-                  {aiResponse.confidence_score && (
-                    <div className="mt-3 text-xs text-gray-500">
-                      Confidence:{" "}
-                      {Math.round(aiResponse.confidence_score * 100)}%
+                {activeTab === "generate" && (
+                  <div className="bg-gradient-to-r from-blue-50 to-green-50 p-6 rounded-lg border border-blue-200">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                        🧠 AI-Generated Startup Idea
+                      </h3>
+                      {aiResponse.metadata?.saved_to_database && (
+                        <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                          💾 Saved to Portfolio
+                        </span>
+                      )}
                     </div>
-                  )}
-                </div>
+
+                    <div className="prose prose-sm max-w-none">
+                      <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                        {aiResponse.response_text}
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-between">
+                      <div className="flex items-center gap-4 text-xs text-gray-500">
+                        {aiResponse.confidence_score && (
+                          <span className="flex items-center gap-1">
+                            📊 Confidence:{" "}
+                            {Math.round(aiResponse.confidence_score * 100)}%
+                          </span>
+                        )}
+                        <span className="flex items-center gap-1">
+                          🕒 Generated:{" "}
+                          {new Date(aiResponse.generated_at).toLocaleString()}
+                        </span>
+                      </div>
+
+                      {!aiResponse.metadata?.saved_to_database && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleSaveIdeaManually()}
+                          className="text-xs"
+                        >
+                          💾 Save to Portfolio
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {activeTab !== "generate" && (
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h3 className="font-semibold text-gray-800 mb-2">
+                      AI Response
+                    </h3>
+                    <div className="whitespace-pre-wrap text-sm text-gray-700">
+                      {aiResponse.response_text}
+                    </div>
+                    {aiResponse.confidence_score && (
+                      <div className="mt-3 text-xs text-gray-500">
+                        Confidence:{" "}
+                        {Math.round(aiResponse.confidence_score * 100)}%
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {aiResponse.suggestions &&
                   aiResponse.suggestions.length > 0 && (
                     <div className="bg-blue-50 p-4 rounded-lg">
                       <h4 className="font-semibold text-blue-800 mb-2">
-                        Additional Suggestions
+                        💡 Additional Insights
                       </h4>
                       <ul className="list-disc list-inside text-sm text-blue-700 space-y-1">
                         {aiResponse.suggestions.map((suggestion, index) => (
@@ -831,6 +1059,24 @@ const AIGenerator: React.FC = () => {
                       </ul>
                     </div>
                   )}
+
+                {activeTab === "generate" && (
+                  <div className="bg-yellow-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-yellow-800 mb-2">
+                      🎯 Next Steps
+                    </h4>
+                    <ul className="list-disc list-inside text-sm text-yellow-700 space-y-1">
+                      <li>Review the generated idea and assess market fit</li>
+                      <li>
+                        Use the "Judge Ideas" tab to get AI evaluation and
+                        scoring
+                      </li>
+                      <li>Use "Fine-tune Ideas" to improve specific aspects</li>
+                      <li>Research competitors and validate the problem</li>
+                      <li>Create a simple prototype or MVP plan</li>
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
 

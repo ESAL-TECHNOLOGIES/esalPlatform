@@ -269,12 +269,13 @@ const Dashboard: React.FC = () => {
         </CardHeader>{" "}
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {" "}
             <Button
               className="w-full h-14 flex items-center justify-center space-x-2"
-              onClick={() => (window.location.href = "/upload")}
+              onClick={() => (window.location.href = "/my-ideas?create=true")}
             >
-              <span className="text-lg">📤</span>
-              <span>Upload New Idea</span>
+              <span className="text-lg">💡</span>
+              <span>Create New Idea</span>
             </Button>
             <Button
               variant="secondary"
@@ -365,13 +366,16 @@ const Dashboard: React.FC = () => {
                   Your innovative startup ideas could be the next big thing.
                   Start by uploading your first idea and connecting with
                   potential investors.
-                </p>
+                </p>{" "}
                 <div className="space-y-3">
+                  {" "}
                   <Button
                     className="px-6 py-3"
-                    onClick={() => (window.location.href = "/upload")}
+                    onClick={() =>
+                      (window.location.href = "/my-ideas?create=true")
+                    }
                   >
-                    🚀 Upload Your First Idea
+                    🚀 Create Your First Idea
                   </Button>
                   <div className="text-xs text-gray-400">
                     or{" "}
@@ -636,10 +640,10 @@ const Dashboard: React.FC = () => {
                   <div className="flex items-start space-x-3">
                     <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
                       1
-                    </div>
+                    </div>{" "}
                     <div>
                       <p className="font-medium text-gray-800">
-                        Upload Your First Idea
+                        Create Your First Idea
                       </p>
                       <p className="text-sm text-gray-600">
                         Share your startup concept with detailed description and
@@ -703,11 +707,14 @@ const Dashboard: React.FC = () => {
                       Update your profile to build credibility with investors
                     </span>
                   </li>
-                </ul>
+                </ul>{" "}
                 <div className="mt-4 space-x-3">
+                  {" "}
                   <Button
                     size="sm"
-                    onClick={() => (window.location.href = "/upload")}
+                    onClick={() =>
+                      (window.location.href = "/my-ideas?create=true")
+                    }
                   >
                     Start Now
                   </Button>

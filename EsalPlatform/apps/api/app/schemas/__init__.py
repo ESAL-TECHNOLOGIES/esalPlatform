@@ -47,29 +47,57 @@ class TokenResponse(BaseModel):
 # Idea schemas
 class IdeaBase(BaseModel):
     title: str
-    problem: str
-    solution: str
-    target_market: str
+    description: Optional[str] = ""
+    category: Optional[str] = ""
+    tags: Optional[List[str]] = []
+    status: Optional[str] = "draft"
+    visibility: Optional[str] = "private"
 
 
 class IdeaCreate(IdeaBase):
-    pass
+    # Additional optional fields for idea creation
+    problem: Optional[str] = ""
+    solution: Optional[str] = ""
+    target_market: Optional[str] = ""
+    industry: Optional[str] = ""
+    stage: Optional[str] = "idea"
 
 
 class IdeaUpdate(BaseModel):
     title: Optional[str] = None
+    description: Optional[str] = None
+    category: Optional[str] = None
+    industry: Optional[str] = None
+    stage: Optional[str] = None
     problem: Optional[str] = None
     solution: Optional[str] = None
     target_market: Optional[str] = None
+    tags: Optional[List[str]] = None
+    status: Optional[str] = None
+    visibility: Optional[str] = None
 
 
-class IdeaResponse(IdeaBase):
-    id: int
-    user_id: str  # Changed from UUID to string
-    ai_pitch: Optional[str] = None
+class IdeaResponse(BaseModel):
+    id: str  # Changed to string to match Supabase
+    title: str
+    description: str
+    industry: str  # Maps to category in DB
+    stage: str
     status: str
-    created_at: datetime
-    updated_at: datetime
+    created_at: str  # String format for API response
+    updated_at: str  # String format for API response
+    views_count: int = 0
+    interests_count: int = 0
+    user_id: str
+    ai_score: Optional[float] = None
+    
+    # Optional fields for frontend compatibility
+    target_market: Optional[str] = ""
+    problem: Optional[str] = ""
+    solution: Optional[str] = ""
+    category: Optional[str] = ""
+    tags: Optional[List[str]] = []
+    visibility: Optional[str] = "private"
     
     class Config:
         from_attributes = True
@@ -127,6 +155,7 @@ class AIGenerateIdeaRequest(BaseModel):
     industry: Optional[str] = None
     problem_area: Optional[str] = None
     target_market: Optional[str] = None
+    save_to_database: Optional[bool] = False
 
 
 class AIFineTuneRequest(BaseModel):
@@ -155,6 +184,7 @@ class AIInteractionResponse(BaseModel):
     suggestions: Optional[List[str]] = None
     confidence_score: Optional[float] = None
     generated_at: datetime
+    metadata: Optional[Dict[str, Any]] = None
     
     class Config:
         from_attributes = True
@@ -169,6 +199,7 @@ class AIJudgeResponse(BaseModel):
     technical_feasibility: float
     business_potential: float
     generated_at: datetime
+    metadata: Optional[Dict[str, Any]] = None
     
     class Config:
         from_attributes = True
@@ -180,6 +211,29 @@ class ChangePasswordRequest(BaseModel):
     new_password: str
 
 
+class NotificationSettings(BaseModel):
+    email_notifications: bool = True
+    idea_comments: bool = True
+    idea_interests: bool = True
+    platform_updates: bool = True
+    marketing_emails: bool = False
+    weekly_digest: bool = True
+
+
+class PrivacySettings(BaseModel):
+    profile_visibility: str = "public"  # "public", "private", "registered"
+    show_contact_info: bool = True
+    allow_messages: bool = True
+    show_ideas: bool = True
+    data_sharing: bool = False
+
+
+class SecuritySettings(BaseModel):
+    two_factor_enabled: bool = False
+    login_notifications: bool = True
+    session_timeout: int = 30  # minutes (frontend expects minutes)
+
+
 class NotificationPreferences(BaseModel):
     emailUpdates: bool = True
     pushNotifications: bool = False
@@ -189,10 +243,12 @@ class NotificationPreferences(BaseModel):
 
 
 class UserSettings(BaseModel):
+    notifications: NotificationSettings = NotificationSettings()
+    privacy: PrivacySettings = PrivacySettings()
+    security: SecuritySettings = SecuritySettings()
     theme: str = "light"
     language: str = "en"
     timezone: str = "UTC"
-    notifications: NotificationPreferences = NotificationPreferences()
 
 
 class UserDataExport(BaseModel):
@@ -201,3 +257,27 @@ class UserDataExport(BaseModel):
     activities: List[Dict[str, Any]]
     settings: Dict[str, Any]
     export_date: str
+
+
+# Security schemas
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+    confirm_password: str
+
+
+class Enable2FARequest(BaseModel):
+    password: str
+
+
+class Verify2FARequest(BaseModel):
+    token: str
+
+
+class SessionInfo(BaseModel):
+    device: str
+    browser: str
+    ip_address: str
+    location: str
+    last_active: datetime
+    is_current: bool = False

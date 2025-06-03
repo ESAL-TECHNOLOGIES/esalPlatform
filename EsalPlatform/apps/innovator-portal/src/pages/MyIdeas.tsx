@@ -14,21 +14,33 @@ interface Idea {
   updated_at: string;
   views_count: number;
   interests_count: number;
+  target_market?: string;
+  problem?: string;
+  solution?: string;
+  category?: string;
+  tags?: string[];
 }
 
-interface NewIdeaFormData {
+interface EditFormData {
   title: string;
+  description: string;
+  industry: string;
+  stage: string;
+  target_market: string;
   problem: string;
   solution: string;
-  target_market: string;
+  category: string;
+  tags: string;
 }
 
-interface AIFormData {
-  interests: string;
-  skills: string;
-  industry: string;
-  problemArea: string;
-  targetMarket: string;
+interface CreateFormData {
+  title: string;
+  description: string;
+  category: string;
+  tags: string;
+  status: string;
+  visibility: string;
+  documents: File[];
 }
 
 const MyIdeas: React.FC = () => {
@@ -38,34 +50,51 @@ const MyIdeas: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("newest");
-
-  // Modal states
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showAIModal, setShowAIModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
+  // Edit modal state
   const [editingIdea, setEditingIdea] = useState<Idea | null>(null);
-  // Form states
-  const [newIdeaForm, setNewIdeaForm] = useState<NewIdeaFormData>({
+  const [editFormData, setEditFormData] = useState<EditFormData>({
     title: "",
+    description: "",
+    industry: "",
+    stage: "",
+    target_market: "",
     problem: "",
     solution: "",
-    target_market: "",
+    category: "",
+    tags: "",
   });
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateError, setUpdateError] = useState<string | null>(null);
 
-  const [aiForm, setAIForm] = useState<AIFormData>({
-    interests: "",
-    skills: "",
-    industry: "",
-    problemArea: "",
-    targetMarket: "",
+  // Create modal state
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [createFormData, setCreateFormData] = useState<CreateFormData>({
+    title: "",
+    description: "",
+    category: "",
+    tags: "",
+    status: "draft",
+    visibility: "private",
+    documents: [],
   });
-
-  const [generatedIdea, setGeneratedIdea] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
-
+  const [isCreating, setIsCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [createSuccessMessage, setCreateSuccessMessage] = useState<
+    string | null
+  >(null);
+  const [createValidationErrors, setCreateValidationErrors] = useState<
+    Record<string, string>
+  >({});
   useEffect(() => {
     fetchIdeas();
+
+    // Check if we should auto-open the create modal
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("create") === "true") {
+      setIsCreateModalOpen(true);
+      // Remove the parameter from URL without reloading
+      window.history.replaceState({}, "", "/my-ideas");
+    }
   }, []);
 
   const fetchIdeas = async () => {
@@ -117,6 +146,7 @@ const MyIdeas: React.FC = () => {
         if (!token) {
           throw new Error("Authentication required");
         }
+
         const response = await fetch(
           `http://localhost:8000/api/v1/innovator/delete-idea/${ideaId}`,
           {
@@ -135,6 +165,9 @@ const MyIdeas: React.FC = () => {
 
         // Remove the deleted idea from the state
         setIdeas((prevIdeas) => prevIdeas.filter((idea) => idea.id !== ideaId));
+
+        // Show success message
+        alert("Idea deleted successfully!");
       } catch (err) {
         setError(
           err instanceof Error
@@ -143,6 +176,469 @@ const MyIdeas: React.FC = () => {
         );
         console.error("Error deleting idea:", err);
       }
+    }
+  };
+  // Create idea form validation - separate for complete vs partial validation
+  const validateCreateForm = (isComplete = true) => {
+    const errors: Record<string, string> = {};
+
+    // Only validate required fields for complete submission
+    if (isComplete) {
+      if (!createFormData.title.trim()) {
+        errors.title = "Title is required";
+      } else if (createFormData.title.length < 5) {
+        errors.title = "Title must be at least 5 characters long";
+      }
+
+      if (!createFormData.description.trim()) {
+        errors.description = "Description is required";
+      } else if (createFormData.description.length < 50) {
+        errors.description = "Description must be at least 50 characters long";
+      }
+
+      if (!createFormData.category) {
+        errors.category = "Please select a category";
+      }
+    } else {
+      // For partial validation, only check if fields have minimum length when filled
+      if (createFormData.title.trim() && createFormData.title.length < 5) {
+        errors.title = "Title must be at least 5 characters long";
+      }
+
+      if (
+        createFormData.description.trim() &&
+        createFormData.description.length < 50
+      ) {
+        errors.description = "Description must be at least 50 characters long";
+      }
+    }
+
+    setCreateValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleCreateInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setCreateFormData((prev) => ({ ...prev, [name]: value }));
+  };
+  const handleCreateFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+
+    // File size validation - 3MB limit
+    const maxSizeInBytes = 3 * 1024 * 1024; // 3MB
+    const oversizedFiles = files.filter((file) => file.size > maxSizeInBytes);
+
+    if (oversizedFiles.length > 0) {
+      const oversizedFileNames = oversizedFiles
+        .map(
+          (file) => `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`
+        )
+        .join(", ");
+
+      setCreateError(
+        `The following files exceed the 3MB size limit: ${oversizedFileNames}. Please choose smaller files.`
+      );
+
+      // Clear the file input
+      e.target.value = "";
+      return;
+    }
+
+    // Clear any previous error
+    setCreateError(null);
+    setCreateFormData((prev) => ({ ...prev, documents: files }));
+  };
+
+  // Handle independent file upload without requiring complete form
+  const handleFileUploadOnly = async () => {
+    if (createFormData.documents.length === 0) {
+      setCreateError("Please select files to upload");
+      return;
+    }
+
+    setIsCreating(true);
+    setCreateError(null);
+    setCreateSuccessMessage(null);
+
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Authentication required");
+      }
+
+      // Create a minimal draft idea if needed for file attachment
+      const hasMinimalInfo =
+        createFormData.title.trim() || createFormData.description.trim();
+
+      if (!hasMinimalInfo) {
+        setCreateError(
+          "Please provide at least a title or description before uploading files"
+        );
+        return;
+      }
+
+      // Create a draft idea with available information
+      const draftIdeaData = {
+        title: createFormData.title.trim() || "Untitled Idea",
+        description:
+          createFormData.description.trim() || "Description to be added later",
+        category: createFormData.category || "Other",
+        tags: createFormData.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0),
+        status: "draft",
+        visibility: "private",
+      };
+
+      const response = await fetch(
+        "http://localhost:8000/api/v1/innovator/submit-idea",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(draftIdeaData),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.detail || "Failed to create draft for file upload"
+        );
+      }
+
+      const ideaResult = await response.json();
+
+      // Upload files
+      let uploadedCount = 0;
+      for (const file of createFormData.documents) {
+        const fileFormData = new FormData();
+        fileFormData.append("file", file);
+        fileFormData.append("idea_id", ideaResult.id.toString());
+        fileFormData.append(
+          "description",
+          `Document for ${draftIdeaData.title}`
+        );
+
+        const fileResponse = await fetch(
+          "http://localhost:8000/api/v1/innovator/upload-file",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: fileFormData,
+          }
+        );
+
+        if (fileResponse.ok) {
+          uploadedCount++;
+        } else {
+          console.warn(`Failed to upload file: ${file.name}`);
+        }
+      }
+
+      setCreateSuccessMessage(
+        `Files uploaded successfully! ${uploadedCount} of ${createFormData.documents.length} files uploaded. A draft idea was created to attach your files.`
+      );
+
+      // Clear only the file input, keep form data
+      setCreateFormData((prev) => ({ ...prev, documents: [] }));
+
+      // Refresh ideas list
+      await fetchIdeas();
+    } catch (err) {
+      setCreateError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred while uploading files"
+      );
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  // Handle partial form save without file upload
+  const handlePartialFormSave = async () => {
+    setIsCreating(true);
+    setCreateError(null);
+    setCreateSuccessMessage(null);
+
+    // Use partial validation
+    if (!validateCreateForm(false)) {
+      setIsCreating(false);
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Authentication required");
+      }
+
+      // Check if there's enough data to save
+      const hasData =
+        createFormData.title.trim() ||
+        createFormData.description.trim() ||
+        createFormData.category;
+
+      if (!hasData) {
+        setCreateError(
+          "Please provide at least a title, description, or category to save"
+        );
+        setIsCreating(false);
+        return;
+      }
+
+      // Create idea data with fallbacks for missing required fields
+      const ideaData = {
+        title: createFormData.title.trim() || "Untitled Idea",
+        description:
+          createFormData.description.trim() || "Description to be added later",
+        category: createFormData.category || "Other",
+        tags: createFormData.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0),
+        status: "draft",
+        visibility: createFormData.visibility,
+      };
+
+      const response = await fetch(
+        "http://localhost:8000/api/v1/innovator/submit-idea",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(ideaData),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to save partial idea");
+      }
+
+      setCreateSuccessMessage(
+        "Progress saved successfully! You can continue editing your idea later."
+      );
+
+      // Refresh ideas list
+      await fetchIdeas();
+    } catch (err) {
+      setCreateError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred while saving your progress"
+      );
+    } finally {
+      setIsCreating(false);
+    }
+  };
+  const handleCreateSubmit = async (isDraft = false) => {
+    setIsCreating(true);
+    setCreateError(null);
+    setCreateSuccessMessage(null);
+
+    // Use complete validation for full submission, partial for drafts
+    if (!validateCreateForm(!isDraft)) {
+      setIsCreating(false);
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Authentication required");
+      }
+
+      // Create idea data structure matching backend schema
+      const ideaData = {
+        title: createFormData.title,
+        description: createFormData.description,
+        category: createFormData.category,
+        tags: createFormData.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0),
+        status: isDraft ? "draft" : createFormData.status,
+        visibility: createFormData.visibility,
+      };
+
+      const response = await fetch(
+        "http://localhost:8000/api/v1/innovator/submit-idea",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(ideaData),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to create idea");
+      }
+
+      const ideaResult = await response.json();
+
+      // Upload files if any
+      if (createFormData.documents.length > 0) {
+        for (const file of createFormData.documents) {
+          const fileFormData = new FormData();
+          fileFormData.append("file", file);
+          fileFormData.append("idea_id", ideaResult.id.toString());
+          fileFormData.append(
+            "description",
+            `Document for ${createFormData.title}`
+          );
+
+          const fileResponse = await fetch(
+            "http://localhost:8000/api/v1/innovator/upload-file",
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              body: fileFormData,
+            }
+          );
+
+          if (!fileResponse.ok) {
+            console.warn(`Failed to upload file: ${file.name}`);
+          }
+        }
+      }
+
+      setCreateSuccessMessage(
+        isDraft
+          ? "Draft saved successfully! You can continue editing it later."
+          : "Idea created successfully! You can now track its progress in your dashboard."
+      );
+
+      // Reset form
+      setCreateFormData({
+        title: "",
+        description: "",
+        category: "",
+        tags: "",
+        status: "draft",
+        visibility: "private",
+        documents: [],
+      });
+
+      // Refresh ideas list
+      await fetchIdeas();
+
+      // Close modal after a delay
+      setTimeout(() => {
+        setIsCreateModalOpen(false);
+        setCreateSuccessMessage(null);
+      }, 2000);
+    } catch (err) {
+      setCreateError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred while creating your idea"
+      );
+    } finally {
+      setIsCreating(false);
+    }
+  };
+  const handleEditIdea = (idea: Idea) => {
+    setEditingIdea(idea);
+    setEditFormData({
+      title: idea.title || "",
+      description: idea.description || "",
+      industry: idea.industry || "",
+      stage: idea.stage || "",
+      target_market: idea.target_market || "",
+      problem: idea.problem || "",
+      solution: idea.solution || "",
+      category: idea.category || "",
+      tags: idea.tags?.join(", ") || "",
+    });
+  };
+
+  const handleUpdateIdea = async (ideaId: string) => {
+    setIsUpdating(true);
+    setUpdateError(null);
+
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Authentication required");
+      }
+
+      const response = await fetch(
+        `http://localhost:8000/api/v1/innovator/update-idea/${ideaId}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...editFormData,
+            tags: editFormData.tags.split(",").map((tag) => tag.trim()),
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to update idea");
+      } // Update the idea in the state with properly formatted data
+      const updatedIdeaData = {
+        ...editFormData,
+        tags: editFormData.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0),
+      };
+
+      setIdeas((prevIdeas) =>
+        prevIdeas.map((idea) =>
+          idea.id === ideaId ? { ...idea, ...updatedIdeaData } : idea
+        )
+      );
+
+      // Close the edit modal
+      setEditingIdea(null);
+      setEditFormData({
+        title: "",
+        description: "",
+        industry: "",
+        stage: "",
+        target_market: "",
+        problem: "",
+        solution: "",
+        category: "",
+        tags: "",
+      });
+
+      // Show success message
+      alert("Idea updated successfully!");
+    } catch (err) {
+      setUpdateError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred updating the idea"
+      );
+      console.error("Error updating idea:", err);
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -201,344 +697,6 @@ const MyIdeas: React.FC = () => {
     }
   });
 
-  // Modal management functions
-  const openCreateModal = () => {
-    setNewIdeaForm({
-      title: "",
-      problem: "",
-      solution: "",
-      target_market: "",
-    });
-    setShowCreateModal(true);
-  };
-
-  const openAIModal = () => {
-    setAIForm({
-      interests: "",
-      skills: "",
-      industry: "",
-      problemArea: "",
-      targetMarket: "",
-    });
-    setGeneratedIdea(null);
-    setShowAIModal(true);
-  };
-  const openEditModal = (idea: Idea) => {
-    setEditingIdea(idea);
-    setNewIdeaForm({
-      title: idea.title,
-      problem: idea.description, // Map description to problem temporarily
-      solution: "", // Will need to be filled by user
-      target_market: "", // Note: target_market not in current Idea interface
-    });
-    setShowEditModal(true);
-  };
-
-  const closeAllModals = () => {
-    setShowCreateModal(false);
-    setShowAIModal(false);
-    setShowEditModal(false);
-    setEditingIdea(null);
-    setGeneratedIdea(null);
-    setError(null);
-  };
-
-  // Form handlers
-  const handleNewIdeaChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value } = e.target;
-    setNewIdeaForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleAIFormChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value } = e.target;
-    setAIForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // Create new idea
-  const handleCreateIdea = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        throw new Error("Authentication required");
-      }
-      const ideaData = {
-        title: newIdeaForm.title,
-        problem: newIdeaForm.problem,
-        solution: newIdeaForm.solution,
-        target_market: newIdeaForm.target_market,
-      };
-
-      const response = await fetch(
-        "http://localhost:8000/api/v1/innovator/submit-idea",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(ideaData),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to create idea");
-      }
-
-      const newIdea = await response.json();
-      setIdeas((prevIdeas) => [newIdea, ...prevIdeas]);
-      closeAllModals();
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "An error occurred creating the idea"
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-  // Generate AI idea
-  const handleGenerateAI = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsGeneratingAI(true);
-    setError(null);
-
-    try {
-      // Since there's no direct idea generation endpoint, we'll create a comprehensive fallback
-      // that simulates AI generation based on the user's inputs
-
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
-      const industries: Record<
-        string,
-        { problems: string[]; solutions: string[] }
-      > = {
-        technology: {
-          problems: [
-            "Small businesses lack affordable access to advanced technology solutions",
-            "Remote teams struggle with effective collaboration and project management",
-            "Data security concerns prevent companies from adopting cloud solutions",
-          ],
-          solutions: [
-            "A comprehensive platform that provides enterprise-level tools at SMB pricing",
-            "An AI-powered collaboration suite that adapts to team workflows",
-            "A zero-trust security framework with user-friendly implementation",
-          ],
-        },
-        healthcare: {
-          problems: [
-            "Patients have limited access to personalized health monitoring",
-            "Healthcare providers struggle with data fragmentation across systems",
-            "Mental health support is often inaccessible or too expensive",
-          ],
-          solutions: [
-            "A wearable ecosystem that provides real-time health insights and alerts",
-            "An interoperable platform that unifies patient data across providers",
-            "A mobile-first therapy platform with AI-powered support",
-          ],
-        },
-        education: {
-          problems: [
-            "Students learn at different paces but receive one-size-fits-all education",
-            "Teachers lack tools to identify and address learning gaps early",
-            "Skills gap between education and industry demands continues to grow",
-          ],
-          solutions: [
-            "An adaptive learning platform that personalizes content delivery",
-            "AI-powered analytics that predict and prevent learning difficulties",
-            "Industry-partnered curriculum that ensures job-ready skills",
-          ],
-        },
-      };
-
-      const selectedIndustry = aiForm.industry?.toLowerCase() || "technology";
-      const industryData =
-        industries[selectedIndustry] || industries["technology"];
-
-      const randomProblem =
-        industryData.problems[
-          Math.floor(Math.random() * industryData.problems.length)
-        ];
-      const randomSolution =
-        industryData.solutions[
-          Math.floor(Math.random() * industryData.solutions.length)
-        ];
-
-      const titleKeywords = [
-        `${aiForm.interests || "Smart"} Solutions`,
-        `${aiForm.skills || "AI"} Platform`,
-        `Next-Gen ${selectedIndustry.charAt(0).toUpperCase() + selectedIndustry.slice(1)}`,
-        `Intelligent ${aiForm.interests || "Innovation"} Hub`,
-      ];
-
-      const generatedTitle =
-        titleKeywords[Math.floor(Math.random() * titleKeywords.length)];
-
-      const generatedIdea = `**${generatedTitle}**
-
-**Problem:** ${randomProblem}
-
-**Solution:** ${randomSolution}
-
-**Target Market:** ${aiForm.targetMarket || `${selectedIndustry} companies and professionals`}
-
-**Key Features:**
-- Personalized dashboard based on your ${aiForm.interests || "interests"}
-- Leverages your ${aiForm.skills || "skills"} expertise
-- Scalable architecture for growth
-- Mobile-first design for accessibility
-
-**Revenue Model:**
-- Subscription-based SaaS ($99-$999/month)
-- Premium features and integrations
-- Professional services and consulting
-
-This idea combines your interests in ${aiForm.interests || "innovation"} with your skills in ${aiForm.skills || "technology"} to address a real market need.`;
-
-      setGeneratedIdea(generatedIdea);
-    } catch (err) {
-      console.error("AI Generation Error:", err);
-      setError("Failed to generate idea. Please try again.");
-
-      // Provide basic fallback
-      const fallbackIdea = `**Custom Innovation Solution**
-
-Based on your interests in ${aiForm.interests} and skills in ${aiForm.skills}, here's a potential startup idea:
-
-**Problem:** Small businesses struggle to implement sustainable practices due to lack of knowledge and high implementation costs.
-
-**Solution:** A comprehensive platform that provides AI-powered sustainability assessment, customized eco-friendly recommendations, and cost-benefit analysis for green initiatives.
-
-**Target Market:** Small to medium businesses (10-500 employees) looking to improve their environmental impact while reducing operational costs.
-
-**Revenue Model:** Monthly SaaS subscriptions, commission from supplier marketplace, premium consulting services.`;
-
-      setGeneratedIdea(fallbackIdea);
-    } finally {
-      setIsGeneratingAI(false);
-    }
-  };
-
-  // Save AI generated idea
-  const handleSaveAIIdea = async () => {
-    if (!generatedIdea) {
-      setError("No idea to save");
-      return;
-    }
-
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        throw new Error("Authentication required");
-      }
-
-      // Parse the generated idea to extract title
-      const titleMatch = generatedIdea.match(/\*\*(.*?)\*\*/);
-      const title = titleMatch ? titleMatch[1] : "AI Generated Startup Idea";
-      const ideaData = {
-        title: title,
-        problem: generatedIdea,
-        solution: "AI Generated solution - please review and edit",
-        target_market: aiForm.targetMarket || "To be determined",
-      };
-
-      const response = await fetch(
-        "http://localhost:8000/api/v1/innovator/submit-idea",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(ideaData),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to save idea");
-      }
-
-      const newIdea = await response.json();
-      setIdeas((prevIdeas) => [newIdea, ...prevIdeas]);
-      closeAllModals();
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "An error occurred saving the idea"
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // Update existing idea
-  const handleUpdateIdea = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingIdea) return;
-
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        throw new Error("Authentication required");
-      }
-      const updateData = {
-        title: newIdeaForm.title,
-        problem: newIdeaForm.problem,
-        solution: newIdeaForm.solution,
-        target_market: newIdeaForm.target_market,
-      };
-      const response = await fetch(
-        `http://localhost:8000/api/v1/innovator/update-idea/${editingIdea.id}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updateData),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to update idea");
-      }
-
-      const updatedIdea = await response.json();
-      setIdeas((prevIdeas) =>
-        prevIdeas.map((idea) =>
-          idea.id === editingIdea.id ? updatedIdea : idea
-        )
-      );
-      closeAllModals();
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "An error occurred updating the idea"
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -561,12 +719,12 @@ Based on your interests in ${aiForm.interests} and skills in ${aiForm.skills}, h
 
   return (
     <div className="space-y-6">
-      {" "}
+      {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">My Ideas</h1>
           <p className="text-gray-600 mt-1">
-            Manage and track all your startup ideas in one place
+            View and manage all your startup ideas
           </p>
           <div className="flex items-center gap-6 mt-2 text-sm text-gray-500">
             <span className="flex items-center gap-1">
@@ -581,24 +739,18 @@ Based on your interests in ${aiForm.interests} and skills in ${aiForm.skills}, h
               <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
               {ideas.filter((idea) => idea.status === "draft").length} Drafts
             </span>
-          </div>
+          </div>{" "}
         </div>
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex gap-3">
           <Button
-            onClick={openCreateModal}
+            onClick={() => setIsCreateModalOpen(true)}
             className="flex items-center bg-blue-600 hover:bg-blue-700 transition-colors"
           >
-            <span className="mr-2 text-lg">+</span> Create Idea
-          </Button>
-          <Button
-            variant="outline"
-            onClick={openAIModal}
-            className="flex items-center border-purple-300 text-purple-600 hover:bg-purple-50 transition-colors"
-          >
-            <span className="mr-2">🤖</span> AI Generator
+            <span className="mr-2 text-lg">+</span> Create New Idea
           </Button>
         </div>
-      </div>{" "}
+      </div>
+      {/* Error Display */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex items-start">
@@ -633,7 +785,7 @@ Based on your interests in ${aiForm.interests} and skills in ${aiForm.skills}, h
             </div>
           </div>
         </div>
-      )}{" "}
+      )}
       {/* Filters and Sorting */}
       <Card className="border-gray-200 shadow-sm">
         <CardContent className="p-6">
@@ -712,7 +864,7 @@ Based on your interests in ${aiForm.interests} and skills in ${aiForm.skills}, h
             </div>
           </div>
         </CardContent>
-      </Card>{" "}
+      </Card>
       {/* Ideas List */}
       {sortedIdeas.length === 0 ? (
         <Card className="border-gray-200 shadow-sm">
@@ -729,27 +881,20 @@ Based on your interests in ${aiForm.interests} and skills in ${aiForm.skills}, h
               </div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3">
                 {filter === "all"
-                  ? "Ready to launch your first idea?"
+                  ? "Ready to upload your first idea?"
                   : `No ${filter} ideas found`}
               </h3>
               <p className="text-gray-600 mb-8 leading-relaxed">
                 {filter === "all"
-                  ? "Every great startup begins with a single idea. Transform your vision into reality by creating your first startup concept here."
-                  : `You don't have any ideas with the "${filter}" status. Try a different filter or create a new idea.`}
-              </p>
+                  ? "Every great startup begins with a single idea. Upload your first startup concept to get started."
+                  : `You don't have any ideas with the "${filter}" status. Try a different filter or upload a new idea.`}
+              </p>{" "}
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Button
-                  onClick={openCreateModal}
+                  onClick={() => setIsCreateModalOpen(true)}
                   className="bg-blue-600 hover:bg-blue-700 px-6 py-3 text-base font-medium transition-colors"
                 >
                   🎯 Create Your First Idea
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={openAIModal}
-                  className="border-purple-300 text-purple-600 hover:bg-purple-50 px-6 py-3 text-base font-medium transition-colors"
-                >
-                  🤖 Get AI Inspiration
                 </Button>
               </div>
               {filter !== "all" && (
@@ -880,18 +1025,18 @@ Based on your interests in ${aiForm.interests} and skills in ${aiForm.skills}, h
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => openEditModal(idea)}
-                          className="border-gray-300 hover:bg-gray-50 px-4 py-2 transition-colors"
-                        >
-                          ✏️ Edit
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
                           className="border-red-300 text-red-600 hover:bg-red-50 px-4 py-2 transition-colors"
                           onClick={() => handleDeleteIdea(idea.id)}
                         >
                           🗑️ Delete
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-blue-300 text-blue-600 hover:bg-blue-50 px-4 py-2 transition-colors"
+                          onClick={() => handleEditIdea(idea)}
+                        >
+                          ✏️ Edit
                         </Button>
                       </div>
                     </div>
@@ -902,421 +1047,544 @@ Based on your interests in ${aiForm.interests} and skills in ${aiForm.skills}, h
           })}
         </div>
       )}{" "}
-      {/* Create New Idea Modal */}
+      {/* Edit Idea Modal */}
       <Modal
-        isOpen={showCreateModal}
-        onClose={closeAllModals}
-        title="🚀 Create New Startup Idea"
-        size="lg"
+        isOpen={!!editingIdea}
+        onClose={() => setEditingIdea(null)}
+        title="Edit Idea"
+        size="xl"
       >
-        <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-sm text-blue-700">
-            <span className="font-medium">💡 Tip:</span> Be specific about the
-            problem and solution. Great ideas clearly define the target market
-            and value proposition.
-          </p>
+        <div className="max-h-[70vh] overflow-y-auto">
+          {/* Edit Form */}
+          <div className="space-y-6 pr-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  value={editFormData.title}
+                  onChange={(e) =>
+                    setEditFormData({
+                      ...editFormData,
+                      title: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter idea title"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Category
+                </label>
+                <input
+                  type="text"
+                  value={editFormData.category}
+                  onChange={(e) =>
+                    setEditFormData({
+                      ...editFormData,
+                      category: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter category"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Description
+              </label>
+              <textarea
+                value={editFormData.description}
+                onChange={(e) =>
+                  setEditFormData({
+                    ...editFormData,
+                    description: e.target.value,
+                  })
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter idea description"
+                rows={4}
+              ></textarea>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Industry
+                </label>
+                <input
+                  type="text"
+                  value={editFormData.industry}
+                  onChange={(e) =>
+                    setEditFormData({
+                      ...editFormData,
+                      industry: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter industry"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Stage
+                </label>
+                <input
+                  type="text"
+                  value={editFormData.stage}
+                  onChange={(e) =>
+                    setEditFormData({
+                      ...editFormData,
+                      stage: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter stage"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Target Market
+              </label>
+              <input
+                type="text"
+                value={editFormData.target_market}
+                onChange={(e) =>
+                  setEditFormData({
+                    ...editFormData,
+                    target_market: e.target.value,
+                  })
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter target market"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Problem
+                </label>
+                <textarea
+                  value={editFormData.problem}
+                  onChange={(e) =>
+                    setEditFormData({
+                      ...editFormData,
+                      problem: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Describe the problem"
+                  rows={3}
+                ></textarea>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Solution
+                </label>
+                <textarea
+                  value={editFormData.solution}
+                  onChange={(e) =>
+                    setEditFormData({
+                      ...editFormData,
+                      solution: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Describe the solution"
+                  rows={3}
+                ></textarea>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Tags (comma separated)
+              </label>
+              <input
+                type="text"
+                value={editFormData.tags}
+                onChange={(e) =>
+                  setEditFormData({ ...editFormData, tags: e.target.value })
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter tags separated by commas (e.g., fintech, mobile, startup)"
+              />
+            </div>
+          </div>
         </div>
 
-        <form onSubmit={handleCreateIdea} className="space-y-6">
-          <div>
-            <label
-              htmlFor="title"
-              className="block text-sm font-semibold text-gray-700 mb-2"
-            >
-              Startup Title *
-            </label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              required
-              value={newIdeaForm.title}
-              onChange={handleNewIdeaChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-              placeholder="Enter your startup name or title (e.g., 'EcoDelivery - Sustainable Food Delivery')"
-            />
-          </div>
+        {/* Modal Footer with Actions */}
+        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+          <Button
+            variant="outline"
+            onClick={() => setEditingIdea(null)}
+            className="px-6"
+            disabled={isUpdating}
+          >
+            Cancel
+          </Button>{" "}
+          <Button
+            variant="primary"
+            onClick={() => editingIdea?.id && handleUpdateIdea(editingIdea.id)}
+            className="px-6"
+            disabled={isUpdating || !editingIdea?.id}
+          >
+            {isUpdating ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Updating...
+              </>
+            ) : (
+              "Update Idea"
+            )}
+          </Button>
+        </div>
 
-          <div>
-            <label
-              htmlFor="problem"
-              className="block text-sm font-semibold text-gray-700 mb-2"
-            >
-              Problem Statement *
-            </label>
-            <textarea
-              id="problem"
-              name="problem"
-              required
-              rows={4}
-              value={newIdeaForm.problem}
-              onChange={handleNewIdeaChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-              placeholder="What specific problem does your startup solve? Be detailed about the pain points..."
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Describe the current challenges people face and why existing
-              solutions are inadequate
-            </p>
+        {/* Error Message */}
+        {updateError && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-sm text-red-600">{updateError}</p>
           </div>
-
-          <div>
-            <label
-              htmlFor="solution"
-              className="block text-sm font-semibold text-gray-700 mb-2"
-            >
-              Solution *
-            </label>
-            <textarea
-              id="solution"
-              name="solution"
-              required
-              rows={4}
-              value={newIdeaForm.solution}
-              onChange={handleNewIdeaChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-              placeholder="How does your startup solve this problem? What makes your approach unique..."
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Explain your unique value proposition and competitive advantages
-            </p>
-          </div>
-
-          <div>
-            <label
-              htmlFor="target_market"
-              className="block text-sm font-semibold text-gray-700 mb-2"
-            >
-              Target Market *
-            </label>
-            <input
-              type="text"
-              id="target_market"
-              name="target_market"
-              required
-              value={newIdeaForm.target_market}
-              onChange={handleNewIdeaChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-              placeholder="Who is your target audience? (e.g., 'Urban millennials aged 25-35 who order food 3+ times/week')"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Be specific about demographics, behaviors, and market size
-            </p>
-          </div>
-
-          <div className="flex space-x-4 pt-6 border-t border-gray-200">
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 py-3 text-base font-medium transition-colors"
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Creating...
-                </>
-              ) : (
-                <>🚀 Create Idea</>
-              )}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={closeAllModals}
-              className="flex-1 py-3 text-base font-medium border-gray-300 hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </Modal>{" "}
-      {/* AI Generation Modal */}
+        )}
+      </Modal>
+      {/* Create Idea Modal */}
       <Modal
-        isOpen={showAIModal}
-        onClose={closeAllModals}
-        title="🤖 AI-Powered Idea Generator"
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        title="Create New Startup Idea"
         size="lg"
       >
-        {!generatedIdea ? (
-          <>
-            <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200">
-              <p className="text-sm text-purple-700">
-                <span className="font-medium">✨ AI Magic:</span> Our advanced
-                AI will analyze your preferences and generate personalized
-                startup ideas tailored to your interests and skills.
-              </p>
-            </div>
-            <form onSubmit={handleGenerateAI} className="space-y-6">
-              <div>
-                <label
-                  htmlFor="interests"
-                  className="block text-sm font-semibold text-gray-700 mb-2"
-                >
-                  Your Interests & Passions *
-                </label>
-                <input
-                  type="text"
-                  id="interests"
-                  name="interests"
-                  required
-                  value={aiForm.interests}
-                  onChange={handleAIFormChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-                  placeholder="e.g., sustainability, technology, social impact, fitness, education"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  List topics you're passionate about, separated by commas
-                </p>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="skills"
-                  className="block text-sm font-semibold text-gray-700 mb-2"
-                >
-                  Your Skills & Expertise *
-                </label>
-                <input
-                  type="text"
-                  id="skills"
-                  name="skills"
-                  required
-                  value={aiForm.skills}
-                  onChange={handleAIFormChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-                  placeholder="e.g., web development, marketing, data analysis, project management"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  What are you good at? Include both technical and soft skills
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label
-                    htmlFor="industry"
-                    className="block text-sm font-semibold text-gray-700 mb-2"
+        <div className="space-y-6">
+          {createError && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+              <div className="flex">
+                <div className="text-red-400">
+                  <svg
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
                   >
-                    Preferred Industry
-                  </label>
-                  <select
-                    id="industry"
-                    title="Select preferred industry for AI generation"
-                    name="industry"
-                    value={aiForm.industry}
-                    onChange={handleAIFormChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-                  >
-                    <option value="">Any Industry</option>
-                    <option value="Technology">🖥️ Technology</option>
-                    <option value="Healthcare">🏥 Healthcare</option>
-                    <option value="Finance">💰 Finance</option>
-                    <option value="Education">📚 Education</option>
-                    <option value="E-commerce">🛒 E-commerce</option>
-                    <option value="SaaS">☁️ SaaS</option>
-                    <option value="Mobile Apps">📱 Mobile Apps</option>
-                    <option value="AI/ML">🤖 AI/ML</option>
-                    <option value="IoT">🌐 IoT</option>
-                  </select>
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
                 </div>
+                <div className="ml-3">
+                  <p className="text-sm text-red-700">{createError}</p>
+                </div>
+              </div>
+            </div>
+          )}
 
-                <div>
-                  <label
-                    htmlFor="targetMarket"
-                    className="block text-sm font-semibold text-gray-700 mb-2"
+          {createSuccessMessage && (
+            <div className="bg-green-50 border border-green-200 rounded-md p-4">
+              <div className="flex">
+                <div className="text-green-400">
+                  <svg
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
                   >
-                    Target Market
-                  </label>
-                  <input
-                    type="text"
-                    id="targetMarket"
-                    name="targetMarket"
-                    value={aiForm.targetMarket}
-                    onChange={handleAIFormChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-                    placeholder="e.g., small businesses, students, developers"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Who would benefit most from your solution?
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-green-700">
+                    {createSuccessMessage}
                   </p>
                 </div>
               </div>
+            </div>
+          )}
+
+          <form className="space-y-6">
+            <div>
+              <label
+                htmlFor="create-title"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Idea Title *
+              </label>
+              <input
+                type="text"
+                id="create-title"
+                name="title"
+                required
+                value={createFormData.title}
+                onChange={handleCreateInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter your startup idea title"
+              />
+              {createValidationErrors.title && (
+                <p className="text-xs text-red-600 mt-1">
+                  {createValidationErrors.title}
+                </p>
+              )}
+            </div>
+            <div>
+              <label
+                htmlFor="create-description"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Description *
+              </label>
+              <textarea
+                id="create-description"
+                name="description"
+                required
+                rows={4}
+                value={createFormData.description}
+                onChange={handleCreateInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Describe your idea in detail - the problem it solves, your solution, target market, etc."
+              />
+              {createValidationErrors.description && (
+                <p className="text-xs text-red-600 mt-1">
+                  {createValidationErrors.description}
+                </p>
+              )}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="create-category"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Category *
+                </label>
+                <select
+                  id="create-category"
+                  name="category"
+                  required
+                  value={createFormData.category}
+                  onChange={handleCreateInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select Category</option>
+                  <option value="Technology">Technology</option>
+                  <option value="Healthcare">Healthcare</option>
+                  <option value="Finance">Finance</option>
+                  <option value="Education">Education</option>
+                  <option value="Retail">Retail</option>
+                  <option value="Energy">Energy</option>
+                  <option value="Environment">Environment</option>
+                  <option value="Transportation">Transportation</option>
+                  <option value="Entertainment">Entertainment</option>
+                  <option value="Food & Beverage">Food & Beverage</option>
+                  <option value="Real Estate">Real Estate</option>
+                  <option value="Agriculture">Agriculture</option>
+                  <option value="Manufacturing">Manufacturing</option>
+                  <option value="Other">Other</option>
+                </select>
+                {createValidationErrors.category && (
+                  <p className="text-xs text-red-600 mt-1">
+                    {createValidationErrors.category}
+                  </p>
+                )}
+              </div>
 
               <div>
                 <label
-                  htmlFor="problemArea"
-                  className="block text-sm font-semibold text-gray-700 mb-2"
+                  htmlFor="create-visibility"
+                  className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Problem Area (Optional)
+                  Visibility *
                 </label>
-                <textarea
-                  id="problemArea"
-                  name="problemArea"
-                  rows={3}
-                  value={aiForm.problemArea}
-                  onChange={handleAIFormChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-                  placeholder="Describe a specific problem area you'd like to address..."
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  This helps AI generate more targeted ideas for specific
-                  challenges
-                </p>
-              </div>
-
-              <div className="flex space-x-4 pt-6 border-t border-gray-200">
-                <Button
-                  type="submit"
-                  disabled={isGeneratingAI}
-                  className="flex-1 bg-purple-600 hover:bg-purple-700 py-3 text-base font-medium transition-colors"
+                <select
+                  id="create-visibility"
+                  name="visibility"
+                  required
+                  value={createFormData.visibility}
+                  onChange={handleCreateInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  {isGeneratingAI ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Generating Ideas...
-                    </>
-                  ) : (
-                    <>✨ Generate AI Ideas</>
-                  )}
+                  <option value="private">Private (Only me)</option>
+                  <option value="public">Public (Visible to investors)</option>
+                  <option value="limited">Limited (Selected viewers)</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label
+                htmlFor="create-tags"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Tags
+              </label>
+              <input
+                type="text"
+                id="create-tags"
+                name="tags"
+                value={createFormData.tags}
+                onChange={handleCreateInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter tags separated by commas (e.g., AI, Machine Learning, SaaS)"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Add relevant keywords to help investors find your idea
+              </p>
+            </div>
+            <div>
+              <label
+                htmlFor="create-status"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Status
+              </label>
+              <select
+                id="create-status"
+                name="status"
+                value={createFormData.status}
+                onChange={handleCreateInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="draft">Draft (Work in progress)</option>
+                <option value="active">Active (Ready for review)</option>
+                <option value="published">
+                  Published (Visible to investors)
+                </option>
+              </select>
+            </div>
+            <div>
+              <label
+                htmlFor="create-documents"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Upload Supporting Documents
+                <span className="text-sm text-gray-500 ml-2">(Optional)</span>
+              </label>{" "}
+              <input
+                type="file"
+                id="create-documents"
+                name="documents"
+                onChange={handleCreateFileChange}
+                accept=".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.csv,.txt,.jpg,.jpeg,.png"
+                multiple
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />{" "}
+              <p className="text-xs text-gray-500 mt-1">
+                Upload pitch decks, business plans, prototypes, data files, or
+                other relevant documents. Accepted formats: PDF, PPT, DOC,
+                Excel, CSV, TXT, Images. Max 3MB per file.
+              </p>
+              {createFormData.documents.length > 0 && (
+                <div className="mt-2">
+                  <p className="text-sm font-medium text-gray-700">
+                    Selected files:
+                  </p>
+                  <ul className="text-sm text-gray-600">
+                    {createFormData.documents.map((file, index) => (
+                      <li key={index} className="flex items-center space-x-2">
+                        <span>📄</span>
+                        <span>{file.name}</span>
+                        <span className="text-gray-400">
+                          ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>{" "}
+            {/* Independent Action Buttons */}
+            <div className="space-y-4">
+              {/* File Upload and Form Save - Independent Actions */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleFileUploadOnly}
+                  disabled={isCreating || createFormData.documents.length === 0}
+                  className="w-full"
+                >
+                  {isCreating
+                    ? "Uploading..."
+                    : `Upload Files Only (${createFormData.documents.length})`}
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={closeAllModals}
-                  className="flex-1 py-3 text-base font-medium border-gray-300 hover:bg-gray-50 transition-colors"
+                  onClick={handlePartialFormSave}
+                  disabled={
+                    isCreating ||
+                    (!createFormData.title.trim() &&
+                      !createFormData.description.trim())
+                  }
+                  className="w-full"
                 >
-                  Cancel
+                  {isCreating ? "Saving..." : "Save Progress"}
                 </Button>
               </div>
-            </form>
-          </>
-        ) : (
-          <div className="space-y-4">
-            <div className="bg-gray-50 p-4 rounded-lg border">
-              <h4 className="font-medium text-gray-900 mb-2">
-                Generated Idea:
-              </h4>
-              <div className="text-sm text-gray-800 whitespace-pre-wrap">
-                {generatedIdea}
+
+              {/* Divider with text */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">
+                    or create complete idea
+                  </span>
+                </div>
+              </div>
+
+              {/* Main Creation Actions */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Button
+                  type="button"
+                  onClick={() => handleCreateSubmit(false)}
+                  className="w-full"
+                  disabled={isCreating}
+                >
+                  {isCreating ? "Creating..." : "Create Idea"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleCreateSubmit(true)}
+                  disabled={isCreating}
+                  className="w-full"
+                >
+                  {isCreating ? "Saving..." : "Save as Draft"}
+                </Button>
+              </div>
+
+              {/* Helper Text */}
+              <div className="text-xs text-gray-500 space-y-1">
+                <p>
+                  <strong>Upload Files Only:</strong> Upload files with minimal
+                  form data (requires title or description)
+                </p>
+                <p>
+                  <strong>Save Progress:</strong> Save your current form
+                  progress without creating a complete idea
+                </p>
+                <p>
+                  <strong>Create Idea:</strong> Create a complete idea with full
+                  validation
+                </p>
+                <p>
+                  <strong>Save as Draft:</strong> Save as draft with all current
+                  data
+                </p>
               </div>
             </div>
-
-            <div className="flex space-x-3 pt-4">
-              <Button
-                onClick={handleSaveAIIdea}
-                disabled={isSubmitting}
-                className="flex-1"
-              >
-                {isSubmitting ? "Saving..." : "Save as New Idea"}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setGeneratedIdea(null)}
-                className="flex-1"
-              >
-                Generate Another
-              </Button>
-              <Button variant="ghost" onClick={closeAllModals}>
-                Close
-              </Button>
-            </div>
-          </div>
-        )}
-      </Modal>
-      {/* Edit Idea Modal */}
-      <Modal
-        isOpen={showEditModal}
-        onClose={closeAllModals}
-        title="Edit Idea"
-        size="lg"
-      >
-        <form onSubmit={handleUpdateIdea} className="space-y-4">
-          <div>
-            <label
-              htmlFor="edit-title"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Startup Title *
-            </label>
-            <input
-              type="text"
-              id="edit-title"
-              name="title"
-              required
-              value={newIdeaForm.title}
-              onChange={handleNewIdeaChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your startup name or title"
-            />
-          </div>{" "}
-          <div>
-            <label
-              htmlFor="edit-problem"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Problem Statement *
-            </label>
-            <textarea
-              id="edit-problem"
-              name="problem"
-              required
-              rows={3}
-              value={newIdeaForm.problem}
-              onChange={handleNewIdeaChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="What problem does your startup solve?"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="edit-solution"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Solution *
-            </label>
-            <textarea
-              id="edit-solution"
-              name="solution"
-              required
-              rows={3}
-              value={newIdeaForm.solution}
-              onChange={handleNewIdeaChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="How does your startup solve this problem?"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="edit-target_market"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Target Market *
-            </label>
-            <input
-              type="text"
-              id="edit-target_market"
-              name="target_market"
-              required
-              value={newIdeaForm.target_market}
-              onChange={handleNewIdeaChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Who is your target audience?"
-            />
-          </div>
-          <div className="flex space-x-3 pt-4">
-            <Button type="submit" disabled={isSubmitting} className="flex-1">
-              {isSubmitting ? "Updating..." : "Update Idea"}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={closeAllModals}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-          </div>
-        </form>
+          </form>
+        </div>
       </Modal>
     </div>
   );

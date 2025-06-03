@@ -5,7 +5,7 @@ This guide will help you create the required storage buckets for the Innovator P
 ## 🎯 Required Buckets
 
 1. **`avatars`** - Public bucket for user profile pictures (5MB limit)
-2. **`uploads`** - Private bucket for file uploads and attachments (10MB limit)
+2. **`uploads`** - Private bucket for file uploads and attachments (3MB limit)
 
 ## 🚀 Setup Methods
 
@@ -109,7 +109,7 @@ After setup, verify everything works:
 - Check bucket permissions in Supabase dashboard
 
 ### Error: "file upload failed"
-- Check file size limits (5MB for avatars, 10MB for uploads)
+- Check file size limits (5MB for avatars, 3MB for uploads)
 - Verify file types are allowed (images for avatars)
 - Check user authentication token
 

@@ -80,8 +80,11 @@ class SupabaseProfileService:
                 "phone": None,
                 "avatar_url": None,
                 "experience_years": 0,
-                "education": None
-            }            # Create profile in profiles table (service role bypasses RLS)
+                "education": None,
+                "total_ideas": 0,
+                "total_views": 0,
+                "total_interests": 0
+            }# Create profile in profiles table (service role bypasses RLS)
             result = self.supabase.table("profiles").insert(profile_create).execute()
             logger.info(f"Created profile for user {user_id}")
             
@@ -109,11 +112,10 @@ class SupabaseProfileService:
                     "interests": [],
                     "experience_years": 0,
                     "education": None,
-                    "avatar_url": None,                    "total_ideas": 0,
+                    "avatar_url": None,
+                    "total_ideas": 0,
                     "total_views": 0,
                     "total_interests": 0,
-                    "is_active": True,
-                    "is_blocked": False,
                     "created_at": datetime.utcnow().isoformat(),
                     "updated_at": datetime.utcnow().isoformat()
                 }
@@ -138,8 +140,11 @@ class SupabaseProfileService:
                 "skills": [],
                 "interests": [],
                 "experience_years": 0,
-                "education": None,                "avatar_url": None,
-                "is_active": True,                "is_blocked": False,
+                "education": None,
+                "avatar_url": None,
+                "total_ideas": 0,
+                "total_views": 0,
+                "total_interests": 0,
                 "created_at": datetime.utcnow().isoformat(),
                 "updated_at": datetime.utcnow().isoformat()
             }
@@ -172,9 +177,7 @@ class SupabaseProfileService:
                 "avatar_url": profile_data.get("avatar_url"),
                 "experience_years": profile_data.get("experience_years", 0),
                 "education": profile_data.get("education"),
-                "total_ideas": profile_data.get("total_ideas", 0),
-                "total_views": profile_data.get("total_views", 0),
-                "total_interests": profile_data.get("total_interests", 0),
+                "total_ideas": profile_data.get("total_ideas", 0),                "total_views": profile_data.get("total_views", 0),                "total_interests": profile_data.get("total_interests", 0),
                 "created_at": profile_data.get("created_at"),
                 "updated_at": profile_data.get("updated_at")
             }
@@ -183,17 +186,17 @@ class SupabaseProfileService:
             logger.error(f"Error fetching profile: {e}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to fetch profile"            )
-
+                detail="Failed to fetch profile"
+            )
+                        
     async def update_profile(self, user_id: str, profile_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Update user profile"""        
-        try:
-            # Prepare profile data for profiles table
+        """Update user profile"""
+        try:            # Prepare profile data for profiles table
             profile_update = {
                 "id": user_id,  # Use 'id' for profiles table primary key
                 "updated_at": datetime.utcnow().isoformat()
             }
-            
+
             # Define field mappings from frontend to database (profiles table fields)
             field_mappings = {
                 "username": "username",
@@ -217,9 +220,14 @@ class SupabaseProfileService:
             # Add profile fields that exist in the input data
             for frontend_field, db_field in field_mappings.items():
                 if frontend_field in profile_data:
-                    profile_update[db_field] = profile_data[frontend_field]              # Upsert profile data in the profiles table (service role bypasses RLS)
+                    profile_update[db_field] = profile_data[frontend_field]
+            
+            # NOTE: is_active and is_blocked are stored in Supabase user metadata, not in profiles table
+            logger.info(f"Updating profile for user {user_id}")
+            
+            # Upsert profile data in the profiles table (service role bypasses RLS)
             result = self.supabase.table("profiles").upsert(profile_update).execute()
-            logger.info(f"Updated profile for user {user_id}")
+            logger.info(f"Profile update completed for user {user_id}")
             
             if result.data:
                 # Return updated profile
@@ -238,7 +246,7 @@ class SupabaseProfileService:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to update profile"
-            )    
+            )
     async def upload_avatar(self, user_id: str, file_content: bytes, filename: str) -> str:
         """Upload user avatar file and update profile"""
         try:

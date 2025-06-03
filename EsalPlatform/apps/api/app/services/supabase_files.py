@@ -38,13 +38,12 @@ class SupabaseFileService:
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail="File service is not available"
-            )
-
+            )  
     async def upload_file(
         self, 
         user_id: str, 
         file: UploadFile, 
-        bucket_name: str = "uploads",
+        bucket_name: str = "idea-files",
         folder: str = "ideas",
         idea_id: Optional[int] = None,
         description: Optional[str] = None
@@ -56,15 +55,13 @@ class SupabaseFileService:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="No filename provided"
-                )
-
-            # Check file size (10MB limit)
+                )            # Check file size (3MB limit)
             file_content = await file.read()
             file_size = len(file_content)
-            if file_size > 10 * 1024 * 1024:  # 10MB
+            if file_size > 3 * 1024 * 1024:  # 3MB
                 raise HTTPException(
                     status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-                    detail="File size exceeds 10MB limit"
+                    detail="File size exceeds 3MB limit"
                 )
 
             # Reset file pointer
@@ -134,46 +131,47 @@ class SupabaseFileService:
                 raise e
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to upload file"
-            )    
-        async def get_user_files(self, user_id: str) -> List[Dict[str, Any]]:
-            """Get all files uploaded by a user"""
+                detail="Failed to upload file"            )
+        
+    async def get_user_files(self, user_id: str, bucket_name: str = "idea-files") -> List[Dict[str, Any]]:
+        """Get all files uploaded by a user"""
         try:
             result = self.supabase.table("files").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
             files = result.data or []
-            # Enhance files with public URLs
-            return await self.enhance_files_with_urls(files)
+            # Enhance files with public URLs using the specified bucket
+            return await self.enhance_files_with_urls(files, bucket_name)
             
         except Exception as e:
             logger.error(f"Error fetching user files: {e}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to fetch files"
-            )    
-        async def get_file_by_id(self, file_id: str, user_id: str) -> Optional[Dict[str, Any]]:
-            """Get a specific file by ID (only if user owns it)"""
-        try:
+            )
+
+    async def get_file_by_id(self, file_id: str, user_id: str) -> Optional[Dict[str, Any]]:
+        """Get a specific file by ID (only if user owns it)"""
+        try:            
             result = self.supabase.table("files").select("*").eq("id", file_id).eq("user_id", user_id).execute()
-            
+
             if result.data:
                 # Enhance with public URL
                 enhanced_file = await self.enhance_file_with_url(result.data[0])
                 return enhanced_file
             return None
-            
+
         except Exception as e:
             logger.error(f"Error fetching file: {e}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to fetch file"
             )
-        async def delete_file(self, file_id: str, user_id: str, bucket_name: str = "uploads") -> bool:
-            """Delete a file and its metadata"""
+
+    async def delete_file(self, file_id: str, user_id: str, bucket_name: str = "idea-files") -> bool:
+        """Delete a file and its metadata"""
         try:
             # Get file info first
             file_info = await self.get_file_by_id(file_id, user_id)
-            if not file_info:
-                return False
+            if not file_info:                return False
 
             # Delete from storage using the file_path
             storage_result = self.supabase.storage.from_(bucket_name).remove([file_info["file_path"]])
@@ -188,12 +186,12 @@ class SupabaseFileService:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to delete file"
-            )    
-        async def associate_file_with_idea(self, file_id: str, idea_id: str, user_id: str) -> bool:
-            """Associate a file with an idea"""
+            )
+
+    async def associate_file_with_idea(self, file_id: str, idea_id: str, user_id: str) -> bool:
+        """Associate a file with an idea"""
         try:
-            # Verify the user owns both the file and the idea
-            file_info = await self.get_file_by_id(file_id, user_id)
+            # Verify the user owns both the file and the idea            file_info = await self.get_file_by_id(file_id, user_id)
             if not file_info:
                 return False
 
@@ -208,36 +206,35 @@ class SupabaseFileService:
             logger.error(f"Error associating file with idea: {e}")
             return False
 
-        async def get_idea_files(self, idea_id: str, user_id: str) -> List[Dict[str, Any]]:
-            """Get all files associated with an idea"""
-            try:
-                result = self.supabase.table("files").select("*").eq("idea_id", idea_id).eq("user_id", user_id).execute()
-                files = result.data or []
-                # Enhance files with public URLs
-                return await self.enhance_files_with_urls(files)
+    async def get_idea_files(self, idea_id: str, user_id: str) -> List[Dict[str, Any]]:
+        """Get all files associated with an idea"""
+        try:
+            result = self.supabase.table("files").select("*").eq("idea_id", idea_id).eq("user_id", user_id).execute()
+            files = result.data or []            # Enhance files with public URLs
+            return await self.enhance_files_with_urls(files)
 
-            except Exception as e:
-                logger.error(f"Error fetching idea files: {e}")
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail="Failed to fetch idea files"
-                )
+        except Exception as e:
+            logger.error(f"Error fetching idea files: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to fetch idea files"
+            )
 
-        async def get_file_url(self, file_path: str, bucket_name: str = "uploads") -> str:
-            """Get public URL for a file"""
-            try:
-                return self.supabase.storage.from_(bucket_name).get_public_url(file_path)
-            except Exception as e:
-                logger.error(f"Error getting file URL: {e}")
-                return ""
+    async def get_file_url(self, file_path: str, bucket_name: str = "idea-files") -> str:
+        """Get public URL for a file"""
+        try:
+            return self.supabase.storage.from_(bucket_name).get_public_url(file_path)
+        except Exception as e:
+            logger.error(f"Error getting file URL: {e}")
+            return ""
 
-    async def enhance_file_with_url(self, file_record: Dict[str, Any], bucket_name: str = "uploads") -> Dict[str, Any]:
+    async def enhance_file_with_url(self, file_record: Dict[str, Any], bucket_name: str = "idea-files") -> Dict[str, Any]:
         """Add public_url to file record"""
         if file_record and "file_path" in file_record:
             file_record["public_url"] = await self.get_file_url(file_record["file_path"], bucket_name)
         return file_record
 
-    async def enhance_files_with_urls(self, files: List[Dict[str, Any]], bucket_name: str = "uploads") -> List[Dict[str, Any]]:
+    async def enhance_files_with_urls(self, files: List[Dict[str, Any]], bucket_name: str = "idea-files") -> List[Dict[str, Any]]:
         """Add public_urls to list of file records"""
         enhanced_files = []
         for file_record in files:

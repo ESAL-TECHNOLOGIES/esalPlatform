@@ -18,7 +18,7 @@ class GeminiAIService:
     def __init__(self):
         # Configure Gemini API
         genai.configure(api_key=settings.GEMINI_API_KEY)
-        self.model = genai.GenerativeModel('gemini-pro')
+        self.model = genai.GenerativeModel('gemini-2.0-flash')
     
     async def generate_pitch(self, pitch_request: PitchRequest) -> PitchResponse:
         """Generate AI pitch using Gemini API"""
@@ -85,10 +85,18 @@ This innovative solution addresses a critical market need with cutting-edge tech
 [AI-generated pitch - Fallback mode]"""
 
     # New AI Interaction Methods
-    
     async def generate_new_idea(self, request: AIGenerateIdeaRequest) -> AIInteractionResponse:
         """Generate a new startup idea based on user interests and skills"""
         try:
+            print(f"🔧 DEBUG: Starting idea generation with Gemini API")
+            print(f"🔧 DEBUG: API Key configured: {bool(settings.GEMINI_API_KEY and settings.GEMINI_API_KEY != 'your-gemini-api-key')}")
+            print(f"🔧 DEBUG: API Key length: {len(settings.GEMINI_API_KEY) if settings.GEMINI_API_KEY else 0}")
+            
+            # Check if API key is properly set
+            if not settings.GEMINI_API_KEY or settings.GEMINI_API_KEY == 'your-gemini-api-key':
+                print(f"🚨 ERROR: Gemini API key not properly configured")
+                return self._create_fallback_idea_response(request)
+            
             prompt = f"""You are an AI innovation consultant. Based on the following user profile, generate a detailed startup idea:
 
 Interests: {request.interests}
@@ -97,27 +105,43 @@ Industry: {request.industry or 'Any'}
 Problem Area: {request.problem_area or 'Not specified'}
 Target Market: {request.target_market or 'To be determined'}
 
-Generate a comprehensive startup idea with:
-1. **Title**: A catchy, memorable name
-2. **Problem Statement**: A clear, specific problem worth solving
-3. **Solution**: An innovative solution leveraging the user's skills
-4. **Target Market**: Specific audience who would pay for this
-5. **Revenue Model**: How the business would make money
-6. **Key Features**: 3-5 core features
-7. **Competitive Advantage**: What makes this unique
-8. **Next Steps**: 3 actionable steps to validate the idea
+Generate a comprehensive startup idea as natural, flowing paragraphs. Structure your response with these sections written as continuous narrative text:
 
-Make it practical, feasible, and aligned with current market trends."""
+**Title**: Start with a catchy, memorable name for the startup
 
+**Problem Statement**: Describe a clear, specific problem worth solving that real people face
+
+**Solution**: Explain an innovative solution that leverages the user's skills and interests
+
+**Target Market**: Identify the specific audience who would pay for this solution
+
+**Revenue Model**: Describe how the business would make money
+
+**Key Features**: Mention the core features that would make this product valuable
+
+**Competitive Advantage**: Explain what makes this unique in the market
+
+**Next Steps**: Suggest actionable steps to validate and develop the idea
+
+IMPORTANT: Write everything as flowing paragraphs. Do NOT use any numbered lists (1, 2, 3), bullet points (•, -), or step-by-step formatting. Make each section a cohesive paragraph that reads naturally. Be practical, feasible, and aligned with current market trends."""
+
+            print(f"🔧 DEBUG: Sending request to Gemini API")
             response = self.model.generate_content(prompt)
+            print(f"🔧 DEBUG: Gemini API response received successfully")
+            print(f"🔧 DEBUG: Response length: {len(response.text)} characters")
             
             return AIInteractionResponse(
                 response_text=response.text.strip(),
                 confidence_score=0.85,
-                generated_at=datetime.utcnow()
+                generated_at=datetime.utcnow(),
+                metadata={"source": "gemini-api", "api_success": True}
             )
             
         except Exception as e:
+            print(f"🚨 ERROR: Gemini API failed - {str(e)}")
+            print(f"🚨 ERROR: Exception type: {type(e).__name__}")
+            import traceback
+            print(f"🚨 ERROR: Full traceback:\n{traceback.format_exc()}")
             return self._create_fallback_idea_response(request)
     
     async def fine_tune_idea(self, request: AIFineTuneRequest) -> AIInteractionResponse:
@@ -142,12 +166,12 @@ Be constructive, specific, and provide actionable advice."""
             
             # Extract suggestions from response
             suggestions = self._extract_suggestions_from_text(response.text)
-            
             return AIInteractionResponse(
                 response_text=response.text.strip(),
                 suggestions=suggestions,
                 confidence_score=0.88,
-                generated_at=datetime.utcnow()
+                generated_at=datetime.utcnow(),
+                metadata={}
             )
             
         except Exception as e:
@@ -180,7 +204,7 @@ Be honest, constructive, and specific in your evaluation."""
             
             # Try to parse JSON response
             try:
-                eval_data = json.loads(response.text.strip())
+                eval_data = json.loads(response.text.strip())                
                 return AIJudgeResponse(
                     overall_score=eval_data.get('overall_score', 6.5),
                     strengths=eval_data.get('strengths', []),
@@ -189,7 +213,8 @@ Be honest, constructive, and specific in your evaluation."""
                     market_viability=eval_data.get('market_viability', 6.0),
                     technical_feasibility=eval_data.get('technical_feasibility', 7.0),
                     business_potential=eval_data.get('business_potential', 6.5),
-                    generated_at=datetime.utcnow()
+                    generated_at=datetime.utcnow(),
+                    metadata={}
                 )
             except json.JSONDecodeError:
                 return self._create_fallback_judgment(request)
@@ -222,51 +247,42 @@ Be specific, actionable, and tailored to their portfolio of ideas."""
             response = self.model.generate_content(prompt)
             
             suggestions = self._extract_action_items_from_text(response.text)
-            
             return AIInteractionResponse(
                 response_text=response.text.strip(),
                 suggestions=suggestions,
                 confidence_score=0.82,
-                generated_at=datetime.utcnow()
+                generated_at=datetime.utcnow(),
+                metadata={}
             )
-            
         except Exception as e:
             return self._create_fallback_recommendations(request)
     
     # Helper methods for fallbacks and text processing
-    
     def _create_fallback_idea_response(self, request: AIGenerateIdeaRequest) -> AIInteractionResponse:
         """Create fallback idea when AI service fails"""
         fallback = f"""**Smart {request.interests.split(',')[0].strip()} Platform**
 
-**Problem Statement:** Many people interested in {request.interests} lack easy access to tools and resources that match their skill level in {request.skills}.
+**Problem Statement:** Many people interested in {request.interests} lack easy access to tools and resources that match their skill level in {request.skills}. This creates a significant barrier to learning, development, and practical application of their interests.
 
-**Solution:** A comprehensive platform that combines {request.skills} with {request.interests} to create personalized experiences and solutions.
+**Solution:** A comprehensive platform that combines {request.skills} with {request.interests} to create personalized experiences and solutions. The platform would leverage advanced algorithms and user-centered design to bridge the gap between knowledge and practical application.
 
-**Target Market:** {request.target_market or 'Professionals and enthusiasts in the ' + (request.industry or 'technology') + ' sector'}
+**Target Market:** {request.target_market or 'Professionals and enthusiasts in the ' + (request.industry or 'technology') + ' sector'} who are seeking to deepen their expertise and connect with like-minded individuals.
 
-**Revenue Model:** Subscription-based SaaS with freemium tier
+**Revenue Model:** Subscription-based SaaS with freemium tier offering basic features, premium memberships for advanced tools, and enterprise solutions for organizations.
 
-**Key Features:**
-- Personalized dashboard
-- Community networking
-- Resource recommendations
-- Progress tracking
-- Expert mentorship
+**Key Features:** The platform includes personalized dashboards for tracking progress, community networking capabilities for peer collaboration, intelligent resource recommendations, progress tracking with detailed analytics, and expert mentorship matching.
 
-**Competitive Advantage:** Unique combination of {request.skills} expertise with {request.interests} focus
+**Competitive Advantage:** Unique combination of {request.skills} expertise with {request.interests} focus, creating a specialized niche that addresses specific user needs better than generic platforms.
 
-**Next Steps:**
-1. Survey 50 potential users about their current challenges
-2. Build a simple MVP to test core features
-3. Connect with industry experts for validation
+**Next Steps:** Survey potential users about their current challenges and pain points. Build a simple MVP to test core features and validate the concept. Connect with industry experts for feedback and validation.
 
 [AI-generated idea - Fallback mode]"""
-
+        
         return AIInteractionResponse(
             response_text=fallback,
             confidence_score=0.6,
-            generated_at=datetime.utcnow()
+            generated_at=datetime.utcnow(),
+            metadata={"source": "fallback", "api_success": False}
         )
     
     def _create_fallback_finetune_response(self, request: AIFineTuneRequest) -> AIInteractionResponse:
@@ -296,12 +312,13 @@ Your {request.improvement_focus} shows potential but could be strengthened with 
 - Run small-scale pilot program
 
 [AI-generated improvements - Fallback mode]"""
-
+        
         return AIInteractionResponse(
             response_text=fallback,
             suggestions=["Add specific metrics", "Include competitive analysis", "Interview potential customers"],
             confidence_score=0.65,
-            generated_at=datetime.utcnow()
+            generated_at=datetime.utcnow(),
+            metadata={}
         )
     
     def _create_fallback_judgment(self, request: AIJudgeIdeaRequest) -> AIJudgeResponse:
@@ -322,12 +339,11 @@ Your {request.improvement_focus} shows potential but could be strengthened with 
                 "Conduct user interviews to validate problem",
                 "Research competitors and differentiation",
                 "Develop detailed financial projections",
-                "Create minimum viable product plan"
-            ],
+                "Create minimum viable product plan"            ],
             market_viability=6.0,
-            technical_feasibility=7.0,
-            business_potential=6.5,
-            generated_at=datetime.utcnow()
+            technical_feasibility=7.0,            business_potential=6.5,
+            generated_at=datetime.utcnow(),
+            metadata={}
         )
     
     def _create_fallback_recommendations(self, request: AIRecommendationRequest) -> AIInteractionResponse:
@@ -366,7 +382,7 @@ Your ideas show a strong focus on solving real-world problems with technology so
 - Prototype development tools
 
 [AI-generated recommendations - Fallback mode]"""
-
+        
         return AIInteractionResponse(
             response_text=fallback,
             suggestions=[
@@ -377,7 +393,8 @@ Your ideas show a strong focus on solving real-world problems with technology so
                 "Join entrepreneur community"
             ],
             confidence_score=0.7,
-            generated_at=datetime.utcnow()
+            generated_at=datetime.utcnow(),
+            metadata={}
         )
     
     def _extract_suggestions_from_text(self, text: str) -> List[str]:
@@ -394,7 +411,6 @@ Your ideas show a strong focus on solving real-world problems with technology so
                 clean_suggestion = re.sub(r'^\d+\.\s*', '', clean_suggestion)
                 if len(clean_suggestion.strip()) > 10:  # Filter out very short items
                     suggestions.append(clean_suggestion.strip())
-        
         return suggestions[:5]  # Return max 5 suggestions
     
     def _extract_action_items_from_text(self, text: str) -> List[str]:

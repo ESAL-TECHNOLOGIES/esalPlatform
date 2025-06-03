@@ -2,7 +2,6 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { Layout, Navbar, Sidebar } from "@esal/ui";
 import { useState, useEffect } from "react";
 import Dashboard from "./pages/Dashboard";
-import Upload from "./pages/Upload";
 import AIGenerator from "./pages/AIGenerator";
 import Metrics from "./pages/Metrics";
 import Login from "./pages/Login";
@@ -17,7 +16,6 @@ import MyIdeas from "./pages/MyIdeas";
 const sidebarItems = [
   { label: "Dashboard", href: "/", icon: "📊" },
   { label: "My Ideas", href: "/my-ideas", icon: "💡" },
-  { label: "Upload Idea", href: "/upload", icon: "📤" },
   { label: "AI Generator", href: "/ai-generator", icon: "🤖" },
   { label: "Metrics", href: "/metrics", icon: "📈" },
   { label: "Profile", href: "/profile", icon: "👤" },
@@ -143,9 +141,9 @@ function App() {
                 />
               }
             >
+              {" "}
               <Routes>
                 <Route path="/" element={<Dashboard />} />
-                <Route path="/upload" element={<Upload />} />
                 <Route path="/ai-generator" element={<AIGenerator />} />
                 <Route path="/metrics" element={<Metrics />} />
                 <Route path="/ideas/:ideaId" element={<IdeaDetails />} />

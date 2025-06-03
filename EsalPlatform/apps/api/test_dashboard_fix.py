@@ -9,7 +9,8 @@ from datetime import datetime
 
 # Test configuration
 API_BASE_URL = "http://localhost:8000"
-TEST_USER_ID = "test-user-12345"
+# Use a proper UUID format for test user ID to avoid PostgreSQL constraint violations
+TEST_USER_ID = "123e4567-e89b-12d3-a456-426614174000"
 
 def test_table_access():
     """Test if we can access the tables with the correct names"""

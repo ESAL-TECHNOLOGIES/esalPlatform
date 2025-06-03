@@ -25,10 +25,9 @@ class Settings(BaseSettings):
     
     # Site Configuration
     SITE_URL: str = "http://localhost:3001"
-    # CONFIRM_EMAIL_REDIRECT_URL removed - email confirmation disabled
-      # AI APIs
-    GEMINI_API_KEY: str = "your-gemini-api-key"
-    OPENAI_API_KEY: str = ""  # Optional OpenAI API key
+    # CONFIRM_EMAIL_REDIRECT_URL removed - email confirmation disabled    # AI APIs
+    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "your-gemini-api-key")
+    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")  # Optional OpenAI API key
       # JWT
     JWT_SECRET_KEY: str = "hzuQ0vV09u6lDiKEb7a+5SG0uNRpepuaImQW7F/8+pePoatdth4/YyJWkgB/IjnwH6qYTMJWgny1bs0fB/nS8A=="
     JWT_ALGORITHM: str = "HS256"

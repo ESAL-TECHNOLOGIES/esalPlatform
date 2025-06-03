@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ESAL Frontend Debug Helper</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .section {
+        margin-bottom: 20px;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+      }
+      .error {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+      }
+      .warning {
+        background-color: #fff3cd;
+        border-color: #ffeaa7;
+      }
+      .info {
+        background-color: #cce7ff;
+        border-color: #99d3ff;
+      }
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      pre {
+        background-color: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        overflow-x: auto;
+      }
+      .step {
+        margin: 10px 0;
+        padding: 10px;
+        border-left: 4px solid #007bff;
+        background-color: #f8f9fa;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔍 ESAL Frontend Debugging Tool</h1>
+      <p>
+        This tool will help you diagnose the "failed to fetch" error in the ESAL
+        Platform frontend.
+      </p>
+
+      <div class="section info">
+        <h2>📋 Instructions</h2>
+        <div class="step">
+          <strong>Step 1:</strong> Open your ESAL frontend at
+          <a href="http://localhost:3001" target="_blank"
+            >http://localhost:3001</a
+          >
+        </div>
+        <div class="step">
+          <strong>Step 2:</strong> Login to your account using your credentials
+        </div>
+        <div class="step">
+          <strong>Step 3:</strong> Come back to this page and click the
+          diagnostic buttons below
+        </div>
+        <div class="step">
+          <strong>Step 4:</strong> Try to access "My Ideas" in another tab and
+          compare the network requests
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>🔧 Diagnostic Tools</h2>
+
+        <button onclick="checkAuthToken()">Check Authentication Token</button>
+        <button onclick="testDirectAPI()">Test Direct API Call</button>
+        <button onclick="testCORS()">Test CORS</button>
+        <button onclick="checkNetworkConnectivity()">
+          Check Backend Connectivity
+        </button>
+        <button onclick="runFullDiagnostic()">Run Full Diagnostic</button>
+        <button onclick="clearResults()">Clear Results</button>
+      </div>
+
+      <div id="results" class="section" style="display: none">
+        <h2>📊 Diagnostic Results</h2>
+        <div id="output"></div>
+      </div>
+
+      <div class="section">
+        <h2>🛠️ Manual Network Inspection</h2>
+        <p>While this page is open, follow these steps:</p>
+        <ol>
+          <li>
+            Open
+            <a href="http://localhost:3001" target="_blank"
+              >http://localhost:3001</a
+            >
+            in a new tab
+          </li>
+          <li>Open browser Developer Tools (F12)</li>
+          <li>Go to the <strong>Network</strong> tab</li>
+          <li>Clear the network log</li>
+          <li>Navigate to "My Ideas" and try to trigger the error</li>
+          <li>Look for failed requests (shown in red)</li>
+          <li>Click on the failed request to see details</li>
+        </ol>
+      </div>
+
+      <div class="section">
+        <h2>🎯 Common Issues to Check</h2>
+        <ul>
+          <li>
+            <strong>Authentication Token:</strong> Missing or expired token in
+            localStorage
+          </li>
+          <li>
+            <strong>CORS Issues:</strong> Backend not allowing requests from
+            frontend
+          </li>
+          <li>
+            <strong>Network Connectivity:</strong> Backend server not running or
+            unreachable
+          </li>
+          <li><strong>API Endpoint:</strong> Wrong URL or endpoint path</li>
+          <li>
+            <strong>Request Headers:</strong> Missing or incorrect headers
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      function logResult(message, type = "info") {
+        const output = document.getElementById("output");
+        const results = document.getElementById("results");
+        results.style.display = "block";
+
+        const timestamp = new Date().toLocaleTimeString();
+        const div = document.createElement("div");
+        div.className = `section ${type}`;
+        div.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+        output.appendChild(div);
+      }
+
+      function clearResults() {
+        document.getElementById("output").innerHTML = "";
+        document.getElementById("results").style.display = "none";
+      }
+
+      async function checkAuthToken() {
+        logResult("Checking authentication token...", "info");
+
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+          logResult(
+            "❌ No access_token found in localStorage. Please login first!",
+            "error"
+          );
+          return false;
+        }
+
+        try {
+          // Decode JWT token to check expiry
+          const tokenParts = token.split(".");
+          if (tokenParts.length !== 3) {
+            logResult("❌ Invalid token format", "error");
+            return false;
+          }
+
+          const payload = JSON.parse(atob(tokenParts[1]));
+          const expiryDate = new Date(payload.exp * 1000);
+          const isExpired = Date.now() > payload.exp * 1000;
+
+          logResult(`✅ Token found in localStorage`, "success");
+          logResult(`Token expires: ${expiryDate.toLocaleString()}`, "info");
+          logResult(
+            `Token expired: ${isExpired ? "❌ YES" : "✅ NO"}`,
+            isExpired ? "error" : "success"
+          );
+
+          return !isExpired;
+        } catch (e) {
+          logResult(`❌ Error parsing token: ${e.message}`, "error");
+          return false;
+        }
+      }
+
+      async function testDirectAPI() {
+        logResult("Testing direct API call to backend...", "info");
+
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+          logResult("❌ No token available for API test", "error");
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            "http://localhost:8000/api/v1/innovator/view-ideas",
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          logResult(
+            `API Response Status: ${response.status}`,
+            response.ok ? "success" : "error"
+          );
+          logResult(
+            `API Response OK: ${response.ok}`,
+            response.ok ? "success" : "error"
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            logResult(
+              `✅ API call successful! Found ${data.length || 0} ideas`,
+              "success"
+            );
+            logResult(
+              `Response: <pre>${JSON.stringify(data, null, 2)}</pre>`,
+              "info"
+            );
+          } else {
+            const errorText = await response.text();
+            logResult(`❌ API Error: ${errorText}`, "error");
+          }
+        } catch (error) {
+          logResult(`❌ Network Error: ${error.message}`, "error");
+          logResult(`Error Type: ${error.constructor.name}`, "warning");
+        }
+      }
+
+      async function testCORS() {
+        logResult("Testing CORS preflight...", "info");
+
+        try {
+          const response = await fetch(
+            "http://localhost:8000/api/v1/innovator/view-ideas",
+            {
+              method: "OPTIONS",
+            }
+          );
+
+          logResult(
+            `CORS Preflight Status: ${response.status}`,
+            response.ok ? "success" : "warning"
+          );
+
+          const corsHeaders = {};
+          response.headers.forEach((value, key) => {
+            if (key.toLowerCase().includes("access-control")) {
+              corsHeaders[key] = value;
+            }
+          });
+
+          logResult(
+            `CORS Headers: <pre>${JSON.stringify(corsHeaders, null, 2)}</pre>`,
+            "info"
+          );
+        } catch (error) {
+          logResult(`❌ CORS Test Failed: ${error.message}`, "error");
+        }
+      }
+
+      async function checkNetworkConnectivity() {
+        logResult("Checking backend connectivity...", "info");
+
+        try {
+          // Test if backend is reachable
+          const response = await fetch("http://localhost:8000/docs", {
+            method: "HEAD",
+          });
+          logResult(`✅ Backend reachable at http://localhost:8000`, "success");
+          logResult(`Backend status: ${response.status}`, "success");
+        } catch (error) {
+          logResult(`❌ Cannot reach backend: ${error.message}`, "error");
+          logResult(`Make sure the backend is running on port 8000`, "warning");
+        }
+      }
+
+      async function runFullDiagnostic() {
+        clearResults();
+        logResult("🚀 Running full diagnostic...", "info");
+
+        // Check token
+        const tokenValid = await checkAuthToken();
+
+        // Check connectivity
+        await checkNetworkConnectivity();
+
+        // Test CORS
+        await testCORS();
+
+        // Test API if token is valid
+        if (tokenValid) {
+          await testDirectAPI();
+        }
+
+        logResult("🏁 Full diagnostic completed!", "info");
+      }
+
+      // Auto-run basic checks when page loads
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          logResult(
+            "🔍 Frontend Debug Tool loaded. Click diagnostic buttons above.",
+            "info"
+          );
+        }, 500);
+      });
+    </script>
+  </body>
+</html>

@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from contextlib import asynccontextmanager
 import logging
+import time
 
 from app.routers import auth_supabase as auth, innovator, hub, investor, admin
 from app.config import settings
@@ -49,11 +50,45 @@ if settings.DEBUG:
 # CORS middleware - Configure before other middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_origins=["*"],  # Temporarily allow all origins for debugging
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
+
+
+# CORS debug middleware - Add after CORS middleware
+@app.middleware("http")
+async def cors_debug_middleware(request: Request, call_next):
+    """Debug CORS requests and ensure proper preflight handling"""
+    origin = request.headers.get("origin")
+    method = request.method
+    path = request.url.path
+    
+    # Log request details
+    logger.info(f"Request: {method} {path} from origin: {origin}")
+    
+    # Handle preflight OPTIONS requests explicitly
+    if method == "OPTIONS":
+        logger.info(f"Preflight request detected for {path}")
+        response = await call_next(request)
+        
+        # Ensure preflight response has required headers
+        if origin:
+            response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Max-Age"] = "86400"  # 24 hours
+        
+        logger.info(f"Preflight response headers: {dict(response.headers)}")
+        return response
+    
+    response = await call_next(request)
+    logger.info(f"Response status: {response.status_code}")
+    
+    return response
 
 
 # Health check endpoint
@@ -87,7 +122,7 @@ async def root():
 
 
 # Include routers
-app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
+app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
 app.include_router(innovator.router, prefix="/api/v1/innovator", tags=["Innovator"])
 app.include_router(hub.router, prefix="/api/v1/hub", tags=["Hub"])
 app.include_router(investor.router, prefix="/api/v1/investor", tags=["Investor"])
@@ -115,7 +150,6 @@ async def log_requests(request: Request, call_next):
 
 if __name__ == "__main__":
     import uvicorn
-    import time
     
     uvicorn.run(
         "app.main:app",

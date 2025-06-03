@@ -7,6 +7,7 @@ interface NotificationSettings {
   idea_interests: boolean;
   platform_updates: boolean;
   marketing_emails: boolean;
+  weekly_digest: boolean;
 }
 
 interface PrivacySettings {
@@ -14,11 +15,39 @@ interface PrivacySettings {
   show_contact_info: boolean;
   allow_messages: boolean;
   show_ideas: boolean;
+  data_sharing: boolean;
+}
+
+interface SecuritySettings {
+  two_factor_enabled: boolean;
+  session_timeout: number;
+  login_notifications: boolean;
 }
 
 interface Settings {
   notifications: NotificationSettings;
   privacy: PrivacySettings;
+  security: SecuritySettings;
+  theme: string;
+  language: string;
+  timezone: string;
+}
+
+interface SecurityInfo {
+  two_factor_enabled: boolean;
+  last_password_change: string | null;
+  account_created: string;
+  login_notifications: boolean;
+  active_sessions_count: number;
+}
+
+interface SessionInfo {
+  device: string;
+  browser: string;
+  ip_address: string;
+  location: string;
+  last_active: string;
+  is_current: boolean;
 }
 
 const Settings: React.FC = () => {
@@ -26,6 +55,13 @@ const Settings: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [securityInfo, setSecurityInfo] = useState<SecurityInfo | null>(null);
+  const [sessions, setSessions] = useState<SessionInfo[]>([]);
+  const [passwordForm, setPasswordForm] = useState({
+    current_password: "",
+    new_password: "",
+    confirm_password: "",
+  });
   const [settings, setSettings] = useState<Settings>({
     notifications: {
       email_notifications: true,
@@ -33,20 +69,32 @@ const Settings: React.FC = () => {
       idea_interests: true,
       platform_updates: true,
       marketing_emails: false,
+      weekly_digest: true,
     },
     privacy: {
       profile_visibility: "public",
       show_contact_info: true,
       allow_messages: true,
       show_ideas: true,
+      data_sharing: false,
     },
+    security: {
+      two_factor_enabled: false,
+      session_timeout: 30,
+      login_notifications: true,
+    },
+    theme: "light",
+    language: "en",
+    timezone: "UTC",
   });
   const [isSaving, setIsSaving] = useState(false);
-
   useEffect(() => {
     fetchSettings();
-  }, []);
-
+    if (activeTab === "security") {
+      fetchSecurityInfo();
+      fetchSessions();
+    }
+  }, [activeTab]);
   const fetchSettings = async () => {
     setIsLoading(true);
     setError(null);
@@ -57,7 +105,8 @@ const Settings: React.FC = () => {
         throw new Error("Authentication required");
       }
 
-      const response = await fetch(
+      // Fetch general settings
+      const settingsResponse = await fetch(
         "http://localhost:8000/api/v1/users/settings",
         {
           method: "GET",
@@ -68,13 +117,35 @@ const Settings: React.FC = () => {
         }
       );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to fetch settings");
-      }
+      // Fetch notification settings
+      const notificationsResponse = await fetch(
+        "http://localhost:8000/api/v1/users/notifications",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-      const settingsData = await response.json();
-      setSettings(settingsData);
+      if (!settingsResponse.ok || !notificationsResponse.ok) {
+        // If settings don't exist, use defaults
+        console.log("Using default settings");
+      } else {
+        const settingsData = await settingsResponse.json();
+        const notificationsData = await notificationsResponse.json();
+
+        // Merge settings with fetched data
+        setSettings((prev) => ({
+          ...prev,
+          ...settingsData,
+          notifications: {
+            ...prev.notifications,
+            ...notificationsData,
+          },
+        }));
+      }
     } catch (err) {
       setError(
         err instanceof Error
@@ -84,6 +155,56 @@ const Settings: React.FC = () => {
       console.error("Error fetching settings:", err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchSecurityInfo = async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) return;
+
+      const response = await fetch(
+        "http://localhost:8000/api/v1/users/security-info",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setSecurityInfo(data);
+      }
+    } catch (err) {
+      console.error("Error fetching security info:", err);
+    }
+  };
+
+  const fetchSessions = async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) return;
+
+      const response = await fetch(
+        "http://localhost:8000/api/v1/users/sessions",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setSessions(data.sessions || []);
+      }
+    } catch (err) {
+      console.error("Error fetching sessions:", err);
     }
   };
 
@@ -97,7 +218,6 @@ const Settings: React.FC = () => {
       },
     }));
   };
-
   const handlePrivacyChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -111,6 +231,138 @@ const Settings: React.FC = () => {
         [name]: isCheckbox ? (e.target as HTMLInputElement).checked : value,
       },
     }));
+  };
+
+  const handleSecurityChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    const isCheckbox = e.target.type === "checkbox";
+
+    setSettings((prev) => ({
+      ...prev,
+      security: {
+        ...prev.security,
+        [name]: isCheckbox ? (e.target as HTMLInputElement).checked : value,
+      },
+    }));
+  };
+
+  const handlePasswordFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setPasswordForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+  const handleSaveNotifications = async () => {
+    setIsSaving(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Authentication required");
+      }
+
+      console.log(
+        "Sending notifications request with token:",
+        token ? "Token present" : "No token"
+      );
+      console.log("Notification settings being sent:", settings.notifications);
+
+      const response = await fetch(
+        "http://localhost:8000/api/v1/users/notifications",
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(settings.notifications),
+        }
+      );
+
+      console.log("Response status:", response.status);
+      console.log("Response headers:", response.headers);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error response:", errorData);
+        throw new Error(
+          errorData.detail || "Failed to save notification settings"
+        );
+      }
+
+      const result = await response.json();
+      console.log("Success response:", result);
+
+      setSuccessMessage("Notification settings saved successfully!");
+
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred saving notification settings"
+      );
+      console.error("Error saving notification settings:", err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSavePrivacy = async () => {
+    setIsSaving(true);
+    setError(null);
+
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Authentication required");
+      }
+
+      // Save privacy settings as part of the general settings
+      const updatedSettings = {
+        ...settings,
+        privacy: settings.privacy,
+      };
+
+      const response = await fetch(
+        "http://localhost:8000/api/v1/users/settings",
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedSettings),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to save privacy settings");
+      }
+
+      setSuccessMessage("Privacy settings saved successfully!");
+
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred saving privacy settings"
+      );
+      console.error("Error saving privacy settings:", err);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleSaveSettings = async () => {
@@ -141,7 +393,7 @@ const Settings: React.FC = () => {
       }
 
       const updatedSettings = await response.json();
-      setSettings(updatedSettings);
+      setSettings(updatedSettings.settings || updatedSettings);
       setSuccessMessage("Settings saved successfully!");
 
       // Clear success message after 3 seconds
@@ -157,11 +409,253 @@ const Settings: React.FC = () => {
       setIsSaving(false);
     }
   };
-
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    // This would be implemented with an API call to change the password
-    alert("Password change functionality would be implemented here");
+    setError(null);
+    setSuccessMessage(null);
+
+    // Validate form
+    if (
+      !passwordForm.current_password ||
+      !passwordForm.new_password ||
+      !passwordForm.confirm_password
+    ) {
+      setError("All password fields are required");
+      return;
+    }
+
+    if (passwordForm.new_password !== passwordForm.confirm_password) {
+      setError("New password and confirmation do not match");
+      return;
+    }
+
+    if (passwordForm.new_password.length < 8) {
+      setError("New password must be at least 8 characters long");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Authentication required");
+      }
+
+      const response = await fetch(
+        "http://localhost:8000/api/v1/users/change-password",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            current_password: passwordForm.current_password,
+            new_password: passwordForm.new_password,
+            confirm_password: passwordForm.confirm_password,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to change password");
+      }
+
+      setSuccessMessage("Password changed successfully!");
+      setPasswordForm({
+        current_password: "",
+        new_password: "",
+        confirm_password: "",
+      });
+
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred changing password"
+      );
+    }
+  };
+
+  const handleEnable2FA = async () => {
+    try {
+      const password = prompt(
+        "Please enter your current password to enable 2FA:"
+      );
+      if (!password) return;
+
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Authentication required");
+      }
+
+      const response = await fetch(
+        "http://localhost:8000/api/v1/users/enable-2fa",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ password }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to enable 2FA");
+      }
+
+      const data = await response.json();
+      alert(
+        `2FA enabled successfully!\n\nSecret: ${data.secret}\n\nBackup codes: ${data.backup_codes.join(", ")}\n\nPlease save these backup codes in a safe place.`
+      );
+
+      // Refresh security info
+      fetchSecurityInfo();
+      setSuccessMessage("Two-factor authentication enabled successfully!");
+
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "An error occurred enabling 2FA"
+      );
+    }
+  };
+
+  const handleDisable2FA = async () => {
+    if (
+      !window.confirm(
+        "Are you sure you want to disable two-factor authentication?"
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Authentication required");
+      }
+
+      const response = await fetch(
+        "http://localhost:8000/api/v1/users/disable-2fa",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to disable 2FA");
+      }
+
+      // Refresh security info
+      fetchSecurityInfo();
+      setSuccessMessage("Two-factor authentication disabled successfully!");
+
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "An error occurred disabling 2FA"
+      );
+    }
+  };
+
+  const handleRevokeSession = async (sessionId: string) => {
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Authentication required");
+      }
+
+      const response = await fetch(
+        `http://localhost:8000/api/v1/users/sessions/${sessionId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to revoke session");
+      }
+
+      // Refresh sessions
+      fetchSessions();
+      setSuccessMessage("Session revoked successfully!");
+
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred revoking session"
+      );
+    }
+  };
+
+  const handleExportData = async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Authentication required");
+      }
+
+      const response = await fetch(
+        "http://localhost:8000/api/v1/users/export",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to export data");
+      }
+
+      // Create download link
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `esal_data_export_${new Date().toISOString().split("T")[0]}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      setSuccessMessage("Data export downloaded successfully!");
+
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "An error occurred exporting data"
+      );
+    }
   };
 
   const handleDeleteAccount = async () => {
@@ -277,7 +771,7 @@ const Settings: React.FC = () => {
           }`}
         >
           Privacy
-        </button>
+        </button>{" "}
         <button
           onClick={() => setActiveTab("security")}
           className={`py-2 px-4 border-b-2 font-medium text-sm ${
@@ -287,6 +781,16 @@ const Settings: React.FC = () => {
           }`}
         >
           Security
+        </button>
+        <button
+          onClick={() => setActiveTab("preferences")}
+          className={`py-2 px-4 border-b-2 font-medium text-sm ${
+            activeTab === "preferences"
+              ? "border-blue-500 text-blue-600"
+              : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+          }`}
+        >
+          Preferences
         </button>
         <button
           onClick={() => setActiveTab("danger")}
@@ -354,7 +858,6 @@ const Settings: React.FC = () => {
                       ></div>
                     </label>
                   </div>
-
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-medium text-gray-900">
@@ -379,7 +882,6 @@ const Settings: React.FC = () => {
                       ></div>
                     </label>
                   </div>
-
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-medium text-gray-900">
@@ -403,8 +905,7 @@ const Settings: React.FC = () => {
                         className={`w-11 h-6 ${settings.notifications.email_notifications ? "bg-gray-200" : "bg-gray-100"} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}
                       ></div>
                     </label>
-                  </div>
-
+                  </div>{" "}
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-medium text-gray-900">
@@ -429,18 +930,42 @@ const Settings: React.FC = () => {
                       ></div>
                     </label>
                   </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-medium text-gray-900">
+                        Weekly Digest
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Receive a weekly summary of platform activity and new
+                        ideas
+                      </p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="weekly_digest"
+                        className="sr-only peer"
+                        checked={settings.notifications.weekly_digest}
+                        onChange={handleNotificationChange}
+                        disabled={!settings.notifications.email_notifications}
+                      />
+                      <div
+                        className={`w-11 h-6 ${settings.notifications.email_notifications ? "bg-gray-200" : "bg-gray-100"} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}
+                      ></div>{" "}
+                    </label>
+                  </div>
                 </div>
               </div>
 
               <div className="mt-6 pt-6 border-t">
-                <Button onClick={handleSaveSettings} disabled={isSaving}>
+                <Button onClick={handleSaveNotifications} disabled={isSaving}>
                   {isSaving ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                       Saving...
                     </>
                   ) : (
-                    "Save Changes"
+                    "Save Notification Settings"
                   )}
                 </Button>
               </div>
@@ -498,7 +1023,6 @@ const Settings: React.FC = () => {
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                     </label>
                   </div>
-
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <h3 className="font-medium text-gray-900">
@@ -518,8 +1042,7 @@ const Settings: React.FC = () => {
                       />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                     </label>
-                  </div>
-
+                  </div>{" "}
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-medium text-gray-900">
@@ -540,6 +1063,345 @@ const Settings: React.FC = () => {
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                     </label>
                   </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-medium text-gray-900">
+                        Allow Data Sharing
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Allow anonymized data sharing for platform improvement
+                        and research
+                      </p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="data_sharing"
+                        className="sr-only peer"
+                        checked={settings.privacy.data_sharing}
+                        onChange={handlePrivacyChange}
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>{" "}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-6 border-t">
+                <Button onClick={handleSavePrivacy} disabled={isSaving}>
+                  {isSaving ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Privacy Settings"
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        {activeTab === "security" && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Security Settings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-medium text-gray-900 mb-4">
+                    Change Password
+                  </h3>{" "}
+                  <form className="space-y-4" onSubmit={handleChangePassword}>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Current Password
+                      </label>
+                      <input
+                        type="password"
+                        name="current_password"
+                        value={passwordForm.current_password}
+                        onChange={handlePasswordFormChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Enter your current password"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        New Password
+                      </label>
+                      <input
+                        type="password"
+                        name="new_password"
+                        value={passwordForm.new_password}
+                        onChange={handlePasswordFormChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Enter new password"
+                        required
+                        minLength={8}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Confirm New Password
+                      </label>
+                      <input
+                        type="password"
+                        name="confirm_password"
+                        value={passwordForm.confirm_password}
+                        onChange={handlePasswordFormChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Confirm new password"
+                        required
+                        minLength={8}
+                      />
+                    </div>
+
+                    <Button type="submit">Change Password</Button>
+                  </form>
+                </div>{" "}
+                <div className="border-t pt-6">
+                  <h3 className="font-medium text-gray-900 mb-4">
+                    Two-Factor Authentication
+                  </h3>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-700 mb-1">
+                        {securityInfo?.two_factor_enabled
+                          ? "Two-factor authentication is enabled"
+                          : "Enable two-factor authentication for enhanced security"}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {securityInfo?.two_factor_enabled
+                          ? "Your account is protected with an additional security layer"
+                          : "Protect your account with an additional security layer"}
+                      </p>
+                    </div>
+                    {securityInfo?.two_factor_enabled ? (
+                      <Button
+                        variant="outline"
+                        className="border-red-300 text-red-600 hover:bg-red-50"
+                        onClick={handleDisable2FA}
+                      >
+                        Disable 2FA
+                      </Button>
+                    ) : (
+                      <Button variant="outline" onClick={handleEnable2FA}>
+                        Enable 2FA
+                      </Button>
+                    )}
+                  </div>
+                </div>{" "}
+                <div className="border-t pt-6">
+                  <h3 className="font-medium text-gray-900 mb-4">
+                    Session Management
+                  </h3>
+                  <div>
+                    <p className="text-sm text-gray-700 mb-4">
+                      You're currently logged in on these devices:
+                    </p>
+
+                    <div className="space-y-3">
+                      {sessions.length > 0 ? (
+                        sessions.map((session, index) => (
+                          <div
+                            key={index}
+                            className="flex justify-between items-center p-3 bg-gray-50 rounded-md"
+                          >
+                            <div>
+                              <p className="font-medium">
+                                {session.is_current
+                                  ? "Current Device"
+                                  : session.device}
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                {session.browser} • IP: {session.ip_address}
+                                {session.location && ` • ${session.location}`}
+                                {!session.is_current &&
+                                  ` • Last active: ${new Date(session.last_active).toLocaleDateString()}`}
+                              </p>
+                            </div>
+                            {!session.is_current && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() =>
+                                  handleRevokeSession(index.toString())
+                                }
+                              >
+                                Log Out
+                              </Button>
+                            )}
+                          </div>
+                        ))
+                      ) : (
+                        <div className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
+                          <div>
+                            <p className="font-medium">Current Device</p>
+                            <p className="text-sm text-gray-600">
+                              No session information available
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="border-t pt-6">
+                  <h3 className="font-medium text-gray-900 mb-4">
+                    Security Preferences
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Session Timeout (minutes)
+                      </label>
+                      <select
+                        name="session_timeout"
+                        value={settings.security.session_timeout}
+                        onChange={handleSecurityChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value={15}>15 minutes</option>
+                        <option value={30}>30 minutes</option>
+                        <option value={60}>1 hour</option>
+                        <option value={120}>2 hours</option>
+                        <option value={240}>4 hours</option>
+                        <option value={480}>8 hours</option>
+                      </select>
+                      <p className="mt-1 text-sm text-gray-500">
+                        Automatically log out after this period of inactivity
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-medium text-gray-900">
+                          Login Notifications
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          Receive notifications when someone logs into your
+                          account
+                        </p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="login_notifications"
+                          className="sr-only peer"
+                          checked={settings.security.login_notifications}
+                          onChange={handleSecurityChange}
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>{" "}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-6 border-t">
+                <Button onClick={handleSaveSettings} disabled={isSaving}>
+                  {isSaving ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}{" "}
+        {activeTab === "preferences" && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Preferences</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Theme
+                  </label>
+                  <select
+                    name="theme"
+                    value={settings.theme}
+                    onChange={(e) =>
+                      setSettings((prev) => ({
+                        ...prev,
+                        theme: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                    <option value="auto">Auto (System)</option>
+                  </select>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Choose your preferred color theme
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Language
+                  </label>
+                  <select
+                    name="language"
+                    value={settings.language}
+                    onChange={(e) =>
+                      setSettings((prev) => ({
+                        ...prev,
+                        language: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="en">English</option>
+                    <option value="ar">العربية (Arabic)</option>
+                    <option value="fr">Français</option>
+                    <option value="es">Español</option>
+                  </select>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Select your preferred language
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Timezone
+                  </label>
+                  <select
+                    name="timezone"
+                    value={settings.timezone}
+                    onChange={(e) =>
+                      setSettings((prev) => ({
+                        ...prev,
+                        timezone: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="UTC">UTC</option>
+                    <option value="America/New_York">Eastern Time</option>
+                    <option value="America/Chicago">Central Time</option>
+                    <option value="America/Denver">Mountain Time</option>
+                    <option value="America/Los_Angeles">Pacific Time</option>
+                    <option value="Europe/London">London</option>
+                    <option value="Europe/Paris">Paris</option>
+                    <option value="Asia/Dubai">Dubai</option>
+                    <option value="Asia/Riyadh">Riyadh</option>
+                    <option value="Asia/Tokyo">Tokyo</option>
+                  </select>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Set your timezone for accurate timestamps
+                  </p>
                 </div>
               </div>
 
@@ -558,111 +1420,6 @@ const Settings: React.FC = () => {
             </CardContent>
           </Card>
         )}
-        {activeTab === "security" && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Security Settings</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div>
-                  <h3 className="font-medium text-gray-900 mb-4">
-                    Change Password
-                  </h3>
-                  <form className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Current Password
-                      </label>
-                      <input
-                        type="password"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Enter your current password"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        New Password
-                      </label>
-                      <input
-                        type="password"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Enter new password"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Confirm New Password
-                      </label>
-                      <input
-                        type="password"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Confirm new password"
-                      />
-                    </div>
-
-                    <Button type="button" onClick={handleChangePassword}>
-                      Change Password
-                    </Button>
-                  </form>
-                </div>
-
-                <div className="border-t pt-6">
-                  <h3 className="font-medium text-gray-900 mb-4">
-                    Two-Factor Authentication
-                  </h3>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-700 mb-1">
-                        Enable two-factor authentication for enhanced security
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Protect your account with an additional security layer
-                      </p>
-                    </div>
-                    <Button variant="outline">Enable 2FA</Button>
-                  </div>
-                </div>
-
-                <div className="border-t pt-6">
-                  <h3 className="font-medium text-gray-900 mb-4">
-                    Session Management
-                  </h3>
-                  <div>
-                    <p className="text-sm text-gray-700 mb-4">
-                      You're currently logged in on these devices:
-                    </p>
-
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
-                        <div>
-                          <p className="font-medium">Current Device</p>
-                          <p className="text-sm text-gray-600">
-                            Windows • Chrome • IP: 192.168.1.1
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
-                        <div>
-                          <p className="font-medium">Mobile Device</p>
-                          <p className="text-sm text-gray-600">
-                            iOS • Safari • Last active: 2 days ago
-                          </p>
-                        </div>
-                        <Button variant="outline" size="sm">
-                          Log Out
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}{" "}
         {activeTab === "danger" && (
           <Card className="border-red-200">
             <CardHeader>
@@ -672,6 +1429,7 @@ const Settings: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
+                {" "}
                 <div>
                   <h3 className="font-medium text-gray-900 mb-2">
                     Export Your Data
@@ -680,9 +1438,10 @@ const Settings: React.FC = () => {
                     Download all your personal data and startup ideas in a
                     portable format
                   </p>
-                  <Button variant="outline">Export My Data</Button>
+                  <Button variant="outline" onClick={handleExportData}>
+                    Export My Data
+                  </Button>
                 </div>
-
                 <div className="border-t pt-6">
                   <h3 className="font-medium text-red-600 mb-2">
                     Delete Account

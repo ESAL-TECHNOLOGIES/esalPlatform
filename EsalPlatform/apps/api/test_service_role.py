@@ -64,9 +64,9 @@ async def test_service_role_key():
     
     print("\n🔧 Testing Profile Creation (Mock)...")
     print("=" * 50)
-    
-    # Test 4: Test profile creation with mock data
-    test_user_id = "test-user-12345"
+      # Test 4: Test profile creation with mock data
+    # Using proper UUID format to comply with PostgreSQL auth.users(id) foreign key constraint
+    test_user_id = "123e4567-e89b-12d3-a456-426614174001"
     test_user_data = {
         "email": "test@example.com",
         "full_name": "Test User",

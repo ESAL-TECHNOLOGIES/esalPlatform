@@ -276,3 +276,23 @@ class SupabaseAuthService:
         except Exception as e:
             logger.error(f"Error deleting user account: {e}")
             return False
+        
+    async def verify_password(self, user_id: str, password: str) -> bool:
+        """Verify user's current password by attempting to sign in"""
+        try:
+            # Get user's email first
+            user_data = await self.get_user_by_id(user_id)
+            if not user_data:
+                return False
+            
+            # Try to sign in with the provided password to verify it
+            auth_response = self.supabase.auth.sign_in_with_password({
+                "email": user_data["email"],
+                "password": password
+            })
+            
+            return auth_response.user is not None
+            
+        except Exception as e:
+            logger.error(f"Error verifying password: {e}")
+            return False

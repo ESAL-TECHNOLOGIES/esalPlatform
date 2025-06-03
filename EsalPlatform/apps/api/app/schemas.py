@@ -89,6 +89,12 @@ class IdeaResponse(IdeaBase):
     views_count: int = 0
     interests_count: int = 0
     ai_score: Optional[float] = None
+    # Additional fields for frontend compatibility
+    industry: Optional[str] = None
+    stage: Optional[str] = "idea"
+    category: Optional[str] = None
+    tags: Optional[List[str]] = None
+    visibility: Optional[str] = "private"
     
     class Config:
         from_attributes = True
@@ -196,6 +202,7 @@ class AIGenerateIdeaRequest(BaseModel):
     industry: Optional[str] = None
     problem_area: Optional[str] = None
     target_market: Optional[str] = None
+    save_to_database: Optional[bool] = False
 
 
 class AIFineTuneRequest(BaseModel):
@@ -224,6 +231,7 @@ class AIInteractionResponse(BaseModel):
     suggestions: Optional[List[str]] = None
     confidence_score: Optional[float] = None
     generated_at: datetime
+    metadata: Optional[Dict[str, Any]] = None
     
     class Config:
         from_attributes = True
@@ -238,6 +246,7 @@ class AIJudgeResponse(BaseModel):
     technical_feasibility: float
     business_potential: float
     generated_at: datetime
+    metadata: Optional[Dict[str, Any]] = None
     
     class Config:
         from_attributes = True
@@ -247,6 +256,24 @@ class AIJudgeResponse(BaseModel):
 class ChangePasswordRequest(BaseModel):
     current_password: str
     new_password: str
+    confirm_password: str
+
+
+class Enable2FARequest(BaseModel):
+    password: str
+
+
+class Verify2FARequest(BaseModel):
+    token: str
+
+
+class SessionInfo(BaseModel):
+    device: str
+    browser: str
+    ip_address: str
+    location: str
+    last_active: datetime
+    is_current: bool = False
 
 
 class NotificationPreferences(BaseModel):
@@ -255,13 +282,6 @@ class NotificationPreferences(BaseModel):
     weeklyDigest: bool = True
     investorInterest: bool = True
     systemAlerts: bool = False
-
-
-class UserSettings(BaseModel):
-    theme: str = "light"
-    language: str = "en"
-    timezone: str = "UTC"
-    notifications: NotificationPreferences = NotificationPreferences()
 
 
 class UserDataExport(BaseModel):
