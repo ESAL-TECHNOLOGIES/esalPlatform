@@ -7,10 +7,12 @@ import asyncio
 import sys
 import os
 import json
+import pytest
 
 # Add the app directory to Python path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'app'))
 
+@pytest.mark.asyncio
 async def test_complete_flow():
     """Test the complete data flow for view-ideas endpoint"""
     print("🧪 Testing complete view-ideas endpoint integration...")
@@ -175,8 +177,7 @@ async def test_complete_flow():
         print("\n🎉 All tests completed successfully!")
         print("\n📋 Summary:")
         print("   ✅ Service initialization working")
-        print("   ✅ Schema validation passing")
-        print("   ✅ Field mapping correct")
+        print("   ✅ Schema validation passing")        print("   ✅ Field mapping correct")
         print("   ✅ Frontend compatibility confirmed")
         print("   ✅ JSON serialization working")
         print("   ✅ Router response model validated")
@@ -185,6 +186,4 @@ async def test_complete_flow():
         print(f"\n❌ Test failed with error: {e}")
         import traceback
         traceback.print_exc()
-
-if __name__ == "__main__":
-    asyncio.run(test_complete_flow())
+        raise  # Re-raise for pytest to catch

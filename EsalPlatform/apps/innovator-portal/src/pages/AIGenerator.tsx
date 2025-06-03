@@ -283,7 +283,6 @@ const AIGenerator: React.FC = () => {
       setIsLoading(false);
     }
   };
-
   const handleGetRecommendations = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -296,6 +295,13 @@ const AIGenerator: React.FC = () => {
         throw new Error("Authentication required");
       }
 
+      // Prepare the request with user ideas
+      const requestData = {
+        user_id: "", // This will be set by the backend from the token
+        current_ideas: userIdeas.map(idea => `${idea.title}: ${idea.description || ''}`).filter(ideaText => ideaText.length > 10),
+        focus_area: recommendationsForm.focus_area
+      };
+
       const response = await fetch(
         "http://localhost:8000/api/v1/innovator/ai/recommendations",
         {
@@ -304,7 +310,7 @@ const AIGenerator: React.FC = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(recommendationsForm),
+          body: JSON.stringify(requestData),
         }
       );
 
@@ -704,11 +710,20 @@ const AIGenerator: React.FC = () => {
                   startup ideas
                 </div>
               </form>
-            )}
-
-            {/* Fine-tune Tab */}
+            )}            {/* Fine-tune Tab */}
             {activeTab === "finetune" && (
               <form onSubmit={handleFineTuneIdea} className="space-y-4">
+                <div className="bg-green-50 p-4 rounded-lg mb-4">
+                  <h4 className="font-semibold text-green-800 mb-2">
+                    🔧 AI Idea Fine-tuning
+                  </h4>
+                  <p className="text-sm text-green-700">
+                    Select an existing idea and choose which aspect you want to
+                    improve. Our AI will provide specific, actionable recommendations
+                    to strengthen your concept.
+                  </p>
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Select Idea to Fine-tune *
@@ -721,17 +736,27 @@ const AIGenerator: React.FC = () => {
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="">Choose an idea...</option>
+                    <option value="">Choose an idea to improve...</option>
                     {userIdeas.map((idea) => (
                       <option key={idea.id} value={idea.id}>
                         {idea.title}
+                        {idea.ai_score && ` (AI Score: ${idea.ai_score}/10)`}
                       </option>
                     ))}
                   </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {userIdeas.length === 0
+                      ? "No ideas found. Create an idea first to use fine-tuning."
+                      : `${userIdeas.length} ideas available for improvement`}
+                  </p>
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Current Content
+                    <span className="text-xs text-gray-500 ml-1">
+                      (Auto-filled from selected idea)
+                    </span>
                   </label>
                   <textarea
                     value={finetuneForm.current_content}
@@ -744,13 +769,20 @@ const AIGenerator: React.FC = () => {
                     }
                     rows={4}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Current idea description will appear here..."
-                    readOnly
+                    placeholder="Select an idea above to see its description here. You can also edit this content before fine-tuning..."
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Edit the content if needed - AI will use this as the base for
+                    improvements
+                  </p>
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Improvement Focus
+                    Improvement Focus Area *
+                    <span className="text-xs text-gray-500 ml-1">
+                      (What specific aspect needs improvement?)
+                    </span>
                   </label>
                   <select
                     value={finetuneForm.improvement_focus}
@@ -763,18 +795,45 @@ const AIGenerator: React.FC = () => {
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="problem_statement">Problem Statement</option>
-                    <option value="solution_design">Solution Design</option>
-                    <option value="target_market">Target Market</option>
-                    <option value="business_model">Business Model</option>
+                    <option value="problem_statement">
+                      🎯 Problem Statement - Define the problem more clearly
+                    </option>
+                    <option value="solution_design">
+                      💡 Solution Design - Improve the proposed solution
+                    </option>
+                    <option value="target_market">
+                      👥 Target Market - Refine market identification
+                    </option>
+                    <option value="business_model">
+                      💰 Business Model - Strengthen revenue strategy
+                    </option>
                     <option value="competitive_advantage">
-                      Competitive Advantage
+                      🏆 Competitive Advantage - Identify unique strengths
+                    </option>
+                    <option value="market_analysis">
+                      📊 Market Analysis - Deep dive into market opportunity
+                    </option>
+                    <option value="technical_feasibility">
+                      ⚙️ Technical Feasibility - Assess implementation challenges
+                    </option>
+                    <option value="financial_projections">
+                      📈 Financial Projections - Improve financial planning
+                    </option>
+                    <option value="go_to_market">
+                      🚀 Go-to-Market Strategy - Plan market entry
                     </option>
                   </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Choose the area where you want the most improvement
+                  </p>
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Additional Context
+                    Additional Context & Specific Requests
+                    <span className="text-xs text-gray-500 ml-1">
+                      (Optional but recommended)
+                    </span>
                   </label>
                   <textarea
                     value={finetuneForm.additional_context}
@@ -787,23 +846,120 @@ const AIGenerator: React.FC = () => {
                     }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Any specific guidance or areas you want to focus on..."
+                    placeholder="Provide specific guidance for AI improvements, e.g.:
+• Focus on B2B enterprise customers
+• Include sustainability aspects
+• Consider mobile-first approach
+• Address privacy concerns
+• Include international expansion plans"
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    More specific context leads to better, more targeted AI recommendations
+                  </p>
                 </div>
+
+                {/* Improvement Focus Guidelines */}
+                {finetuneForm.improvement_focus && (
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <h5 className="font-medium text-blue-800 mb-2">
+                      💡 What AI will help you improve:
+                    </h5>
+                    <div className="text-sm text-blue-700">
+                      {finetuneForm.improvement_focus === "problem_statement" && (
+                        <ul className="list-disc list-inside space-y-1">
+                          <li>Clarify the core problem and pain points</li>
+                          <li>Quantify the problem's impact and scope</li>
+                          <li>Identify specific user frustrations</li>
+                          <li>Validate problem-market fit evidence</li>
+                        </ul>
+                      )}
+                      {finetuneForm.improvement_focus === "solution_design" && (
+                        <ul className="list-disc list-inside space-y-1">
+                          <li>Refine the core solution approach</li>
+                          <li>Suggest technical implementation options</li>
+                          <li>Identify key features and functionality</li>
+                          <li>Address potential solution limitations</li>
+                        </ul>
+                      )}
+                      {finetuneForm.improvement_focus === "target_market" && (
+                        <ul className="list-disc list-inside space-y-1">
+                          <li>Define specific customer segments</li>
+                          <li>Identify early adopters and champions</li>
+                          <li>Analyze market size and accessibility</li>
+                          <li>Suggest market entry strategies</li>
+                        </ul>
+                      )}
+                      {finetuneForm.improvement_focus === "business_model" && (
+                        <ul className="list-disc list-inside space-y-1">
+                          <li>Explore revenue model options</li>
+                          <li>Analyze pricing strategies</li>
+                          <li>Identify key partnerships and channels</li>
+                          <li>Assess scalability potential</li>
+                        </ul>
+                      )}
+                      {finetuneForm.improvement_focus === "competitive_advantage" && (
+                        <ul className="list-disc list-inside space-y-1">
+                          <li>Identify unique value propositions</li>
+                          <li>Analyze competitive landscape</li>
+                          <li>Suggest differentiation strategies</li>
+                          <li>Highlight sustainable advantages</li>
+                        </ul>
+                      )}
+                      {finetuneForm.improvement_focus === "market_analysis" && (
+                        <ul className="list-disc list-inside space-y-1">
+                          <li>Deep dive into market trends</li>
+                          <li>Identify growth opportunities</li>
+                          <li>Analyze market timing and readiness</li>
+                          <li>Assess regulatory and external factors</li>
+                        </ul>
+                      )}
+                      {finetuneForm.improvement_focus === "technical_feasibility" && (
+                        <ul className="list-disc list-inside space-y-1">
+                          <li>Assess technical implementation challenges</li>
+                          <li>Suggest technology stack options</li>
+                          <li>Identify development milestones</li>
+                          <li>Address scalability and performance</li>
+                        </ul>
+                      )}
+                      {finetuneForm.improvement_focus === "financial_projections" && (
+                        <ul className="list-disc list-inside space-y-1">
+                          <li>Improve revenue forecasting</li>
+                          <li>Analyze cost structure and unit economics</li>
+                          <li>Suggest funding requirements</li>
+                          <li>Identify key financial metrics</li>
+                        </ul>
+                      )}
+                      {finetuneForm.improvement_focus === "go_to_market" && (
+                        <ul className="list-disc list-inside space-y-1">
+                          <li>Develop launch strategy and timeline</li>
+                          <li>Identify marketing channels and tactics</li>
+                          <li>Plan customer acquisition approach</li>
+                          <li>Suggest partnership opportunities</li>
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 <Button
                   type="submit"
                   disabled={isLoading || !finetuneForm.idea_id}
-                  className="w-full"
+                  className="w-full bg-green-600 hover:bg-green-700"
                 >
                   {isLoading ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Fine-tuning...
+                      🔧 Analyzing & Fine-tuning...
                     </>
                   ) : (
-                    "Fine-tune Idea"
+                    <>🚀 Get AI Improvement Recommendations</>
                   )}
                 </Button>
+
+                <div className="text-xs text-gray-500 text-center">
+                  AI will analyze your idea and provide specific, actionable improvements
+                  for the selected focus area
+                </div>
               </form>
             )}
 
@@ -898,14 +1054,76 @@ const AIGenerator: React.FC = () => {
                   )}
                 </Button>
               </form>
-            )}
-
-            {/* Recommendations Tab */}
+            )}            {/* Recommendations Tab */}
             {activeTab === "recommendations" && (
               <form onSubmit={handleGetRecommendations} className="space-y-4">
+                <div className="bg-purple-50 p-4 rounded-lg mb-4">
+                  <h4 className="font-semibold text-purple-800 mb-2">
+                    🎯 AI Strategy Recommendations
+                  </h4>
+                  <p className="text-sm text-purple-700">
+                    Get personalized strategic recommendations based on your entire ideas portfolio.
+                    AI will analyze patterns, identify opportunities, and suggest next steps for growth.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white p-4 rounded border">
+                    <h5 className="font-medium text-gray-800 mb-2">📊 Portfolio Overview</h5>
+                    <div className="text-sm text-gray-600 space-y-1">
+                      <div className="flex justify-between">
+                        <span>Total Ideas:</span>
+                        <span className="font-medium">{userIdeas.length}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Categories:</span>
+                        <span className="font-medium">
+                          {new Set(userIdeas.map(idea => idea.category).filter(Boolean)).size || 0}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Avg AI Score:</span>
+                        <span className="font-medium">
+                          {userIdeas.length > 0 
+                            ? (userIdeas.reduce((sum, idea) => sum + (idea.ai_score || 0), 0) / userIdeas.length).toFixed(1)
+                            : 'N/A'
+                          }/10
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-4 rounded border">
+                    <h5 className="font-medium text-gray-800 mb-2">🔍 Recent Activity</h5>
+                    <div className="text-sm text-gray-600 space-y-1">
+                      <div className="flex justify-between">
+                        <span>Latest Idea:</span>
+                        <span className="font-medium text-right max-w-32 truncate">
+                          {userIdeas.length > 0 ? userIdeas[userIdeas.length - 1].title : 'None'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Draft Ideas:</span>
+                        <span className="font-medium">
+                          {userIdeas.filter(idea => idea.status === 'draft').length}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Public Ideas:</span>
+                        <span className="font-medium">
+                          {userIdeas.filter(idea => idea.visibility === 'public').length}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Focus Area
+                    Recommendation Focus Area *
+                    <span className="text-xs text-gray-500 ml-1">
+                      (What area needs the most attention?)
+                    </span>
                   </label>
                   <select
                     value={recommendationsForm.focus_area}
@@ -918,37 +1136,155 @@ const AIGenerator: React.FC = () => {
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="general">General Recommendations</option>
-                    <option value="market_analysis">Market Analysis</option>
-                    <option value="competition">Competitive Landscape</option>
-                    <option value="funding">Funding Opportunities</option>
-                    <option value="team_building">Team Building</option>
-                    <option value="product_development">
-                      Product Development
-                    </option>
-                    <option value="marketing_strategy">
-                      Marketing Strategy
-                    </option>
+                    <option value="general">🎯 General Strategy - Overall portfolio improvement</option>
+                    <option value="market_analysis">📊 Market Analysis - Market opportunities & sizing</option>
+                    <option value="competition">🏆 Competitive Landscape - Competitor analysis & positioning</option>
+                    <option value="funding">💰 Funding Strategy - Investment readiness & sources</option>
+                    <option value="team_building">👥 Team Building - Hiring & partnership strategies</option>
+                    <option value="product_development">⚙️ Product Development - Technical roadmap & MVP</option>
+                    <option value="marketing_strategy">📢 Marketing Strategy - Customer acquisition & branding</option>
+                    <option value="business_model">💼 Business Model - Revenue streams & scalability</option>
+                    <option value="risk_management">⚠️ Risk Management - Challenges & mitigation strategies</option>
+                    <option value="scaling">📈 Growth & Scaling - Expansion and growth strategies</option>
                   </select>
                 </div>
+
+                {/* Focus Area Guidelines */}
                 <div className="bg-blue-50 p-4 rounded-lg">
-                  <p className="text-sm text-blue-700">
-                    💡 <strong>Portfolio Analysis:</strong> AI will analyze your
-                    current ideas portfolio ({userIdeas.length} ideas) to
-                    provide personalized recommendations for improvement and
-                    growth.
-                  </p>
+                  <h5 className="font-medium text-blue-800 mb-2">
+                    💡 What you'll get based on your focus:
+                  </h5>
+                  <div className="text-sm text-blue-700">
+                    {recommendationsForm.focus_area === "general" && (
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Portfolio-wide pattern analysis and themes</li>
+                        <li>Cross-idea synergies and opportunities</li>
+                        <li>Strategic priorities for next 3-6 months</li>
+                        <li>Skill development recommendations</li>
+                        <li>Networking and partnership suggestions</li>
+                      </ul>
+                    )}
+                    {recommendationsForm.focus_area === "market_analysis" && (
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Market size and opportunity assessment</li>
+                        <li>Customer segment identification</li>
+                        <li>Market entry strategies</li>
+                        <li>Trends and timing analysis</li>
+                        <li>Geographic expansion opportunities</li>
+                      </ul>
+                    )}
+                    {recommendationsForm.focus_area === "competition" && (
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Competitive landscape mapping</li>
+                        <li>Differentiation opportunities</li>
+                        <li>White space identification</li>
+                        <li>Competitive advantage development</li>
+                        <li>Market positioning strategies</li>
+                      </ul>
+                    )}
+                    {recommendationsForm.focus_area === "funding" && (
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Investment readiness assessment</li>
+                        <li>Funding stage and amount recommendations</li>
+                        <li>Investor type and criteria matching</li>
+                        <li>Pitch deck optimization suggestions</li>
+                        <li>Alternative funding sources</li>
+                      </ul>
+                    )}
+                    {recommendationsForm.focus_area === "team_building" && (
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Key roles and hiring priorities</li>
+                        <li>Co-founder compatibility analysis</li>
+                        <li>Advisory board recommendations</li>
+                        <li>Equity and compensation strategies</li>
+                        <li>Team culture and management tips</li>
+                      </ul>
+                    )}
+                    {recommendationsForm.focus_area === "product_development" && (
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>MVP definition and feature prioritization</li>
+                        <li>Technical architecture recommendations</li>
+                        <li>Development timeline and milestones</li>
+                        <li>Technology stack suggestions</li>
+                        <li>Quality assurance and testing strategies</li>
+                      </ul>
+                    )}
+                    {recommendationsForm.focus_area === "marketing_strategy" && (
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Target audience definition and personas</li>
+                        <li>Marketing channel recommendations</li>
+                        <li>Content strategy and messaging</li>
+                        <li>Brand positioning and identity</li>
+                        <li>Customer acquisition cost optimization</li>
+                      </ul>
+                    )}
+                    {recommendationsForm.focus_area === "business_model" && (
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Revenue model optimization</li>
+                        <li>Pricing strategy development</li>
+                        <li>Cost structure analysis</li>
+                        <li>Partnership and distribution channels</li>
+                        <li>Scalability and unit economics</li>
+                      </ul>
+                    )}
+                    {recommendationsForm.focus_area === "risk_management" && (
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Risk identification and assessment</li>
+                        <li>Mitigation strategies and contingency plans</li>
+                        <li>Market and regulatory risk analysis</li>
+                        <li>Technical and operational risk management</li>
+                        <li>Financial risk and cash flow planning</li>
+                      </ul>
+                    )}
+                    {recommendationsForm.focus_area === "scaling" && (
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Growth strategy and expansion planning</li>
+                        <li>Scalability bottlenecks identification</li>
+                        <li>International expansion opportunities</li>
+                        <li>Operational efficiency improvements</li>
+                        <li>Exit strategy considerations</li>
+                      </ul>
+                    )}
+                  </div>
                 </div>
-                <Button type="submit" disabled={isLoading} className="w-full">
+
+                <div className="bg-yellow-50 p-4 rounded-lg">
+                  <div className="flex items-start space-x-2">
+                    <span className="text-yellow-600">💡</span>
+                    <div className="text-sm text-yellow-800">
+                      <p className="font-medium mb-1">Smart Portfolio Analysis:</p>
+                      <p>
+                        AI will analyze your {userIdeas.length} idea{userIdeas.length !== 1 ? 's' : ''} to identify patterns, 
+                        gaps, and opportunities. The more detailed your ideas, the better the recommendations!
+                        {userIdeas.length === 0 && (
+                          <span className="block mt-2 text-red-600 font-medium">
+                            ⚠️ You need at least one idea to get recommendations. Create an idea first!
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <Button 
+                  type="submit" 
+                  disabled={isLoading || userIdeas.length === 0} 
+                  className="w-full bg-purple-600 hover:bg-purple-700"
+                >
                   {isLoading ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Analyzing Portfolio...
+                      🧠 Analyzing Portfolio...
                     </>
                   ) : (
-                    "Get Recommendations"
+                    <>🎯 Get Strategic Recommendations</>
                   )}
                 </Button>
+
+                <div className="text-xs text-gray-500 text-center">
+                  AI will provide personalized strategic recommendations based on your 
+                  {userIdeas.length} idea{userIdeas.length !== 1 ? 's' : ''} and selected focus area
+                </div>
               </form>
             )}
           </CardContent>
@@ -1027,20 +1363,221 @@ const AIGenerator: React.FC = () => {
                       )}
                     </div>
                   </div>
-                )}
+                )}                {activeTab !== "generate" && (
+                  <div className="space-y-4">
+                    {/* Fine-tune specific display */}
+                    {activeTab === "finetune" && (
+                      <div className="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-lg border border-green-200">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                            🔧 AI Fine-tuning Recommendations
+                          </h3>
+                          <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                            Focus: {finetuneForm.improvement_focus.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          </span>
+                        </div>
 
-                {activeTab !== "generate" && (
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="font-semibold text-gray-800 mb-2">
-                      AI Response
-                    </h3>
-                    <div className="whitespace-pre-wrap text-sm text-gray-700">
-                      {aiResponse.response_text}
-                    </div>
-                    {aiResponse.confidence_score && (
-                      <div className="mt-3 text-xs text-gray-500">
-                        Confidence:{" "}
-                        {Math.round(aiResponse.confidence_score * 100)}%
+                        <div className="prose prose-sm max-w-none">
+                          <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                            {aiResponse.response_text}
+                          </div>
+                        </div>
+
+                        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="bg-white p-3 rounded border">
+                            <div className="text-xs font-medium text-gray-600 mb-1">IMPROVEMENT CONFIDENCE</div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div 
+                                  className="bg-green-600 h-2 rounded-full" 
+                                  style={{width: `${(aiResponse.confidence_score || 0.8) * 100}%`}}
+                                ></div>
+                              </div>
+                              <span className="text-sm font-medium text-green-600">
+                                {Math.round((aiResponse.confidence_score || 0.8) * 100)}%
+                              </span>
+                            </div>
+                          </div>
+                          <div className="bg-white p-3 rounded border">
+                            <div className="text-xs font-medium text-gray-600 mb-1">ANALYSIS DATE</div>
+                            <div className="text-sm text-gray-700">
+                              {new Date(aiResponse.generated_at).toLocaleDateString()} at{" "}
+                              {new Date(aiResponse.generated_at).toLocaleTimeString()}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Action buttons for fine-tune results */}
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              // Copy the improvement recommendations to clipboard
+                              navigator.clipboard.writeText(aiResponse.response_text);
+                              setSuccessMessage("💾 Recommendations copied to clipboard!");
+                            }}
+                            className="text-xs"
+                          >
+                            📋 Copy Recommendations
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              // Switch to judge tab to evaluate the improved idea
+                              setActiveTab("judge");
+                              clearResults();
+                            }}
+                            className="text-xs"
+                          >
+                            ⚖️ Judge Improved Idea
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              // Navigate to My Ideas to edit the original idea
+                              window.open('/my-ideas', '_blank');
+                            }}
+                            className="text-xs"
+                          >
+                            ✏️ Edit Original Idea
+                          </Button>
+                        </div>
+                      </div>
+                    )}                    {/* Recommendations specific display */}
+                    {activeTab === "recommendations" && (
+                      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-lg border border-purple-200">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                            🎯 AI Strategic Recommendations
+                          </h3>
+                          <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
+                            Focus: {recommendationsForm.focus_area.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          </span>
+                        </div>
+
+                        <div className="prose prose-sm max-w-none">
+                          <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                            {aiResponse.response_text}
+                          </div>
+                        </div>
+
+                        {/* Action Items */}
+                        {aiResponse.suggestions && aiResponse.suggestions.length > 0 && (
+                          <div className="mt-6 bg-white p-4 rounded border">
+                            <h5 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
+                              ✅ Priority Action Items
+                            </h5>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                              {aiResponse.suggestions.slice(0, 6).map((suggestion, index) => (
+                                <div key={index} className="flex items-start space-x-2 text-sm">
+                                  <span className="text-purple-600 font-bold text-xs mt-0.5">
+                                    {index + 1}.
+                                  </span>
+                                  <span className="text-gray-700">{suggestion}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="bg-white p-3 rounded border text-center">
+                            <div className="text-xs font-medium text-gray-600 mb-1">STRATEGY CONFIDENCE</div>
+                            <div className="flex items-center justify-center gap-2">
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div 
+                                  className="bg-purple-600 h-2 rounded-full" 
+                                  style={{width: `${(aiResponse.confidence_score || 0.85) * 100}%`}}
+                                ></div>
+                              </div>
+                              <span className="text-sm font-medium text-purple-600">
+                                {Math.round((aiResponse.confidence_score || 0.85) * 100)}%
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="bg-white p-3 rounded border text-center">
+                            <div className="text-xs font-medium text-gray-600 mb-1">IDEAS ANALYZED</div>
+                            <div className="text-lg font-bold text-purple-600">{userIdeas.length}</div>
+                          </div>
+
+                          <div className="bg-white p-3 rounded border text-center">
+                            <div className="text-xs font-medium text-gray-600 mb-1">RECOMMENDATIONS</div>
+                            <div className="text-lg font-bold text-purple-600">
+                              {aiResponse.suggestions?.length || 3}+
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              navigator.clipboard.writeText(aiResponse.response_text);
+                              setSuccessMessage("📋 Recommendations copied to clipboard!");
+                            }}
+                            className="text-xs"
+                          >
+                            📋 Copy Recommendations
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              // Switch to generate tab for new ideas based on recommendations
+                              setActiveTab("generate");
+                              clearResults();
+                            }}
+                            className="text-xs"
+                          >
+                            💡 Generate New Ideas
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              // Switch to fine-tune tab to improve existing ideas
+                              setActiveTab("finetune");
+                              clearResults();
+                            }}
+                            className="text-xs"
+                          >
+                            🔧 Fine-tune Ideas
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              // Open metrics page in new tab
+                              window.open('/metrics', '_blank');
+                            }}
+                            className="text-xs"
+                          >
+                            📊 View Metrics
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Generic display for other tabs */}
+                    {activeTab !== "finetune" && activeTab !== "recommendations" && (
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <h3 className="font-semibold text-gray-800 mb-2">
+                          AI Response
+                        </h3>
+                        <div className="whitespace-pre-wrap text-sm text-gray-700">
+                          {aiResponse.response_text}
+                        </div>
+                        {aiResponse.confidence_score && (
+                          <div className="mt-3 text-xs text-gray-500">
+                            Confidence:{" "}
+                            {Math.round(aiResponse.confidence_score * 100)}%
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -1058,9 +1595,7 @@ const AIGenerator: React.FC = () => {
                         ))}
                       </ul>
                     </div>
-                  )}
-
-                {activeTab === "generate" && (
+                  )}                {activeTab === "generate" && (
                   <div className="bg-yellow-50 p-4 rounded-lg">
                     <h4 className="font-semibold text-yellow-800 mb-2">
                       🎯 Next Steps
@@ -1074,6 +1609,36 @@ const AIGenerator: React.FC = () => {
                       <li>Use "Fine-tune Ideas" to improve specific aspects</li>
                       <li>Research competitors and validate the problem</li>
                       <li>Create a simple prototype or MVP plan</li>
+                    </ul>
+                  </div>
+                )}
+
+                {activeTab === "recommendations" && (
+                  <div className="bg-indigo-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-indigo-800 mb-2">
+                      🚀 Implementation Roadmap
+                    </h4>
+                    <ul className="list-disc list-inside text-sm text-indigo-700 space-y-1">
+                      <li>Prioritize the top 3 recommendations for immediate action</li>
+                      <li>Set specific deadlines and milestones for each recommendation</li>
+                      <li>Use the suggested focus areas to guide your next steps</li>
+                      <li>Re-run recommendations monthly to track progress</li>
+                      <li>Document your progress and measure the impact</li>
+                    </ul>
+                  </div>
+                )}
+
+                {activeTab === "finetune" && (
+                  <div className="bg-green-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-green-800 mb-2">
+                      🔧 Implementation Tips
+                    </h4>
+                    <ul className="list-disc list-inside text-sm text-green-700 space-y-1">
+                      <li>Apply the improvements to your original idea</li>
+                      <li>Test the improved concept with potential customers</li>
+                      <li>Use "Judge Ideas" to score the improved version</li>
+                      <li>Consider multiple improvement cycles for best results</li>
+                      <li>Document changes and track improvement metrics</li>
                     </ul>
                   </div>
                 )}

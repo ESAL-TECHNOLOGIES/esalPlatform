@@ -37,49 +37,92 @@ class SupabaseIdeasService:
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail="Ideas service is not available"
-            )    
+            )        
     async def create_idea(self, user_id: str, idea_data: IdeaCreate) -> Dict[str, Any]:
         """Create a new idea in Supabase"""
         try:
-            # Build description from structured fields
-            description_parts = []
-            if idea_data.problem:
-                description_parts.append(f"Problem: {idea_data.problem}")
-            if idea_data.solution:
-                description_parts.append(f"Solution: {idea_data.solution}")
-            if idea_data.target_market:
-                description_parts.append(f"Target Market: {idea_data.target_market}")
-            description = "\n\n".join(description_parts) if description_parts else "No description provided"              # Build idea record with structured fields
+            logger.info(f"Creating idea for user: {user_id}")
+            logger.info(f"Idea data received: {idea_data}")
+            
+            # Use description from frontend if provided, otherwise build from structured fields
+            description = idea_data.description
+            if not description and (idea_data.problem or idea_data.solution or idea_data.target_market):
+                # Build description from structured fields if no direct description provided
+                description_parts = []
+                if idea_data.problem:
+                    description_parts.append(f"Problem: {idea_data.problem}")
+                if idea_data.solution:
+                    description_parts.append(f"Solution: {idea_data.solution}")
+                if idea_data.target_market:
+                    description_parts.append(f"Target Market: {idea_data.target_market}")
+                description = "\n\n".join(description_parts)
+            
+            # Build idea record with all fields from frontend
             idea_record = {
                 "user_id": user_id,
                 "title": idea_data.title,
-                "description": description,
-                "problem": idea_data.problem,
-                "solution": idea_data.solution,
-                "target_market": idea_data.target_market,
-                "status": "draft",
+                "description": description or "No description provided",
+                "category": idea_data.category,
+                "tags": idea_data.tags or [],
+                "status": idea_data.status or "draft",
+                "visibility": idea_data.visibility or "private",
                 "view_count": 0,
                 "interest_count": 0,
                 "created_at": datetime.now(timezone.utc).isoformat(),
-                "updated_at": datetime.now(timezone.utc).isoformat()            }
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }
+            
+            # Add structured fields if they exist
+            if idea_data.problem:
+                idea_record["problem"] = idea_data.problem
+            if idea_data.solution:
+                idea_record["solution"] = idea_data.solution
+            if idea_data.target_market:
+                idea_record["target_market"] = idea_data.target_market
+            
+            logger.info(f"Idea record to insert: {idea_record}")
             
             result = self.supabase.table("ideas").insert(idea_record).execute()
             
+            logger.info(f"Supabase result: {result}")
+            logger.info(f"Result data: {result.data}")
+            logger.info(f"Result count: {result.count}")
+            
             if result.data:
+                logger.info(f"Successfully created idea with ID: {result.data[0].get('id')}")
                 return result.data[0]
             else:
+                logger.error("No data returned from Supabase insert")
+                logger.error(f"Full result object: {vars(result)}")
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Failed to create idea"
+                    detail="Failed to create idea - no data returned"
                 )
         except Exception as e:
             logger.error(f"Error creating idea: {e}")
+            logger.error(f"Error type: {type(e).__name__}")
+            logger.error(f"Error args: {e.args}")
+            
+            # Log Supabase-specific error details
+            if hasattr(e, 'message'):
+                logger.error(f"Supabase error message: {e.message}")
+            if hasattr(e, 'details'):
+                logger.error(f"Supabase error details: {e.details}")
+            if hasattr(e, 'code'):
+                logger.error(f"Supabase error code: {e.code}")
+            if hasattr(e, 'hint'):
+                logger.error(f"Supabase error hint: {e.hint}")
+                
+            # Print full exception info for debugging
+            import traceback
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            
             if isinstance(e, HTTPException):
                 raise e
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to create idea"
-            )    
+                detail=f"Failed to create idea: {str(e)}"
+            )
     async def get_user_ideas(self, user_id: str, limit: Optional[int] = None) -> List[Dict[str, Any]]:
         """Get all ideas for a specific user"""
         try:
