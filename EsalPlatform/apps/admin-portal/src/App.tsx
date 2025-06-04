@@ -1,42 +1,76 @@
-import React from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { Layout } from '@esal/ui'
-import Dashboard from './pages/Dashboard'
-import Users from './pages/Users'
-import Analytics from './pages/Analytics'
-import Content from './pages/Content'
-import Settings from './pages/Settings'
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+import { Layout } from "@esal/ui";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { Navbar } from "./components/Navbar";
+import { Sidebar } from "./components/Sidebar";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import Users from "./pages/Users";
+import Analytics from "./pages/Analytics";
+import Content from "./pages/Content";
+import Settings from "./pages/Settings";
 
-const navigation = [
-  { name: 'Dashboard', href: '/', icon: '📊' },
-  { name: 'Users', href: '/users', icon: '👥' },
-  { name: 'Analytics', href: '/analytics', icon: '📈' },
-  { name: 'Content', href: '/content', icon: '📝' },
-  { name: 'Settings', href: '/settings', icon: '⚙️' },
-]
+// Auth guard component - prevents logged-in users from accessing login
+const AuthRedirect = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? (
+    <Navigate to="/dashboard" replace />
+  ) : (
+    <>{children}</>
+  );
+};
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+
+  // Check if current route is login
+  const isLoginRoute = location.pathname === "/login";
+
+  if (isLoginRoute) {
+    return (
+      <AuthRedirect>
+        <Login />
+      </AuthRedirect>
+    );
+  }
+
   return (
-    <Router>
-      <Layout 
-        title="Admin Portal"
-        navigation={navigation}
-        userMenu={[
-          { name: 'Admin Profile', href: '/profile' },
-          { name: 'System Settings', href: '/system' },
-          { name: 'Sign out', href: '/logout' },
-        ]}
-      >
+    <ProtectedRoute>
+      <Layout navbar={<Navbar />} sidebar={<Sidebar />}>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/users" element={<Users />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/content" element={<Content />} />
           <Route path="/settings" element={<Settings />} />
+          {/* Redirect any unknown routes to dashboard */}
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Layout>
-    </Router>
-  )
+    </ProtectedRoute>
+  );
 }
 
-export default App
+function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/*" element={<AppContent />} />
+        </Routes>
+      </AuthProvider>
+    </Router>
+  );
+}
+
+export default App;

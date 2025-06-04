@@ -290,3 +290,68 @@ class UserDataExport(BaseModel):
     activities: List[Dict[str, Any]]
     settings: Dict[str, Any]
     export_date: str
+
+
+# AI Matching schemas for Investor Portal
+class InvestorPreferences(BaseModel):
+    industries: List[str] = []
+    stages: List[str] = []
+    min_funding_amount: Optional[str] = None
+    max_funding_amount: Optional[str] = None
+    geographic_preferences: List[str] = []
+    risk_tolerance: str = "medium"  # conservative, medium, aggressive
+
+
+class AIMatchingRequest(BaseModel):
+    preferences: InvestorPreferences
+    top_k: Optional[int] = 10
+    min_score: Optional[float] = 0.6
+
+
+class MatchHighlight(BaseModel):
+    reason: str
+    score: float
+
+class StartupMatch(BaseModel):
+    startup_id: str
+    startup_title: str
+    industry: Optional[str] = None
+    stage: Optional[str] = None
+    description: Optional[str] = None
+    team_size: Optional[int] = None
+    funding_needed: Optional[str] = None
+    location: Optional[str] = None
+    target_market: Optional[str] = None
+    match_score: float
+    highlights: List[MatchHighlight] = []
+    traction: Optional[str] = None
+    
+    class Config:
+        from_attributes = True
+
+
+class MatchingStatistics(BaseModel):
+    total_startups_analyzed: int
+    high_quality_matches: int  # >80% score
+    average_score: float
+    processing_time_seconds: float
+    ai_confidence: float
+
+class AIMatchingResponse(BaseModel):
+    matches: List[StartupMatch]
+    total_matches: int
+    matching_statistics: MatchingStatistics
+    
+    class Config:
+        from_attributes = True
+
+
+class MatchingHistory(BaseModel):
+    id: str
+    investor_id: str
+    preferences: InvestorPreferences
+    matches_found: int
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True

@@ -298,8 +298,10 @@ const AIGenerator: React.FC = () => {
       // Prepare the request with user ideas
       const requestData = {
         user_id: "", // This will be set by the backend from the token
-        current_ideas: userIdeas.map(idea => `${idea.title}: ${idea.description || ''}`).filter(ideaText => ideaText.length > 10),
-        focus_area: recommendationsForm.focus_area
+        current_ideas: userIdeas
+          .map((idea) => `${idea.title}: ${idea.description || ""}`)
+          .filter((ideaText) => ideaText.length > 10),
+        focus_area: recommendationsForm.focus_area,
       };
 
       const response = await fetch(
@@ -710,7 +712,8 @@ const AIGenerator: React.FC = () => {
                   startup ideas
                 </div>
               </form>
-            )}            {/* Fine-tune Tab */}
+            )}{" "}
+            {/* Fine-tune Tab */}
             {activeTab === "finetune" && (
               <form onSubmit={handleFineTuneIdea} className="space-y-4">
                 <div className="bg-green-50 p-4 rounded-lg mb-4">
@@ -719,8 +722,8 @@ const AIGenerator: React.FC = () => {
                   </h4>
                   <p className="text-sm text-green-700">
                     Select an existing idea and choose which aspect you want to
-                    improve. Our AI will provide specific, actionable recommendations
-                    to strengthen your concept.
+                    improve. Our AI will provide specific, actionable
+                    recommendations to strengthen your concept.
                   </p>
                 </div>
 
@@ -772,8 +775,8 @@ const AIGenerator: React.FC = () => {
                     placeholder="Select an idea above to see its description here. You can also edit this content before fine-tuning..."
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Edit the content if needed - AI will use this as the base for
-                    improvements
+                    Edit the content if needed - AI will use this as the base
+                    for improvements
                   </p>
                 </div>
 
@@ -814,7 +817,8 @@ const AIGenerator: React.FC = () => {
                       📊 Market Analysis - Deep dive into market opportunity
                     </option>
                     <option value="technical_feasibility">
-                      ⚙️ Technical Feasibility - Assess implementation challenges
+                      ⚙️ Technical Feasibility - Assess implementation
+                      challenges
                     </option>
                     <option value="financial_projections">
                       📈 Financial Projections - Improve financial planning
@@ -854,7 +858,8 @@ const AIGenerator: React.FC = () => {
 • Include international expansion plans"
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    More specific context leads to better, more targeted AI recommendations
+                    More specific context leads to better, more targeted AI
+                    recommendations
                   </p>
                 </div>
 
@@ -865,7 +870,8 @@ const AIGenerator: React.FC = () => {
                       💡 What AI will help you improve:
                     </h5>
                     <div className="text-sm text-blue-700">
-                      {finetuneForm.improvement_focus === "problem_statement" && (
+                      {finetuneForm.improvement_focus ===
+                        "problem_statement" && (
                         <ul className="list-disc list-inside space-y-1">
                           <li>Clarify the core problem and pain points</li>
                           <li>Quantify the problem's impact and scope</li>
@@ -897,7 +903,8 @@ const AIGenerator: React.FC = () => {
                           <li>Assess scalability potential</li>
                         </ul>
                       )}
-                      {finetuneForm.improvement_focus === "competitive_advantage" && (
+                      {finetuneForm.improvement_focus ===
+                        "competitive_advantage" && (
                         <ul className="list-disc list-inside space-y-1">
                           <li>Identify unique value propositions</li>
                           <li>Analyze competitive landscape</li>
@@ -913,7 +920,8 @@ const AIGenerator: React.FC = () => {
                           <li>Assess regulatory and external factors</li>
                         </ul>
                       )}
-                      {finetuneForm.improvement_focus === "technical_feasibility" && (
+                      {finetuneForm.improvement_focus ===
+                        "technical_feasibility" && (
                         <ul className="list-disc list-inside space-y-1">
                           <li>Assess technical implementation challenges</li>
                           <li>Suggest technology stack options</li>
@@ -921,7 +929,8 @@ const AIGenerator: React.FC = () => {
                           <li>Address scalability and performance</li>
                         </ul>
                       )}
-                      {finetuneForm.improvement_focus === "financial_projections" && (
+                      {finetuneForm.improvement_focus ===
+                        "financial_projections" && (
                         <ul className="list-disc list-inside space-y-1">
                           <li>Improve revenue forecasting</li>
                           <li>Analyze cost structure and unit economics</li>
@@ -957,12 +966,11 @@ const AIGenerator: React.FC = () => {
                 </Button>
 
                 <div className="text-xs text-gray-500 text-center">
-                  AI will analyze your idea and provide specific, actionable improvements
-                  for the selected focus area
+                  AI will analyze your idea and provide specific, actionable
+                  improvements for the selected focus area
                 </div>
               </form>
             )}
-
             {/* Judge Tab */}
             {activeTab === "judge" && (
               <form onSubmit={handleJudgeIdea} className="space-y-4">
@@ -1054,7 +1062,8 @@ const AIGenerator: React.FC = () => {
                   )}
                 </Button>
               </form>
-            )}            {/* Recommendations Tab */}
+            )}{" "}
+            {/* Recommendations Tab */}
             {activeTab === "recommendations" && (
               <form onSubmit={handleGetRecommendations} className="space-y-4">
                 <div className="bg-purple-50 p-4 rounded-lg mb-4">
@@ -1062,14 +1071,17 @@ const AIGenerator: React.FC = () => {
                     🎯 AI Strategy Recommendations
                   </h4>
                   <p className="text-sm text-purple-700">
-                    Get personalized strategic recommendations based on your entire ideas portfolio.
-                    AI will analyze patterns, identify opportunities, and suggest next steps for growth.
+                    Get personalized strategic recommendations based on your
+                    entire ideas portfolio. AI will analyze patterns, identify
+                    opportunities, and suggest next steps for growth.
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="bg-white p-4 rounded border">
-                    <h5 className="font-medium text-gray-800 mb-2">📊 Portfolio Overview</h5>
+                    <h5 className="font-medium text-gray-800 mb-2">
+                      📊 Portfolio Overview
+                    </h5>
                     <div className="text-sm text-gray-600 space-y-1">
                       <div className="flex justify-between">
                         <span>Total Ideas:</span>
@@ -1078,40 +1090,60 @@ const AIGenerator: React.FC = () => {
                       <div className="flex justify-between">
                         <span>Categories:</span>
                         <span className="font-medium">
-                          {new Set(userIdeas.map(idea => idea.category).filter(Boolean)).size || 0}
+                          {new Set(
+                            userIdeas
+                              .map((idea) => idea.category)
+                              .filter(Boolean)
+                          ).size || 0}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span>Avg AI Score:</span>
                         <span className="font-medium">
-                          {userIdeas.length > 0 
-                            ? (userIdeas.reduce((sum, idea) => sum + (idea.ai_score || 0), 0) / userIdeas.length).toFixed(1)
-                            : 'N/A'
-                          }/10
+                          {userIdeas.length > 0
+                            ? (
+                                userIdeas.reduce(
+                                  (sum, idea) => sum + (idea.ai_score || 0),
+                                  0
+                                ) / userIdeas.length
+                              ).toFixed(1)
+                            : "N/A"}
+                          /10
                         </span>
                       </div>
                     </div>
                   </div>
 
                   <div className="bg-white p-4 rounded border">
-                    <h5 className="font-medium text-gray-800 mb-2">🔍 Recent Activity</h5>
+                    <h5 className="font-medium text-gray-800 mb-2">
+                      🔍 Recent Activity
+                    </h5>
                     <div className="text-sm text-gray-600 space-y-1">
                       <div className="flex justify-between">
                         <span>Latest Idea:</span>
                         <span className="font-medium text-right max-w-32 truncate">
-                          {userIdeas.length > 0 ? userIdeas[userIdeas.length - 1].title : 'None'}
+                          {userIdeas.length > 0
+                            ? userIdeas[userIdeas.length - 1].title
+                            : "None"}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span>Draft Ideas:</span>
                         <span className="font-medium">
-                          {userIdeas.filter(idea => idea.status === 'draft').length}
+                          {
+                            userIdeas.filter((idea) => idea.status === "draft")
+                              .length
+                          }
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span>Public Ideas:</span>
                         <span className="font-medium">
-                          {userIdeas.filter(idea => idea.visibility === 'public').length}
+                          {
+                            userIdeas.filter(
+                              (idea) => idea.visibility === "public"
+                            ).length
+                          }
                         </span>
                       </div>
                     </div>
@@ -1136,16 +1168,37 @@ const AIGenerator: React.FC = () => {
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="general">🎯 General Strategy - Overall portfolio improvement</option>
-                    <option value="market_analysis">📊 Market Analysis - Market opportunities & sizing</option>
-                    <option value="competition">🏆 Competitive Landscape - Competitor analysis & positioning</option>
-                    <option value="funding">💰 Funding Strategy - Investment readiness & sources</option>
-                    <option value="team_building">👥 Team Building - Hiring & partnership strategies</option>
-                    <option value="product_development">⚙️ Product Development - Technical roadmap & MVP</option>
-                    <option value="marketing_strategy">📢 Marketing Strategy - Customer acquisition & branding</option>
-                    <option value="business_model">💼 Business Model - Revenue streams & scalability</option>
-                    <option value="risk_management">⚠️ Risk Management - Challenges & mitigation strategies</option>
-                    <option value="scaling">📈 Growth & Scaling - Expansion and growth strategies</option>
+                    <option value="general">
+                      🎯 General Strategy - Overall portfolio improvement
+                    </option>
+                    <option value="market_analysis">
+                      📊 Market Analysis - Market opportunities & sizing
+                    </option>
+                    <option value="competition">
+                      🏆 Competitive Landscape - Competitor analysis &
+                      positioning
+                    </option>
+                    <option value="funding">
+                      💰 Funding Strategy - Investment readiness & sources
+                    </option>
+                    <option value="team_building">
+                      👥 Team Building - Hiring & partnership strategies
+                    </option>
+                    <option value="product_development">
+                      ⚙️ Product Development - Technical roadmap & MVP
+                    </option>
+                    <option value="marketing_strategy">
+                      📢 Marketing Strategy - Customer acquisition & branding
+                    </option>
+                    <option value="business_model">
+                      💼 Business Model - Revenue streams & scalability
+                    </option>
+                    <option value="risk_management">
+                      ⚠️ Risk Management - Challenges & mitigation strategies
+                    </option>
+                    <option value="scaling">
+                      📈 Growth & Scaling - Expansion and growth strategies
+                    </option>
                   </select>
                 </div>
 
@@ -1200,7 +1253,8 @@ const AIGenerator: React.FC = () => {
                         <li>Team culture and management tips</li>
                       </ul>
                     )}
-                    {recommendationsForm.focus_area === "product_development" && (
+                    {recommendationsForm.focus_area ===
+                      "product_development" && (
                       <ul className="list-disc list-inside space-y-1">
                         <li>MVP definition and feature prioritization</li>
                         <li>Technical architecture recommendations</li>
@@ -1209,7 +1263,8 @@ const AIGenerator: React.FC = () => {
                         <li>Quality assurance and testing strategies</li>
                       </ul>
                     )}
-                    {recommendationsForm.focus_area === "marketing_strategy" && (
+                    {recommendationsForm.focus_area ===
+                      "marketing_strategy" && (
                       <ul className="list-disc list-inside space-y-1">
                         <li>Target audience definition and personas</li>
                         <li>Marketing channel recommendations</li>
@@ -1252,13 +1307,18 @@ const AIGenerator: React.FC = () => {
                   <div className="flex items-start space-x-2">
                     <span className="text-yellow-600">💡</span>
                     <div className="text-sm text-yellow-800">
-                      <p className="font-medium mb-1">Smart Portfolio Analysis:</p>
+                      <p className="font-medium mb-1">
+                        Smart Portfolio Analysis:
+                      </p>
                       <p>
-                        AI will analyze your {userIdeas.length} idea{userIdeas.length !== 1 ? 's' : ''} to identify patterns, 
-                        gaps, and opportunities. The more detailed your ideas, the better the recommendations!
+                        AI will analyze your {userIdeas.length} idea
+                        {userIdeas.length !== 1 ? "s" : ""} to identify
+                        patterns, gaps, and opportunities. The more detailed
+                        your ideas, the better the recommendations!
                         {userIdeas.length === 0 && (
                           <span className="block mt-2 text-red-600 font-medium">
-                            ⚠️ You need at least one idea to get recommendations. Create an idea first!
+                            ⚠️ You need at least one idea to get
+                            recommendations. Create an idea first!
                           </span>
                         )}
                       </p>
@@ -1266,9 +1326,9 @@ const AIGenerator: React.FC = () => {
                   </div>
                 </div>
 
-                <Button 
-                  type="submit" 
-                  disabled={isLoading || userIdeas.length === 0} 
+                <Button
+                  type="submit"
+                  disabled={isLoading || userIdeas.length === 0}
                   className="w-full bg-purple-600 hover:bg-purple-700"
                 >
                   {isLoading ? (
@@ -1282,8 +1342,10 @@ const AIGenerator: React.FC = () => {
                 </Button>
 
                 <div className="text-xs text-gray-500 text-center">
-                  AI will provide personalized strategic recommendations based on your 
-                  {userIdeas.length} idea{userIdeas.length !== 1 ? 's' : ''} and selected focus area
+                  AI will provide personalized strategic recommendations based
+                  on your
+                  {userIdeas.length} idea{userIdeas.length !== 1 ? "s" : ""} and
+                  selected focus area
                 </div>
               </form>
             )}
@@ -1363,7 +1425,8 @@ const AIGenerator: React.FC = () => {
                       )}
                     </div>
                   </div>
-                )}                {activeTab !== "generate" && (
+                )}{" "}
+                {activeTab !== "generate" && (
                   <div className="space-y-4">
                     {/* Fine-tune specific display */}
                     {activeTab === "finetune" && (
@@ -1373,7 +1436,10 @@ const AIGenerator: React.FC = () => {
                             🔧 AI Fine-tuning Recommendations
                           </h3>
                           <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                            Focus: {finetuneForm.improvement_focus.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            Focus:{" "}
+                            {finetuneForm.improvement_focus
+                              .replace(/_/g, " ")
+                              .replace(/\b\w/g, (l) => l.toUpperCase())}
                           </span>
                         </div>
 
@@ -1385,24 +1451,38 @@ const AIGenerator: React.FC = () => {
 
                         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="bg-white p-3 rounded border">
-                            <div className="text-xs font-medium text-gray-600 mb-1">IMPROVEMENT CONFIDENCE</div>
+                            <div className="text-xs font-medium text-gray-600 mb-1">
+                              IMPROVEMENT CONFIDENCE
+                            </div>
                             <div className="flex items-center gap-2">
                               <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div 
-                                  className="bg-green-600 h-2 rounded-full" 
-                                  style={{width: `${(aiResponse.confidence_score || 0.8) * 100}%`}}
+                                <div
+                                  className="bg-green-600 h-2 rounded-full"
+                                  style={{
+                                    width: `${(aiResponse.confidence_score || 0.8) * 100}%`,
+                                  }}
                                 ></div>
                               </div>
                               <span className="text-sm font-medium text-green-600">
-                                {Math.round((aiResponse.confidence_score || 0.8) * 100)}%
+                                {Math.round(
+                                  (aiResponse.confidence_score || 0.8) * 100
+                                )}
+                                %
                               </span>
                             </div>
                           </div>
                           <div className="bg-white p-3 rounded border">
-                            <div className="text-xs font-medium text-gray-600 mb-1">ANALYSIS DATE</div>
+                            <div className="text-xs font-medium text-gray-600 mb-1">
+                              ANALYSIS DATE
+                            </div>
                             <div className="text-sm text-gray-700">
-                              {new Date(aiResponse.generated_at).toLocaleDateString()} at{" "}
-                              {new Date(aiResponse.generated_at).toLocaleTimeString()}
+                              {new Date(
+                                aiResponse.generated_at
+                              ).toLocaleDateString()}{" "}
+                              at{" "}
+                              {new Date(
+                                aiResponse.generated_at
+                              ).toLocaleTimeString()}
                             </div>
                           </div>
                         </div>
@@ -1414,8 +1494,12 @@ const AIGenerator: React.FC = () => {
                             variant="outline"
                             onClick={() => {
                               // Copy the improvement recommendations to clipboard
-                              navigator.clipboard.writeText(aiResponse.response_text);
-                              setSuccessMessage("💾 Recommendations copied to clipboard!");
+                              navigator.clipboard.writeText(
+                                aiResponse.response_text
+                              );
+                              setSuccessMessage(
+                                "💾 Recommendations copied to clipboard!"
+                              );
                             }}
                             className="text-xs"
                           >
@@ -1438,7 +1522,7 @@ const AIGenerator: React.FC = () => {
                             variant="outline"
                             onClick={() => {
                               // Navigate to My Ideas to edit the original idea
-                              window.open('/my-ideas', '_blank');
+                              window.open("/my-ideas", "_blank");
                             }}
                             className="text-xs"
                           >
@@ -1446,7 +1530,8 @@ const AIGenerator: React.FC = () => {
                           </Button>
                         </div>
                       </div>
-                    )}                    {/* Recommendations specific display */}
+                    )}{" "}
+                    {/* Recommendations specific display */}
                     {activeTab === "recommendations" && (
                       <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-lg border border-purple-200">
                         <div className="flex items-center justify-between mb-4">
@@ -1454,7 +1539,10 @@ const AIGenerator: React.FC = () => {
                             🎯 AI Strategic Recommendations
                           </h3>
                           <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
-                            Focus: {recommendationsForm.focus_area.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            Focus:{" "}
+                            {recommendationsForm.focus_area
+                              .replace(/_/g, " ")
+                              .replace(/\b\w/g, (l) => l.toUpperCase())}
                           </span>
                         </div>
 
@@ -1465,47 +1553,68 @@ const AIGenerator: React.FC = () => {
                         </div>
 
                         {/* Action Items */}
-                        {aiResponse.suggestions && aiResponse.suggestions.length > 0 && (
-                          <div className="mt-6 bg-white p-4 rounded border">
-                            <h5 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
-                              ✅ Priority Action Items
-                            </h5>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                              {aiResponse.suggestions.slice(0, 6).map((suggestion, index) => (
-                                <div key={index} className="flex items-start space-x-2 text-sm">
-                                  <span className="text-purple-600 font-bold text-xs mt-0.5">
-                                    {index + 1}.
-                                  </span>
-                                  <span className="text-gray-700">{suggestion}</span>
-                                </div>
-                              ))}
+                        {aiResponse.suggestions &&
+                          aiResponse.suggestions.length > 0 && (
+                            <div className="mt-6 bg-white p-4 rounded border">
+                              <h5 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
+                                ✅ Priority Action Items
+                              </h5>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                {aiResponse.suggestions
+                                  .slice(0, 6)
+                                  .map((suggestion, index) => (
+                                    <div
+                                      key={index}
+                                      className="flex items-start space-x-2 text-sm"
+                                    >
+                                      <span className="text-purple-600 font-bold text-xs mt-0.5">
+                                        {index + 1}.
+                                      </span>
+                                      <span className="text-gray-700">
+                                        {suggestion}
+                                      </span>
+                                    </div>
+                                  ))}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
                         <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
                           <div className="bg-white p-3 rounded border text-center">
-                            <div className="text-xs font-medium text-gray-600 mb-1">STRATEGY CONFIDENCE</div>
+                            <div className="text-xs font-medium text-gray-600 mb-1">
+                              STRATEGY CONFIDENCE
+                            </div>
                             <div className="flex items-center justify-center gap-2">
                               <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div 
-                                  className="bg-purple-600 h-2 rounded-full" 
-                                  style={{width: `${(aiResponse.confidence_score || 0.85) * 100}%`}}
+                                <div
+                                  className="bg-purple-600 h-2 rounded-full"
+                                  style={{
+                                    width: `${(aiResponse.confidence_score || 0.85) * 100}%`,
+                                  }}
                                 ></div>
                               </div>
                               <span className="text-sm font-medium text-purple-600">
-                                {Math.round((aiResponse.confidence_score || 0.85) * 100)}%
+                                {Math.round(
+                                  (aiResponse.confidence_score || 0.85) * 100
+                                )}
+                                %
                               </span>
                             </div>
                           </div>
-                          
+
                           <div className="bg-white p-3 rounded border text-center">
-                            <div className="text-xs font-medium text-gray-600 mb-1">IDEAS ANALYZED</div>
-                            <div className="text-lg font-bold text-purple-600">{userIdeas.length}</div>
+                            <div className="text-xs font-medium text-gray-600 mb-1">
+                              IDEAS ANALYZED
+                            </div>
+                            <div className="text-lg font-bold text-purple-600">
+                              {userIdeas.length}
+                            </div>
                           </div>
 
                           <div className="bg-white p-3 rounded border text-center">
-                            <div className="text-xs font-medium text-gray-600 mb-1">RECOMMENDATIONS</div>
+                            <div className="text-xs font-medium text-gray-600 mb-1">
+                              RECOMMENDATIONS
+                            </div>
                             <div className="text-lg font-bold text-purple-600">
                               {aiResponse.suggestions?.length || 3}+
                             </div>
@@ -1517,8 +1626,12 @@ const AIGenerator: React.FC = () => {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              navigator.clipboard.writeText(aiResponse.response_text);
-                              setSuccessMessage("📋 Recommendations copied to clipboard!");
+                              navigator.clipboard.writeText(
+                                aiResponse.response_text
+                              );
+                              setSuccessMessage(
+                                "📋 Recommendations copied to clipboard!"
+                              );
                             }}
                             className="text-xs"
                           >
@@ -1553,7 +1666,7 @@ const AIGenerator: React.FC = () => {
                             variant="outline"
                             onClick={() => {
                               // Open metrics page in new tab
-                              window.open('/metrics', '_blank');
+                              window.open("/metrics", "_blank");
                             }}
                             className="text-xs"
                           >
@@ -1562,27 +1675,26 @@ const AIGenerator: React.FC = () => {
                         </div>
                       </div>
                     )}
-
                     {/* Generic display for other tabs */}
-                    {activeTab !== "finetune" && activeTab !== "recommendations" && (
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <h3 className="font-semibold text-gray-800 mb-2">
-                          AI Response
-                        </h3>
-                        <div className="whitespace-pre-wrap text-sm text-gray-700">
-                          {aiResponse.response_text}
-                        </div>
-                        {aiResponse.confidence_score && (
-                          <div className="mt-3 text-xs text-gray-500">
-                            Confidence:{" "}
-                            {Math.round(aiResponse.confidence_score * 100)}%
+                    {activeTab !== "finetune" &&
+                      activeTab !== "recommendations" && (
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <h3 className="font-semibold text-gray-800 mb-2">
+                            AI Response
+                          </h3>
+                          <div className="whitespace-pre-wrap text-sm text-gray-700">
+                            {aiResponse.response_text}
                           </div>
-                        )}
-                      </div>
-                    )}
+                          {aiResponse.confidence_score && (
+                            <div className="mt-3 text-xs text-gray-500">
+                              Confidence:{" "}
+                              {Math.round(aiResponse.confidence_score * 100)}%
+                            </div>
+                          )}
+                        </div>
+                      )}
                   </div>
                 )}
-
                 {aiResponse.suggestions &&
                   aiResponse.suggestions.length > 0 && (
                     <div className="bg-blue-50 p-4 rounded-lg">
@@ -1595,7 +1707,8 @@ const AIGenerator: React.FC = () => {
                         ))}
                       </ul>
                     </div>
-                  )}                {activeTab === "generate" && (
+                  )}{" "}
+                {activeTab === "generate" && (
                   <div className="bg-yellow-50 p-4 rounded-lg">
                     <h4 className="font-semibold text-yellow-800 mb-2">
                       🎯 Next Steps
@@ -1612,22 +1725,28 @@ const AIGenerator: React.FC = () => {
                     </ul>
                   </div>
                 )}
-
                 {activeTab === "recommendations" && (
                   <div className="bg-indigo-50 p-4 rounded-lg">
                     <h4 className="font-semibold text-indigo-800 mb-2">
                       🚀 Implementation Roadmap
                     </h4>
                     <ul className="list-disc list-inside text-sm text-indigo-700 space-y-1">
-                      <li>Prioritize the top 3 recommendations for immediate action</li>
-                      <li>Set specific deadlines and milestones for each recommendation</li>
-                      <li>Use the suggested focus areas to guide your next steps</li>
+                      <li>
+                        Prioritize the top 3 recommendations for immediate
+                        action
+                      </li>
+                      <li>
+                        Set specific deadlines and milestones for each
+                        recommendation
+                      </li>
+                      <li>
+                        Use the suggested focus areas to guide your next steps
+                      </li>
                       <li>Re-run recommendations monthly to track progress</li>
                       <li>Document your progress and measure the impact</li>
                     </ul>
                   </div>
                 )}
-
                 {activeTab === "finetune" && (
                   <div className="bg-green-50 p-4 rounded-lg">
                     <h4 className="font-semibold text-green-800 mb-2">
@@ -1635,9 +1754,13 @@ const AIGenerator: React.FC = () => {
                     </h4>
                     <ul className="list-disc list-inside text-sm text-green-700 space-y-1">
                       <li>Apply the improvements to your original idea</li>
-                      <li>Test the improved concept with potential customers</li>
+                      <li>
+                        Test the improved concept with potential customers
+                      </li>
                       <li>Use "Judge Ideas" to score the improved version</li>
-                      <li>Consider multiple improvement cycles for best results</li>
+                      <li>
+                        Consider multiple improvement cycles for best results
+                      </li>
                       <li>Document changes and track improvement metrics</li>
                     </ul>
                   </div>

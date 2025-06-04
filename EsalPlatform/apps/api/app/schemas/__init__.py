@@ -131,21 +131,89 @@ class BlockUserRequest(BaseModel):
     reason: Optional[str] = None
 
 
-# Dashboard schemas
 class DashboardStats(BaseModel):
     total_users: int
     total_ideas: int
     active_users: int
 
 
-class HubDashboard(BaseModel):
-    message: str
-    stats: dict
+class KPIData(BaseModel):
+    label: str
+    value: str
+    change: str
+    trend: str
 
 
-class InvestorDashboard(BaseModel):
+class UserMetric(BaseModel):
+    role: str
+    count: int
+    percentage: float
+    change: str
+
+
+class EngagementData(BaseModel):
+    metric: str
+    value: str
+    change: str
+
+
+class AnalyticsResponse(BaseModel):
+    kpiData: List[KPIData]
+    userMetrics: List[UserMetric]
+    engagementData: List[EngagementData]
+
+
+class SystemHealthService(BaseModel):
+    service: str
+    status: str
+    uptime: str
+    responseTime: str
+
+
+class SystemHealthResponse(BaseModel):
+    systemHealth: List[SystemHealthService]
+
+
+class RecentActivity(BaseModel):
+    type: str
     message: str
-    stats: dict
+    time: str
+    status: str
+
+
+class ActivityResponse(BaseModel):
+    recentActivities: List[RecentActivity]
+
+
+class PendingAction(BaseModel):
+    title: str
+    count: int
+    urgency: str
+
+
+class PendingActionsResponse(BaseModel):
+    pendingActions: List[PendingAction]
+
+
+class ContentStats(BaseModel):
+    totalIdeas: int
+    pendingReviews: int
+    reportedContent: int
+    totalFiles: int
+
+
+class ModerationQueueResponse(BaseModel):
+    queue: List[Dict[str, Any]]
+    total: int
+    pending: int
+
+
+class UserStatistics(BaseModel):
+    total: int
+    active: int
+    blocked: int
+    pending: int
+    by_role: Dict[str, int]
 
 
 # Enhanced AI Interaction Schemas
@@ -281,3 +349,89 @@ class SessionInfo(BaseModel):
     location: str
     last_active: datetime
     is_current: bool = False
+
+
+# AI Matching schemas for Investor Portal
+class InvestorPreferences(BaseModel):
+    industries: List[str] = []
+    stages: List[str] = []
+    min_funding_amount: Optional[float] = None
+    max_funding_amount: Optional[float] = None
+    geographic_preferences: List[str] = []
+    risk_tolerance: str = "medium"  # conservative, medium, aggressive
+    investment_timeline: str = "6_months"  # 3_months, 6_months, 12_months, 24_months
+
+
+class AIMatchingRequest(BaseModel):
+    preferences: InvestorPreferences
+    top_k: Optional[int] = 10
+    min_score: Optional[float] = 0.6
+
+
+class MatchHighlight(BaseModel):
+    reason: str
+    score: float
+
+
+class StartupMatch(BaseModel):
+    startup_id: str
+    startup_title: str
+    match_score: float
+    highlights: List[MatchHighlight] = []
+    industry: Optional[str] = None
+    stage: Optional[str] = None
+    description: Optional[str] = None
+    funding_needed: Optional[str] = None
+    target_market: Optional[str] = None
+    team_size: Optional[int] = None
+    location: Optional[str] = None
+    traction: Optional[str] = None
+    
+    class Config:
+        from_attributes = True
+
+
+class MatchingStatistics(BaseModel):
+    total_startups_analyzed: int
+    high_quality_matches: int  # >80% score
+    average_score: float
+    processing_time_seconds: float
+    ai_confidence: float
+
+
+class AIMatchingResponse(BaseModel):
+    matches: List[StartupMatch]
+    total_matches: int
+    matching_statistics: MatchingStatistics
+    
+    class Config:
+        from_attributes = True
+
+
+class MatchingHistory(BaseModel):
+    id: str
+    investor_id: str
+    preferences: InvestorPreferences
+    matches_found: int
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+
+# Hub Dashboard Schema
+class HubDashboard(BaseModel):
+    message: str
+    stats: Dict[str, Any]
+    
+    class Config:
+        from_attributes = True
+
+
+# Investor Dashboard Schema
+class InvestorDashboard(BaseModel):
+    message: str
+    stats: Dict[str, Any]
+    
+    class Config:
+        from_attributes = True

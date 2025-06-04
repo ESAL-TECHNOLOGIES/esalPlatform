@@ -1,181 +1,197 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, Button } from "@esal/ui";
+import { settingsAPI } from "../utils/api";
+
+interface Setting {
+  key: string;
+  label: string;
+  value: string | boolean | number;
+  type: "text" | "boolean" | "number";
+  disabled?: boolean;
+}
 
 const Settings = () => {
   const [selectedTab, setSelectedTab] = useState("platform");
+  const [platformSettings, setPlatformSettings] = useState<Setting[]>([]);
+  const [emailSettings, setEmailSettings] = useState<Setting[]>([]);
+  const [securitySettings, setSecuritySettings] = useState<Setting[]>([]);
+  const [integrationSettings, setIntegrationSettings] = useState<Setting[]>([]);
+  const [systemLogs, setSystemLogs] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const platformSettings = [
-    {
-      key: "platform_name",
-      label: "Platform Name",
-      value: "ESAL Platform",
-      type: "text",
-    },
-    {
-      key: "maintenance_mode",
-      label: "Maintenance Mode",
-      value: false,
-      type: "boolean",
-    },
-    {
-      key: "user_registration",
-      label: "User Registration",
-      value: true,
-      type: "boolean",
-    },
-    {
-      key: "auto_approval",
-      label: "Auto-approve Users",
-      value: false,
-      type: "boolean",
-    },
-    {
-      key: "max_file_size",
-      label: "Max File Upload (MB)",
-      value: "10",
-      type: "number",
-    },
-    {
-      key: "session_timeout",
-      label: "Session Timeout (hours)",
-      value: "24",
-      type: "number",
-    },
-  ];
-  const emailSettings = [
-    {
-      key: "email_confirmation",
-      label: "Email Confirmation",
-      value: "Disabled",
-      type: "text",
-      disabled: true,
-    },
-    {
-      key: "email_service",
-      label: "Email Service",
-      value: "Not Required",
-      type: "text",
-      disabled: true,
-    },
-    {
-      key: "email_note",
-      label: "Note",
-      value: "Email confirmation has been completely removed from the platform",
-      type: "text",
-      disabled: true,
-    },
-  ];
+  useEffect(() => {
+    fetchSettings();
+  }, []);
 
-  const securitySettings = [
-    {
-      key: "password_min_length",
-      label: "Minimum Password Length",
-      value: "8",
-      type: "number",
-    },
-    {
-      key: "require_2fa",
-      label: "Require 2FA for Admins",
-      value: true,
-      type: "boolean",
-    },
-    {
-      key: "login_attempts",
-      label: "Max Login Attempts",
-      value: "5",
-      type: "number",
-    },
-    {
-      key: "lockout_duration",
-      label: "Lockout Duration (minutes)",
-      value: "30",
-      type: "number",
-    },
-    {
-      key: "jwt_expiry",
-      label: "JWT Token Expiry (hours)",
-      value: "24",
-      type: "number",
-    },
-    {
-      key: "api_rate_limit",
-      label: "API Rate Limit (per minute)",
-      value: "100",
-      type: "number",
-    },
-  ];
+  const fetchSettings = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-  const integrationSettings = [
-    {
-      key: "stripe_public_key",
-      label: "Stripe Public Key",
-      value: "pk_test_...",
-      type: "text",
-    },
-    {
-      key: "stripe_secret_key",
-      label: "Stripe Secret Key",
-      value: "••••••••",
-      type: "password",
-    },
-    {
-      key: "aws_access_key",
-      label: "AWS Access Key",
-      value: "AKIA...",
-      type: "text",
-    },
-    {
-      key: "aws_secret_key",
-      label: "AWS Secret Key",
-      value: "••••••••",
-      type: "password",
-    },
-    {
-      key: "openai_api_key",
-      label: "OpenAI API Key",
-      value: "••••••••",
-      type: "password",
-    },
-    {
-      key: "analytics_id",
-      label: "Google Analytics ID",
-      value: "GA-...",
-      type: "text",
-    },
-  ];
+      const settingsData = await settingsAPI.getSystemSettings();
 
-  const systemLogs = [
-    {
-      timestamp: "2024-01-20 14:35:22",
-      level: "INFO",
-      message: "User alex@techflow.com logged in",
-      module: "Auth",
-    },
-    {
-      timestamp: "2024-01-20 14:32:15",
-      level: "ERROR",
-      message: "Failed to send email to user@example.com",
-      module: "Email",
-    },
-    {
-      timestamp: "2024-01-20 14:30:01",
-      level: "INFO",
-      message: "Database backup completed successfully",
-      module: "Database",
-    },
-    {
-      timestamp: "2024-01-20 14:25:44",
-      level: "WARN",
-      message: "High memory usage detected: 85%",
-      module: "System",
-    },
-    {
-      timestamp: "2024-01-20 14:20:33",
-      level: "INFO",
-      message: "Startup TechFlow submitted application",
-      module: "Application",
-    },
-  ];
+      // Transform general settings to Setting array format
+      const transformedGeneral: Setting[] = [
+        {
+          key: "platform_name",
+          label: "Platform Name",
+          value: settingsData.general.platform_name,
+          type: "text",
+        },
+        {
+          key: "maintenance_mode",
+          label: "Maintenance Mode",
+          value: settingsData.general.maintenance_mode,
+          type: "boolean",
+        },
+        {
+          key: "registration_enabled",
+          label: "User Registration",
+          value: settingsData.general.registration_enabled,
+          type: "boolean",
+        },
+        {
+          key: "max_file_size",
+          label: "Max File Size",
+          value: settingsData.general.max_file_size,
+          type: "text",
+        },
+      ];
+
+      // Transform security settings to Setting array format
+      const transformedSecurity: Setting[] = [
+        {
+          key: "session_timeout",
+          label: "Session Timeout (minutes)",
+          value: settingsData.security.session_timeout,
+          type: "number",
+        },
+        {
+          key: "password_requirements",
+          label: "Password Requirements",
+          value: settingsData.security.password_requirements,
+          type: "text",
+        },
+        {
+          key: "two_factor_enabled",
+          label: "Two-Factor Authentication",
+          value: settingsData.security.two_factor_enabled,
+          type: "boolean",
+        },
+        {
+          key: "ip_whitelist_enabled",
+          label: "IP Whitelist",
+          value: settingsData.security.ip_whitelist_enabled,
+          type: "boolean",
+        },
+      ];
+
+      // Transform notification settings to Setting array format
+      const transformedNotifications: Setting[] = [
+        {
+          key: "email_notifications",
+          label: "Email Notifications",
+          value: settingsData.notifications.email_notifications,
+          type: "boolean",
+        },
+        {
+          key: "sms_notifications",
+          label: "SMS Notifications",
+          value: settingsData.notifications.sms_notifications,
+          type: "boolean",
+        },
+        {
+          key: "push_notifications",
+          label: "Push Notifications",
+          value: settingsData.notifications.push_notifications,
+          type: "boolean",
+        },
+      ];
+
+      // Mock integration settings (would come from API)
+      const integrationDefaults: Setting[] = [
+        {
+          key: "stripe_enabled",
+          label: "Stripe Integration",
+          value: true,
+          type: "boolean",
+        },
+        {
+          key: "aws_s3_enabled",
+          label: "AWS S3 Storage",
+          value: true,
+          type: "boolean",
+        },
+        {
+          key: "openai_enabled",
+          label: "OpenAI Integration",
+          value: true,
+          type: "boolean",
+        },
+      ];
+
+      setPlatformSettings(transformedGeneral);
+      setEmailSettings(transformedNotifications);
+      setSecuritySettings(transformedSecurity);
+      setIntegrationSettings(integrationDefaults);
+
+      // Mock system logs (would come from API)
+      setSystemLogs([
+        {
+          timestamp: new Date().toISOString().slice(0, 19).replace("T", " "),
+          level: "INFO",
+          message: "Settings data loaded successfully",
+          module: "Settings",
+        },
+      ]);
+    } catch (err) {
+      console.error("Settings fetch error:", err);
+      setError(err instanceof Error ? err.message : "Failed to load settings");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSettingUpdate = async (
+    key: string,
+    value: string | boolean | number
+  ) => {
+    try {
+      await settingsAPI.updateSystemSettings({ [key]: value });
+      await fetchSettings(); // Refresh data
+    } catch (err) {
+      console.error("Setting update error:", err);
+      // Could add toast notification here
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-96">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading settings...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-96">
+        <div className="text-center">
+          <div className="text-red-600 text-4xl mb-4">⚠️</div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Failed to Load Settings
+          </h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <Button onClick={fetchSettings}>Retry</Button>
+        </div>
+      </div>
+    );
+  }
+
   const renderSettingField = (setting) => {
     const isDisabled = setting.disabled || false;
     const className = isDisabled

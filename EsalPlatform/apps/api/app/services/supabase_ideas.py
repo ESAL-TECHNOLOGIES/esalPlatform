@@ -548,3 +548,70 @@ class SupabaseIdeasService:
         except Exception as e:
             logger.error(f"Error parsing AI response: {e}")
             return "AI Generated Startup Idea", ai_response, "", "", ""
+
+    async def get_ideas_list(self, 
+                           user_id: Optional[str] = None, 
+                           visibility_filter: Optional[str] = None,
+                           limit: Optional[int] = None) -> List[Dict[str, Any]]:
+        """Get list of ideas with optional filtering for AI matching and other services"""
+        try:
+            # Build query
+            query = self.supabase.table("ideas").select("*")
+            
+            # Apply filters
+            if user_id:
+                query = query.eq("user_id", user_id)
+            
+            if visibility_filter:
+                if visibility_filter == "public":
+                    query = query.in_("visibility", ["public", "public_ideas"])
+                else:
+                    query = query.eq("visibility", visibility_filter)
+            
+            # Order by creation date (newest first)
+            query = query.order("created_at", desc=True)
+            
+            # Apply limit if specified
+            if limit:
+                query = query.limit(limit)
+            
+            result = query.execute()
+            
+            # Transform data for consistency
+            transformed_ideas = []
+            for idea in (result.data or []):
+                transformed_idea = {
+                    "id": str(idea.get("id", "")),
+                    "title": idea.get("title", ""),
+                    "description": idea.get("description", ""),
+                    "industry": idea.get("category", ""),  # Map category to industry
+                    "stage": "idea",  # Default stage since not in DB schema
+                    "status": idea.get("status", "draft"),
+                    "created_at": idea.get("created_at", ""),
+                    "updated_at": idea.get("updated_at", ""),
+                    "views_count": idea.get("view_count", 0),
+                    "interests_count": idea.get("interest_count", 0),
+                    "user_id": str(idea.get("user_id", "")),
+                    "ai_score": idea.get("ai_score"),
+                    # Fields needed for AI matching
+                    "target_market": idea.get("target_market", ""),
+                    "problem": idea.get("problem", ""),
+                    "solution": idea.get("solution", ""),
+                    "category": idea.get("category", ""),
+                    "tags": idea.get("tags", []),
+                    "visibility": idea.get("visibility", "private"),
+                    # Additional AI metadata
+                    "ai_generated": idea.get("ai_generated", False),
+                    "ai_metadata": idea.get("ai_metadata", {})
+                }
+                transformed_ideas.append(transformed_idea)
+            
+            logger.info(f"Retrieved {len(transformed_ideas)} ideas with filters: user_id={user_id}, visibility={visibility_filter}")
+            return transformed_ideas
+            
+        except Exception as e:
+            logger.error(f"Error fetching ideas list: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to fetch ideas list"
+            )

@@ -15,6 +15,7 @@ export interface NavbarProps {
   user?: {
     name: string;
     role: string;
+    avatar_url?: string;
   };
   onLogout?: () => void;
 }
