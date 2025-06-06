@@ -9,6 +9,7 @@ import Schedule from "./pages/Schedule";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import EmailVerification from "./pages/EmailVerification";
 
 const sidebarItems = [
   { label: "Dashboard", href: "/", icon: "📊" },
@@ -25,15 +26,17 @@ function AppContent() {
   const handleLogout = () => {
     logout();
   };
-
-  // Check if current route is login or signup
+  // Check if current route is login, signup, or email verification
   const isAuthRoute =
-    location.pathname === "/login" || location.pathname === "/signup";
+    location.pathname === "/login" ||
+    location.pathname === "/signup" ||
+    location.pathname === "/email-verification";
   if (isAuthRoute) {
     return (
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/email-verification" element={<EmailVerification />} />
       </Routes>
     );
   }

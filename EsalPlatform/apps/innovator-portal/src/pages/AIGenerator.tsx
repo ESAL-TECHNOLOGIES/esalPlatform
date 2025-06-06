@@ -1,6 +1,35 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent, Button } from "@esal/ui";
 import { checkAndConsumeUsage, requireFeature } from "../utils/subscription";
+import {
+  Zap,
+  Target,
+  Settings,
+  Scale,
+  Lightbulb,
+  Wrench,
+  Save,
+  Rocket,
+  Edit3,
+  Brain,
+  DollarSign,
+  Trophy,
+  BarChart3,
+  Cog,
+  TrendingUp,
+  Bot,
+  Search,
+  Users,
+  Briefcase,
+  Megaphone,
+  Trash2,
+  Clock,
+  Copy,
+  Dumbbell,
+  AlertTriangle,
+  CheckCircle,
+  Edit2,
+} from "lucide-react";
 
 interface Idea {
   id: string;
@@ -433,7 +462,7 @@ const AIGenerator: React.FC = () => {
         },
       }));
 
-      setSuccessMessage("💾 Idea saved successfully to your portfolio!");
+      setSuccessMessage("Idea saved successfully to your portfolio!");
 
       // Refresh user ideas list
       fetchUserIdeas();
@@ -453,8 +482,9 @@ const AIGenerator: React.FC = () => {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-3">
+                {" "}
                 <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                  <span className="text-2xl">🤖</span>
+                  <Bot className="w-6 h-6" />
                 </div>
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
                   AI Innovation Hub
@@ -466,16 +496,17 @@ const AIGenerator: React.FC = () => {
                 entrepreneurial vision into reality with AI-powered insights.
               </p>
               <div className="flex flex-wrap gap-3">
+                {" "}
                 <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full text-sm">
-                  <span>🧠</span>
+                  <Brain className="w-4 h-4" />
                   <span>Smart Generation</span>
                 </div>
                 <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full text-sm">
-                  <span>⚡</span>
+                  <Zap className="w-4 h-4" />
                   <span>Real-time Analysis</span>
                 </div>
                 <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full text-sm">
-                  <span>🎯</span>
+                  <Target className="w-4 h-4" />
                   <span>Personalized Insights</span>
                 </div>
               </div>
@@ -542,12 +573,13 @@ const AIGenerator: React.FC = () => {
         {/* Enhanced Tab Navigation - Mobile Responsive */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <nav className="grid grid-cols-2 md:grid-cols-4 gap-0">
+            {" "}
             {[
               {
                 id: "generate",
                 name: "Generate Ideas",
                 shortName: "Generate",
-                icon: "🧠",
+                icon: <Brain className="w-5 h-5" />,
                 color: "blue",
                 description: "Create new startup ideas",
               },
@@ -555,7 +587,7 @@ const AIGenerator: React.FC = () => {
                 id: "finetune",
                 name: "Fine-tune Ideas",
                 shortName: "Fine-tune",
-                icon: "🔧",
+                icon: <Settings className="w-5 h-5" />,
                 color: "green",
                 description: "Improve existing ideas",
               },
@@ -563,7 +595,7 @@ const AIGenerator: React.FC = () => {
                 id: "judge",
                 name: "Judge Your Ideas",
                 shortName: "Judge",
-                icon: "⚖️",
+                icon: <Scale className="w-5 h-5" />,
                 color: "purple",
                 description: "Get AI evaluation & scoring",
               },
@@ -571,7 +603,7 @@ const AIGenerator: React.FC = () => {
                 id: "recommendations",
                 name: "Get Recommendations",
                 shortName: "Insights",
-                icon: "💡",
+                icon: <Lightbulb className="w-5 h-5" />,
                 color: "orange",
                 description: "Strategic portfolio insights",
               },
@@ -645,10 +677,16 @@ const AIGenerator: React.FC = () => {
                                 : "bg-orange-200 text-orange-700"
                         }`}
                       >
-                        {activeTab === "generate" && "🧠"}{" "}
-                        {activeTab === "finetune" && "🔧"}
-                        {activeTab === "judge" && "⚖️"}
-                        {activeTab === "recommendations" && "💡"}
+                        {activeTab === "generate" && (
+                          <Brain className="w-5 h-5" />
+                        )}
+                        {activeTab === "finetune" && (
+                          <Settings className="w-5 h-5" />
+                        )}
+                        {activeTab === "judge" && <Scale className="w-5 h-5" />}
+                        {activeTab === "recommendations" && (
+                          <Lightbulb className="w-5 h-5" />
+                        )}
                       </div>
                       <div>
                         {activeTab === "generate" && "Generate New Ideas"}
@@ -667,8 +705,9 @@ const AIGenerator: React.FC = () => {
                   <form onSubmit={handleGenerateIdea} className="space-y-6">
                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200">
                       <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 bg-blue-200 rounded-xl flex items-center justify-center text-2xl">
-                          🧠
+                        {" "}
+                        <div className="w-12 h-12 bg-blue-200 rounded-xl flex items-center justify-center">
+                          <Brain className="w-6 h-6 text-blue-600" />
                         </div>
                         <div>
                           <h4 className="font-bold text-blue-900 text-lg mb-2">
@@ -705,9 +744,9 @@ const AIGenerator: React.FC = () => {
                           rows={4}
                           className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
                           placeholder="e.g., sustainable technology, renewable energy, AI automation, fintech, healthtech, edtech"
-                        />
+                        />{" "}
                         <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
-                          <span>💡</span>
+                          <Lightbulb className="w-4 h-4" />
                           What topics, industries, or areas are you passionate
                           about?
                         </p>
@@ -733,9 +772,9 @@ const AIGenerator: React.FC = () => {
                           rows={4}
                           className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
                           placeholder="e.g., software development (Python, React), digital marketing, data analysis, UI/UX design, project management"
-                        />
+                        />{" "}
                         <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
-                          <span>🛠️</span>
+                          <Wrench className="w-4 h-4" />
                           What are you good at? Include programming languages,
                           tools, and experience.
                         </p>
@@ -850,9 +889,9 @@ const AIGenerator: React.FC = () => {
                           rows={4}
                           className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
                           placeholder="e.g., climate change, digital divide, mental health, productivity, remote work challenges, data privacy"
-                        />
+                        />{" "}
                         <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
-                          <span>🎯</span>
+                          <Target className="w-4 h-4" />
                           What societal, business, or technical problems do you
                           want to address?
                         </p>
@@ -873,8 +912,9 @@ const AIGenerator: React.FC = () => {
                             className="mt-1 h-5 w-5 text-green-600 focus:ring-green-500 border-gray-300 rounded"
                           />
                           <label htmlFor="save_to_database" className="flex-1">
+                            {" "}
                             <div className="flex items-center gap-2 text-green-800 font-semibold mb-1">
-                              <span>💾</span>
+                              <Save className="w-4 h-4" />
                               <span>
                                 Save generated idea to my ideas portfolio
                               </span>
@@ -892,14 +932,18 @@ const AIGenerator: React.FC = () => {
                         disabled={isLoading}
                         className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
                       >
+                        {" "}
                         {isLoading ? (
                           <div className="flex items-center justify-center gap-3">
                             <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                            <span>🧠 Generating Ideas...</span>
+                            <span className="flex items-center gap-2">
+                              <Brain className="w-4 h-4" />
+                              Generating Ideas...
+                            </span>
                           </div>
                         ) : (
                           <div className="flex items-center justify-center gap-2">
-                            <span>🚀</span>
+                            <Rocket className="w-5 h-5" />
                             <span>Generate New Startup Ideas</span>
                           </div>
                         )}
@@ -920,8 +964,9 @@ const AIGenerator: React.FC = () => {
                   <form onSubmit={handleFineTuneIdea} className="space-y-6">
                     <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border border-green-200">
                       <div className="flex items-start gap-4">
+                        {" "}
                         <div className="w-12 h-12 bg-green-200 rounded-xl flex items-center justify-center text-2xl">
-                          🔧
+                          <Settings className="w-6 h-6" />
                         </div>
                         <div>
                           <h4 className="font-semibold text-green-800 mb-2 text-lg">
@@ -962,9 +1007,9 @@ const AIGenerator: React.FC = () => {
                                 ` (AI Score: ${idea.ai_score}/10)`}
                             </option>
                           ))}
-                        </select>
+                        </select>{" "}
                         <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
-                          <span>💡</span>
+                          <Lightbulb className="w-4 h-4" />
                           {userIdeas.length === 0
                             ? "No ideas found. Create an idea first to use fine-tuning."
                             : `Select from your ${userIdeas.length} existing ideas to improve`}
@@ -989,9 +1034,9 @@ const AIGenerator: React.FC = () => {
                           rows={5}
                           className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 resize-none"
                           placeholder="Select an idea above to see its description here. You can also edit this content before fine-tuning..."
-                        />
+                        />{" "}
                         <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
-                          <span>✏️</span>
+                          <Edit3 className="w-4 h-4" />
                           Edit the content if needed - AI will use this as the
                           base for improvements
                         </p>
@@ -1015,36 +1060,34 @@ const AIGenerator: React.FC = () => {
                           aria-label="Improvement Focus Area"
                           className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 bg-white"
                         >
+                          {" "}
                           <option value="problem_statement">
-                            🎯 Problem Statement - Define the problem more
-                            clearly
+                            Problem Statement - Define the problem more clearly
                           </option>
                           <option value="solution_design">
-                            💡 Solution Design - Improve the proposed solution
+                            Solution Design - Improve the proposed solution
                           </option>
                           <option value="target_market">
-                            👥 Target Market - Refine market identification
-                          </option>
+                            Target Market - Refine market identification
+                          </option>{" "}
                           <option value="business_model">
-                            💰 Business Model - Strengthen revenue strategy
+                            Business Model - Strengthen revenue strategy
                           </option>
                           <option value="competitive_advantage">
-                            🏆 Competitive Advantage - Identify unique strengths
+                            Competitive Advantage - Identify unique strengths
                           </option>
                           <option value="market_analysis">
-                            📊 Market Analysis - Deep dive into market
-                            opportunity
+                            Market Analysis - Deep dive into market opportunity
                           </option>
                           <option value="technical_feasibility">
-                            ⚙️ Technical Feasibility - Assess implementation
+                            Technical Feasibility - Assess implementation
                             challenges
                           </option>
                           <option value="financial_projections">
-                            📈 Financial Projections - Improve financial
-                            planning
+                            Financial Projections - Improve financial planning
                           </option>
                           <option value="go_to_market">
-                            🚀 Go-to-Market Strategy - Plan market entry
+                            Go-to-Market Strategy - Plan market entry
                           </option>
                         </select>
                         <p className="text-xs text-gray-500 mt-1">
@@ -1084,8 +1127,10 @@ const AIGenerator: React.FC = () => {
                       {/* Improvement Focus Guidelines */}
                       {finetuneForm.improvement_focus && (
                         <div className="bg-blue-50 p-4 rounded-lg">
-                          <h5 className="font-medium text-blue-800 mb-2">
-                            💡 What AI will help you improve:
+                          {" "}
+                          <h5 className="font-medium text-blue-800 mb-2 flex items-center gap-2">
+                            <Lightbulb className="w-4 h-4" />
+                            What AI will help you improve:
                           </h5>
                           <div className="text-sm text-blue-700">
                             {finetuneForm.improvement_focus ===
@@ -1185,13 +1230,18 @@ const AIGenerator: React.FC = () => {
                         disabled={isLoading || !finetuneForm.idea_id}
                         className="w-full bg-green-600 hover:bg-green-700"
                       >
+                        {" "}
                         {isLoading ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                            🔧 Analyzing & Fine-tuning...
-                          </>
+                          <div className="flex items-center justify-center gap-2">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                            <Settings className="w-4 h-4" />
+                            Analyzing & Fine-tuning...
+                          </div>
                         ) : (
-                          <>🚀 Get AI Improvement Recommendations</>
+                          <div className="flex items-center justify-center gap-2">
+                            <Rocket className="w-4 h-4" />
+                            Get AI Improvement Recommendations
+                          </div>
                         )}
                       </Button>{" "}
                       <div className="text-xs text-gray-500 text-center">
@@ -1207,8 +1257,9 @@ const AIGenerator: React.FC = () => {
                   <form onSubmit={handleJudgeIdea} className="space-y-6">
                     <div className="bg-gradient-to-r from-purple-50 to-violet-50 p-6 rounded-xl border border-purple-200">
                       <div className="flex items-start gap-4">
+                        {" "}
                         <div className="w-12 h-12 bg-purple-200 rounded-xl flex items-center justify-center text-2xl">
-                          ⚖️
+                          <Scale className="w-6 h-6" />
                         </div>
                         <div>
                           <h4 className="font-semibold text-purple-800 mb-2 text-lg">
@@ -1247,9 +1298,9 @@ const AIGenerator: React.FC = () => {
                               {idea.title}
                             </option>
                           ))}
-                        </select>
+                        </select>{" "}
                         <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
-                          <span>🎯</span>
+                          <Target className="w-4 h-4" />
                           Select an idea to receive comprehensive AI evaluation
                           and scoring
                         </p>
@@ -1346,13 +1397,18 @@ const AIGenerator: React.FC = () => {
                       disabled={isLoading || !judgeForm.idea_id}
                       className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     >
+                      {" "}
                       {isLoading ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          🧠 Evaluating Idea...
-                        </>
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          <Brain className="w-4 h-4" />
+                          Evaluating Idea...
+                        </div>
                       ) : (
-                        <>⚖️ Judge Idea</>
+                        <div className="flex items-center justify-center gap-2">
+                          <Scale className="w-4 h-4" />
+                          Judge Idea
+                        </div>
                       )}
                     </Button>{" "}
                     <div className="text-xs text-gray-500 text-center">
@@ -1371,8 +1427,9 @@ const AIGenerator: React.FC = () => {
                   >
                     <div className="bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-xl border border-orange-200">
                       <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 bg-orange-200 rounded-xl flex items-center justify-center text-2xl">
-                          💡
+                        {" "}
+                        <div className="w-12 h-12 bg-orange-200 rounded-xl flex items-center justify-center">
+                          <Lightbulb className="w-6 h-6 text-orange-600" />
                         </div>
                         <div>
                           <h4 className="font-semibold text-orange-800 mb-2 text-lg">
@@ -1389,8 +1446,9 @@ const AIGenerator: React.FC = () => {
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200">
+                        {" "}
                         <h5 className="font-semibold text-blue-800 mb-4 flex items-center gap-2">
-                          <span className="text-lg">📊</span>
+                          <BarChart3 className="w-5 h-5" />
                           Portfolio Overview
                         </h5>
                         <div className="space-y-3">
@@ -1434,8 +1492,10 @@ const AIGenerator: React.FC = () => {
                       </div>
 
                       <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border border-green-200">
-                        <h5 className="font-medium text-gray-800 mb-2">
-                          🔍 Recent Activity
+                        {" "}
+                        <h5 className="font-medium text-gray-800 mb-2 flex items-center gap-2">
+                          <Search className="w-4 h-4" />
+                          Recent Activity
                         </h5>
                         <div className="text-sm text-gray-600 space-y-1">
                           <div className="flex justify-between">
@@ -1490,44 +1550,61 @@ const AIGenerator: React.FC = () => {
                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 bg-white"
                       >
                         <option value="general">
-                          🎯 General Strategy - Overall portfolio improvement
+                          {" "}
+                          <Target className="w-4 h-4 mr-2" />
+                          General Strategy - Overall portfolio improvement
                         </option>
                         <option value="market_analysis">
-                          📊 Market Analysis - Market opportunities & sizing
+                          {" "}
+                          <BarChart3 className="w-4 h-4 mr-2" />
+                          Market Analysis - Market opportunities & sizing
                         </option>
                         <option value="competition">
-                          🏆 Competitive Landscape - Competitor analysis &
+                          {" "}
+                          <Trophy className="w-4 h-4 mr-2" />
+                          Competitive Landscape - Competitor analysis &
                           positioning
                         </option>
                         <option value="funding">
-                          💰 Funding Strategy - Investment readiness & sources
+                          {" "}
+                          <DollarSign className="w-4 h-4 mr-2" />
+                          Funding Strategy - Investment readiness & sources
                         </option>
                         <option value="team_building">
-                          👥 Team Building - Hiring & partnership strategies
-                        </option>
+                          {" "}
+                          <Users className="w-4 h-4 mr-2" />
+                          Team Building - Hiring & partnership strategies
+                        </option>{" "}
                         <option value="product_development">
-                          ⚙️ Product Development - Technical roadmap & MVP
+                          <Cog className="w-4 h-4 inline mr-2" />
+                          Product Development - Technical roadmap & MVP
                         </option>
                         <option value="marketing_strategy">
-                          📢 Marketing Strategy - Customer acquisition &
-                          branding
+                          {" "}
+                          <Megaphone className="w-4 h-4 mr-2" />
+                          Marketing Strategy - Customer acquisition & branding
                         </option>
                         <option value="business_model">
-                          💼 Business Model - Revenue streams & scalability
-                        </option>
+                          {" "}
+                          <Briefcase className="w-4 h-4 mr-2" />
+                          Business Model - Revenue streams & scalability
+                        </option>{" "}
                         <option value="risk_management">
-                          ⚠️ Risk Management - Challenges & mitigation
-                          strategies
+                          <AlertTriangle className="w-4 h-4 inline mr-2" />
+                          Risk Management - Challenges & mitigation strategies
                         </option>
                         <option value="scaling">
-                          📈 Growth & Scaling - Expansion and growth strategies
+                          {" "}
+                          <TrendingUp className="w-4 h-4 mr-2" />
+                          Growth & Scaling - Expansion and growth strategies
                         </option>
                       </select>
                     </div>
                     {/* Focus Area Guidelines */}
                     <div className="bg-blue-50 p-4 rounded-lg">
                       <h5 className="font-medium text-blue-800 mb-2">
-                        💡 What you'll get based on your focus:
+                        <Lightbulb className="w-4 h-4 mr-2" />
+                        What you'll get based on your focus:
                       </h5>
                       <div className="text-sm text-blue-700">
                         {recommendationsForm.focus_area === "general" && (
@@ -1629,7 +1706,7 @@ const AIGenerator: React.FC = () => {
                     </div>
                     <div className="bg-yellow-50 p-4 rounded-lg">
                       <div className="flex items-start space-x-2">
-                        <span className="text-yellow-600">💡</span>
+                        <Lightbulb className="w-4 h-4 text-yellow-600" />
                         <div className="text-sm text-yellow-800">
                           <p className="font-medium mb-1">
                             Smart Portfolio Analysis:
@@ -1640,8 +1717,9 @@ const AIGenerator: React.FC = () => {
                             patterns, gaps, and opportunities. The more detailed
                             your ideas, the better the recommendations!
                             {userIdeas.length === 0 && (
-                              <span className="block mt-2 text-red-600 font-medium">
-                                ⚠️ You need at least one idea to get
+                              <span className="block mt-2 text-red-600 font-medium flex items-center gap-1">
+                                <AlertTriangle className="w-4 h-4" />
+                                You need at least one idea to get
                                 recommendations. Create an idea first!
                               </span>
                             )}
@@ -1657,10 +1735,14 @@ const AIGenerator: React.FC = () => {
                       {isLoading ? (
                         <>
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          🧠 Analyzing Portfolio...
+                          <Brain className="w-4 h-4 mr-2" />
+                          Analyzing Portfolio...
                         </>
                       ) : (
-                        <>🎯 Get Strategic Recommendations</>
+                        <>
+                          <Target className="w-4 h-4 mr-2" />
+                          Get Strategic Recommendations
+                        </>
                       )}
                     </Button>
                     <div className="text-xs text-gray-500 text-center">
@@ -1682,7 +1764,7 @@ const AIGenerator: React.FC = () => {
                 <CardHeader>
                   <div className="flex items-center gap-3 text-xl">
                     <div className="w-10 h-10 bg-gray-200 text-gray-700 rounded-xl flex items-center justify-center text-xl">
-                      🤖
+                      <Bot className="w-5 h-5" />
                     </div>
                     <div className="font-semibold text-gray-800">
                       AI Results
@@ -1695,7 +1777,8 @@ const AIGenerator: React.FC = () => {
                           onClick={clearResults}
                           className="text-xs px-3 py-1"
                         >
-                          🗑️ Clear
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Clear
                         </Button>
                       </div>
                     )}
@@ -1707,7 +1790,7 @@ const AIGenerator: React.FC = () => {
                   <div className="text-center py-12">
                     <div className="mb-6">
                       <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <span className="text-3xl">🤖</span>
+                        <Bot className="w-8 h-8" />
                       </div>
                       <h3 className="text-lg font-semibold text-gray-800 mb-2">
                         Ready to Assist
@@ -1721,7 +1804,7 @@ const AIGenerator: React.FC = () => {
                     {/* Feature highlights */}
                     <div className="grid grid-cols-1 gap-3 mt-6">
                       <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg text-left">
-                        <span className="text-xl">🧠</span>
+                        <Brain className="w-5 h-5" />
                         <div className="text-sm">
                           <div className="font-medium text-blue-800">
                             Generate Ideas
@@ -1732,7 +1815,7 @@ const AIGenerator: React.FC = () => {
                         </div>
                       </div>
                       <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg text-left">
-                        <span className="text-xl">🔧</span>
+                        <Wrench className="w-5 h-5" />
                         <div className="text-sm">
                           <div className="font-medium text-green-800">
                             Fine-tune
@@ -1741,9 +1824,9 @@ const AIGenerator: React.FC = () => {
                             Improve specific aspects of your ideas
                           </div>
                         </div>
-                      </div>
+                      </div>{" "}
                       <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg text-left">
-                        <span className="text-xl">⚖️</span>
+                        <Scale className="w-5 h-5 text-purple-600" />
                         <div className="text-sm">
                           <div className="font-medium text-purple-800">
                             Judge
@@ -1794,11 +1877,13 @@ const AIGenerator: React.FC = () => {
                       <div className="bg-gradient-to-r from-blue-50 to-green-50 p-6 rounded-lg border border-blue-200">
                         <div className="flex items-center justify-between mb-4">
                           <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-                            🧠 AI-Generated Startup Idea
+                            <Brain className="w-4 h-4 mr-2" />
+                            AI-Generated Startup Idea
                           </h3>
                           {aiResponse.metadata?.saved_to_database && (
                             <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                              💾 Saved to Portfolio
+                              <Save className="w-4 h-4 mr-2" />
+                              Saved to Portfolio
                             </span>
                           )}
                         </div>
@@ -1813,12 +1898,14 @@ const AIGenerator: React.FC = () => {
                           <div className="flex items-center gap-4 text-xs text-gray-500">
                             {aiResponse.confidence_score && (
                               <span className="flex items-center gap-1">
-                                📊 Confidence:{" "}
+                                <BarChart3 className="w-4 h-4 mr-2" />
+                                Confidence:{" "}
                                 {Math.round(aiResponse.confidence_score * 100)}%
                               </span>
                             )}
                             <span className="flex items-center gap-1">
-                              🕒 Generated:{" "}
+                              <Clock className="w-4 h-4 mr-2" />
+                              Generated:{" "}
                               {new Date(
                                 aiResponse.generated_at
                               ).toLocaleString()}
@@ -1832,7 +1919,8 @@ const AIGenerator: React.FC = () => {
                               onClick={() => handleSaveIdeaManually()}
                               className="text-xs"
                             >
-                              💾 Save to Portfolio
+                              <Save className="w-4 h-4 mr-2" />
+                              Save to Portfolio
                             </Button>
                           )}
                         </div>
@@ -1845,7 +1933,8 @@ const AIGenerator: React.FC = () => {
                           <div className="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-lg border border-green-200">
                             <div className="flex items-center justify-between mb-4">
                               <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-                                🔧 AI Fine-tuning Recommendations
+                                <Wrench className="w-4 h-4 mr-2" />
+                                AI Fine-tuning Recommendations
                               </h3>
                               <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
                                 Focus:{" "}
@@ -1912,12 +2001,13 @@ const AIGenerator: React.FC = () => {
                                     aiResponse.response_text
                                   );
                                   setSuccessMessage(
-                                    "💾 Recommendations copied to clipboard!"
+                                    "Recommendations copied to clipboard!"
                                   );
                                 }}
                                 className="text-xs"
                               >
-                                📋 Copy Recommendations
+                                <Copy className="w-4 h-4 mr-2" />
+                                Copy Recommendations
                               </Button>
                               <Button
                                 size="sm"
@@ -1929,7 +2019,8 @@ const AIGenerator: React.FC = () => {
                                 }}
                                 className="text-xs"
                               >
-                                ⚖️ Judge Improved Idea
+                                <Scale className="w-4 h-4 inline mr-1" />
+                                Judge Improved Idea
                               </Button>
                               <Button
                                 size="sm"
@@ -1940,7 +2031,8 @@ const AIGenerator: React.FC = () => {
                                 }}
                                 className="text-xs"
                               >
-                                ✏️ Edit Original Idea
+                                <Edit2 className="w-4 h-4 inline mr-1" />
+                                Edit Original Idea
                               </Button>
                             </div>
                           </div>
@@ -1950,7 +2042,8 @@ const AIGenerator: React.FC = () => {
                           <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-lg border border-purple-200">
                             <div className="flex items-center justify-between mb-4">
                               <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-                                🎯 AI Strategic Recommendations
+                                <Target className="w-4 h-4 mr-2" />
+                                AI Strategic Recommendations
                               </h3>
                               <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
                                 Focus:{" "}
@@ -1970,8 +2063,10 @@ const AIGenerator: React.FC = () => {
                             {aiResponse.suggestions &&
                               aiResponse.suggestions.length > 0 && (
                                 <div className="mt-6 bg-white p-4 rounded border">
+                                  {" "}
                                   <h5 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
-                                    ✅ Priority Action Items
+                                    <CheckCircle className="w-4 h-4 text-green-600" />
+                                    Priority Action Items
                                   </h5>
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                     {aiResponse.suggestions
@@ -2047,12 +2142,13 @@ const AIGenerator: React.FC = () => {
                                     aiResponse.response_text
                                   );
                                   setSuccessMessage(
-                                    "📋 Recommendations copied to clipboard!"
+                                    "Recommendations copied to clipboard!"
                                   );
                                 }}
                                 className="text-xs"
                               >
-                                📋 Copy Recommendations
+                                <Copy className="w-4 h-4 mr-2" />
+                                Copy Recommendations
                               </Button>
                               <Button
                                 size="sm"
@@ -2064,7 +2160,8 @@ const AIGenerator: React.FC = () => {
                                 }}
                                 className="text-xs"
                               >
-                                💡 Generate New Ideas
+                                <Lightbulb className="w-4 h-4 mr-2" />
+                                Generate New Ideas
                               </Button>
                               <Button
                                 size="sm"
@@ -2076,7 +2173,8 @@ const AIGenerator: React.FC = () => {
                                 }}
                                 className="text-xs"
                               >
-                                🔧 Fine-tune Ideas
+                                <Wrench className="w-4 h-4 mr-2" />
+                                Fine-tune Ideas
                               </Button>
                               <Button
                                 size="sm"
@@ -2087,7 +2185,8 @@ const AIGenerator: React.FC = () => {
                                 }}
                                 className="text-xs"
                               >
-                                📊 View Metrics
+                                <BarChart3 className="w-4 h-4 mr-2" />
+                                View Metrics
                               </Button>
                             </div>
                           </div>
@@ -2119,7 +2218,8 @@ const AIGenerator: React.FC = () => {
                       aiResponse.suggestions.length > 0 && (
                         <div className="bg-blue-50 p-4 rounded-lg">
                           <h4 className="font-semibold text-blue-800 mb-2">
-                            💡 Additional Insights
+                            <Lightbulb className="w-4 h-4 mr-2" />
+                            Additional Insights
                           </h4>
                           <ul className="list-disc list-inside text-sm text-blue-700 space-y-1">
                             {aiResponse.suggestions.map((suggestion, index) => (
@@ -2131,7 +2231,8 @@ const AIGenerator: React.FC = () => {
                     {activeTab === "generate" && (
                       <div className="bg-yellow-50 p-4 rounded-lg">
                         <h4 className="font-semibold text-yellow-800 mb-2">
-                          🎯 Next Steps
+                          <Target className="w-4 h-4 mr-2" />
+                          Next Steps
                         </h4>
                         <ul className="list-disc list-inside text-sm text-yellow-700 space-y-1">
                           <li>
@@ -2152,7 +2253,8 @@ const AIGenerator: React.FC = () => {
                     {activeTab === "recommendations" && (
                       <div className="bg-indigo-50 p-4 rounded-lg">
                         <h4 className="font-semibold text-indigo-800 mb-2">
-                          🚀 Implementation Roadmap
+                          <Rocket className="w-4 h-4 mr-2" />
+                          Implementation Roadmap
                         </h4>
                         <ul className="list-disc list-inside text-sm text-indigo-700 space-y-1">
                           <li>
@@ -2177,7 +2279,8 @@ const AIGenerator: React.FC = () => {
                     {activeTab === "finetune" && (
                       <div className="bg-green-50 p-4 rounded-lg">
                         <h4 className="font-semibold text-green-800 mb-2">
-                          🔧 Implementation Tips
+                          <Wrench className="w-4 h-4 mr-2" />
+                          Implementation Tips
                         </h4>
                         <ul className="list-disc list-inside text-sm text-green-700 space-y-1">
                           <li>Apply the improvements to your original idea</li>
@@ -2240,7 +2343,8 @@ const AIGenerator: React.FC = () => {
                     {aiJudgment.strengths.length > 0 && (
                       <div className="bg-green-50 p-4 rounded-lg">
                         <h4 className="font-semibold text-green-800 mb-2">
-                          💪 Strengths
+                          <Dumbbell className="w-4 h-4 mr-2" />
+                          Strengths
                         </h4>
                         <ul className="list-disc list-inside text-sm text-green-700 space-y-1">
                           {aiJudgment.strengths.map((strength, index) => (
@@ -2252,8 +2356,10 @@ const AIGenerator: React.FC = () => {
 
                     {aiJudgment.weaknesses.length > 0 && (
                       <div className="bg-red-50 p-4 rounded-lg">
+                        {" "}
                         <h4 className="font-semibold text-red-800 mb-2">
-                          ⚠️ Areas for Improvement
+                          <AlertTriangle className="w-4 h-4 inline mr-2" />
+                          Areas for Improvement
                         </h4>
                         <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
                           {aiJudgment.weaknesses.map((weakness, index) => (
@@ -2266,7 +2372,8 @@ const AIGenerator: React.FC = () => {
                     {aiJudgment.improvement_suggestions.length > 0 && (
                       <div className="bg-yellow-50 p-4 rounded-lg">
                         <h4 className="font-semibold text-yellow-800 mb-2">
-                          💡 Improvement Suggestions
+                          <Lightbulb className="w-4 h-4 mr-2" />
+                          Improvement Suggestions
                         </h4>
                         <ul className="list-disc list-inside text-sm text-yellow-700 space-y-1">
                           {aiJudgment.improvement_suggestions.map(
@@ -2290,7 +2397,7 @@ const AIGenerator: React.FC = () => {
               <div className="flex items-center gap-3 text-xl">
                 <CardTitle>
                   <div className="w-10 h-10 bg-indigo-200 text-indigo-700 rounded-xl flex items-center justify-center text-xl">
-                    💡
+                    <Lightbulb className="w-4 h-4" />
                   </div>
                   <div>AI Interaction Tips & Best Practices</div>
                 </CardTitle>
@@ -2302,7 +2409,7 @@ const AIGenerator: React.FC = () => {
               <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 bg-blue-200 text-blue-700 rounded-lg flex items-center justify-center text-xl">
-                    🧠
+                    <Brain className="w-4 h-4" />
                   </div>
                   <h4 className="font-semibold text-blue-800">Generate</h4>
                 </div>
@@ -2316,7 +2423,7 @@ const AIGenerator: React.FC = () => {
               <div className="bg-green-50 p-4 rounded-xl border border-green-200">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 bg-green-200 text-green-700 rounded-lg flex items-center justify-center text-xl">
-                    🔧
+                    <Wrench className="w-4 h-4" />
                   </div>
                   <h4 className="font-semibold text-green-800">Fine-tune</h4>
                 </div>
@@ -2329,8 +2436,9 @@ const AIGenerator: React.FC = () => {
 
               <div className="bg-purple-50 p-4 rounded-xl border border-purple-200">
                 <div className="flex items-center gap-3 mb-3">
+                  {" "}
                   <div className="w-10 h-10 bg-purple-200 text-purple-700 rounded-lg flex items-center justify-center text-xl">
-                    ⚖️
+                    <Scale className="w-6 h-6" />
                   </div>
                   <h4 className="font-semibold text-purple-800">Judge</h4>
                 </div>
@@ -2343,7 +2451,7 @@ const AIGenerator: React.FC = () => {
               <div className="bg-orange-50 p-4 rounded-xl border border-orange-200">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 bg-orange-200 text-orange-700 rounded-lg flex items-center justify-center text-xl">
-                    🎯
+                    <Target className="w-4 h-4" />
                   </div>
                   <h4 className="font-semibold text-orange-800">
                     Recommendations
@@ -2360,7 +2468,7 @@ const AIGenerator: React.FC = () => {
             {/* Additional tips */}
             <div className="mt-6 bg-gradient-to-r from-gray-50 to-gray-100 p-4 rounded-xl border border-gray-200">
               <h5 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <span>🎯</span>
+                <Target className="w-4 h-4" />
                 Pro Tips for Better AI Results
               </h5>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">

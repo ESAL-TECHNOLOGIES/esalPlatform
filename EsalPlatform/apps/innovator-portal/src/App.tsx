@@ -1,12 +1,21 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Layout, Navbar, Sidebar } from "@esal/ui";
 import { useState, useEffect } from "react";
+import {
+  BarChart3,
+  Lightbulb,
+  Bot,
+  TrendingUp,
+  User,
+  Settings as SettingsIcon,
+} from "lucide-react";
 import DashboardModern from "./pages/Dashboard_fixed";
 import AIGenerator from "./pages/AIGenerator";
 import Metrics from "./pages/Metrics";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import EmailConfirmed from "./pages/EmailConfirmed";
+import EmailVerification from "./pages/EmailVerification";
 // New page imports
 import IdeaDetails from "./pages/IdeaDetails";
 import Profile from "./pages/Profile";
@@ -14,12 +23,28 @@ import Settings from "./pages/Settings";
 import MyIdeas from "./pages/MyIdeas";
 
 const sidebarItems = [
-  { label: "Dashboard", href: "/", icon: "📊" },
-  { label: "My Ideas", href: "/my-ideas", icon: "💡" },
-  { label: "AI Generator", href: "/ai-generator", icon: "🤖" },
-  { label: "Metrics", href: "/metrics", icon: "📈" },
-  { label: "Profile", href: "/profile", icon: "👤" },
-  { label: "Settings", href: "/settings", icon: "⚙️" },
+  { label: "Dashboard", href: "/", icon: <BarChart3 className="w-5 h-5" /> },
+  {
+    label: "My Ideas",
+    href: "/my-ideas",
+    icon: <Lightbulb className="w-5 h-5" />,
+  },
+  {
+    label: "AI Generator",
+    href: "/ai-generator",
+    icon: <Bot className="w-5 h-5" />,
+  },
+  {
+    label: "Metrics",
+    href: "/metrics",
+    icon: <TrendingUp className="w-5 h-5" />,
+  },
+  { label: "Profile", href: "/profile", icon: <User className="w-5 h-5" /> },
+  {
+    label: "Settings",
+    href: "/settings",
+    icon: <SettingsIcon className="w-5 h-5" />,
+  },
 ];
 
 // Auth guard component
@@ -97,6 +122,7 @@ function App() {
     <Routes>
       {/* Public routes */}
       <Route path="/email-confirmed" element={<EmailConfirmed />} />
+      <Route path="/email-verification" element={<EmailVerification />} />
 
       {/* Auth routes */}
       <Route

@@ -1,39 +1,16 @@
-import React from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { Layout } from '@esal/ui'
-import Dashboard from './pages/Dashboard'
-import Startups from './pages/Startups'
-import Events from './pages/Events'
-import Members from './pages/Members'
-
-const navigation = [
-  { name: 'Dashboard', href: '/', icon: '📊' },
-  { name: 'Startups', href: '/startups', icon: '🚀' },
-  { name: 'Events', href: '/events', icon: '📅' },
-  { name: 'Members', href: '/members', icon: '👥' },
-]
+import React from "react";
 
 function App() {
   return (
-    <Router>
-      <Layout 
-        title="Hub Portal"
-        navigation={navigation}
-        userMenu={[
-          { name: 'Profile', href: '/profile' },
-          { name: 'Settings', href: '/settings' },
-          { name: 'Sign out', href: '/logout' },
-        ]}
-      >
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/startups" element={<Startups />} />
-          <Route path="/events" element={<Events />} />
-          <Route path="/members" element={<Members />} />
-        </Routes>
-      </Layout>
-    </Router>
-  )
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-center">
+        <h1 className="text-6xl font-bold text-gray-800 mb-4">Coming Soon</h1>
+        <p className="text-xl text-gray-600">
+          The Hub Portal is under development
+        </p>
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;

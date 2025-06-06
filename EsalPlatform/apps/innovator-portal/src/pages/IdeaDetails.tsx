@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardContent, Button } from "@esal/ui";
+import {
+  FileText,
+  Image,
+  BarChart3,
+  FileEdit,
+  Folder,
+  AlertTriangle,
+} from "lucide-react";
 
 interface IdeaDetail {
   id: string;
@@ -367,7 +375,10 @@ const IdeaDetails: React.FC = () => {
           <CardContent>
             <div className="bg-red-50 border border-red-200 rounded-md p-4">
               <div className="flex">
-                <div className="text-red-600 text-sm">❌ Error: {error}</div>
+                <div className="flex items-center text-red-600 text-sm">
+                  <AlertTriangle className="w-4 h-4 mr-1" />
+                  Error: {error}
+                </div>
               </div>
             </div>
             <div className="mt-4 text-center">
@@ -559,17 +570,18 @@ const IdeaDetails: React.FC = () => {
                       key={file.id}
                       className="flex items-center justify-between py-2 px-4 border rounded-lg"
                     >
-                      <div className="flex items-center">
-                        <div className="mr-3 text-lg">
-                          {file.file_type.includes("pdf")
-                            ? "📄"
-                            : file.file_type.includes("image")
-                              ? "🖼️"
-                              : file.file_type.includes("spreadsheet")
-                                ? "📊"
-                                : file.file_type.includes("word")
-                                  ? "📝"
-                                  : "📁"}
+                      <div className="flex items-center">                        <div className="mr-3 text-lg">
+                          {file.file_type.includes("pdf") ? (
+                            <FileText className="w-5 h-5 text-red-500" />
+                          ) : file.file_type.includes("image") ? (
+                            <Image className="w-5 h-5 text-green-500" />
+                          ) : file.file_type.includes("spreadsheet") ? (
+                            <BarChart3 className="w-5 h-5 text-blue-500" />
+                          ) : file.file_type.includes("word") ? (
+                            <FileEdit className="w-5 h-5 text-blue-600" />
+                          ) : (
+                            <Folder className="w-5 h-5 text-gray-500" />
+                          )}
                         </div>
                         <div>
                           <p className="font-medium">{file.filename}</p>

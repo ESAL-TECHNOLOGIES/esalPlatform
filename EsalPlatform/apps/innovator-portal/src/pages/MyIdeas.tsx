@@ -2,6 +2,25 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, Button } from "@esal/ui";
 import Modal from "../components/Modal";
+import {
+  Lightbulb,
+  Sparkles,
+  Search,
+  Trash2,
+  Star,
+  CheckCircle,
+  FileText,
+  Eye,
+  Target,
+  Factory,
+  TrendingUp,
+  X,
+  Clock,
+  Heart,
+  BarChart3,
+  Edit3,
+  File,
+} from "lucide-react";
 
 interface Idea {
   id: string;
@@ -846,8 +865,10 @@ const MyIdeas: React.FC = () => {
       <div className="bg-gradient-to-r from-blue-600 to-purple-700 rounded-xl p-4 sm:p-6 lg:p-8 text-white">
         <div className="flex flex-col space-y-4 lg:space-y-0 lg:flex-row lg:justify-between lg:items-center lg:gap-6">
           <div className="flex-1">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">
-              💡 My Ideas
+            {" "}
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 flex items-center gap-2">
+              <Lightbulb className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" />
+              My Ideas
             </h1>
             <p className="text-blue-100 text-sm sm:text-base lg:text-lg mb-4">
               Manage and track your innovative startup concepts
@@ -879,11 +900,12 @@ const MyIdeas: React.FC = () => {
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+            {" "}
             <Button
               onClick={() => setIsCreateModalOpen(true)}
-              className="bg-white text-blue-600 hover:bg-blue-50 px-4 sm:px-6 py-2 sm:py-3 font-semibold transition-all transform hover:scale-105 text-sm sm:text-base w-full sm:w-auto"
+              className="bg-white text-blue-600 hover:bg-blue-50 px-4 sm:px-6 py-2 sm:py-3 font-semibold transition-all transform hover:scale-105 text-sm sm:text-base w-full sm:w-auto flex items-center justify-center gap-2"
             >
-              <span className="mr-1 sm:mr-2 text-lg sm:text-xl">✨</span>
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="hidden sm:inline">Create New Idea</span>
               <span className="sm:hidden">New Idea</span>
             </Button>
@@ -945,10 +967,10 @@ const MyIdeas: React.FC = () => {
                     clipRule="evenodd"
                   />
                 </svg>
-              </div>
+              </div>{" "}
               <input
                 type="text"
-                placeholder="🔍 Search ideas..."
+                placeholder="Search ideas..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="block w-full pl-9 sm:pl-10 pr-10 sm:pr-12 py-2.5 sm:py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
@@ -1014,7 +1036,7 @@ const MyIdeas: React.FC = () => {
                       </>
                     ) : (
                       <>
-                        <span className="mr-1">🗑️</span>
+                        <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                         <span className="sm:hidden">Delete</span>
                         <span className="hidden sm:inline">
                           Delete Selected
@@ -1044,7 +1066,10 @@ const MyIdeas: React.FC = () => {
                       : "hover:bg-gray-50 border-gray-300"
                   }`}
                 >
-                  <span className="hidden sm:inline">🌟 All</span>
+                  <span className="hidden sm:inline flex items-center gap-1">
+                    <Star className="w-4 h-4" />
+                    All
+                  </span>
                   <span className="sm:hidden">All</span>
                   <span className="ml-1">({statusCounts.all})</span>
                 </Button>
@@ -1058,7 +1083,10 @@ const MyIdeas: React.FC = () => {
                       : "hover:bg-gray-50 border-gray-300"
                   }`}
                 >
-                  <span className="hidden sm:inline">✅ Active</span>
+                  <span className="hidden sm:inline flex items-center gap-1">
+                    <CheckCircle className="w-4 h-4" />
+                    Active
+                  </span>
                   <span className="sm:hidden">Active</span>
                   <span className="ml-1">({statusCounts.active})</span>
                 </Button>
@@ -1072,7 +1100,10 @@ const MyIdeas: React.FC = () => {
                       : "hover:bg-gray-50 border-gray-300"
                   }`}
                 >
-                  <span className="hidden sm:inline">📝 Drafts</span>
+                  <span className="hidden sm:inline flex items-center gap-1">
+                    <FileText className="w-4 h-4" />
+                    Drafts
+                  </span>
                   <span className="sm:hidden">Drafts</span>
                   <span className="ml-1">({statusCounts.draft})</span>
                 </Button>
@@ -1086,7 +1117,10 @@ const MyIdeas: React.FC = () => {
                       : "hover:bg-gray-50 border-gray-300"
                   }`}
                 >
-                  <span className="hidden sm:inline">⏳ Pending</span>
+                  <span className="hidden sm:inline flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    Pending
+                  </span>
                   <span className="sm:hidden">Pending</span>
                   <span className="ml-1">({statusCounts.pending})</span>
                 </Button>
@@ -1130,11 +1164,11 @@ const MyIdeas: React.FC = () => {
                   onChange={(e) => setSortBy(e.target.value)}
                   className="flex-1 sm:flex-none px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm min-w-0"
                 >
-                  <option value="newest">📅 Newest First</option>
-                  <option value="oldest">📅 Oldest First</option>
-                  <option value="alphabetical">🔤 Alphabetical</option>
-                  <option value="most-viewed">👁️ Most Viewed</option>
-                  <option value="most-interest">🤝 Most Interest</option>
+                  <option value="newest">Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                  <option value="alphabetical">Alphabetical</option>
+                  <option value="most-viewed">Most Viewed</option>
+                  <option value="most-interest">Most Interest</option>
                 </select>
               </div>
             </div>
@@ -1146,16 +1180,19 @@ const MyIdeas: React.FC = () => {
         <Card className="border-gray-200 shadow-lg">
           <CardContent className="text-center py-12 sm:py-20 px-4 sm:px-6">
             <div className="max-w-md mx-auto">
-              <div className="text-6xl sm:text-8xl mb-4 sm:mb-6">
-                {searchTerm
-                  ? "🔍"
-                  : filter === "all"
-                    ? "🚀"
-                    : filter === "active"
-                      ? "✅"
-                      : filter === "draft"
-                        ? "📝"
-                        : "⏳"}
+              {" "}
+              <div className="mb-4 sm:mb-6 flex justify-center">
+                {searchTerm ? (
+                  <Search className="w-16 h-16 sm:w-20 sm:h-20 text-gray-400" />
+                ) : filter === "all" ? (
+                  <Sparkles className="w-16 h-16 sm:w-20 sm:h-20 text-gray-400" />
+                ) : filter === "active" ? (
+                  <CheckCircle className="w-16 h-16 sm:w-20 sm:h-20 text-gray-400" />
+                ) : filter === "draft" ? (
+                  <FileText className="w-16 h-16 sm:w-20 sm:h-20 text-gray-400" />
+                ) : (
+                  <Clock className="w-16 h-16 sm:w-20 sm:h-20 text-gray-400" />
+                )}
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2 sm:mb-3">
                 {searchTerm
@@ -1175,16 +1212,17 @@ const MyIdeas: React.FC = () => {
                 {searchTerm ? (
                   <Button
                     onClick={() => setSearchTerm("")}
-                    className="bg-blue-600 hover:bg-blue-700 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-medium transition-colors w-full sm:w-auto"
+                    className="bg-blue-600 hover:bg-blue-700 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-medium transition-colors w-full sm:w-auto flex items-center justify-center gap-2"
                   >
-                    🔍 Clear Search
+                    <X className="w-4 h-4" />
+                    Clear Search
                   </Button>
                 ) : (
                   <Button
                     onClick={() => setIsCreateModalOpen(true)}
-                    className="bg-blue-600 hover:bg-blue-700 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-medium transition-colors w-full sm:w-auto"
+                    className="bg-blue-600 hover:bg-blue-700 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-medium transition-colors w-full sm:w-auto flex items-center justify-center gap-2"
                   >
-                    🎯{" "}
+                    <Target className="w-4 h-4" />
                     <span className="hidden sm:inline">
                       Create Your First Idea
                     </span>
@@ -1316,7 +1354,7 @@ const MyIdeas: React.FC = () => {
                           <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
                             {idea.industry && (
                               <div className="flex items-center text-gray-700 bg-blue-50 px-2 sm:px-4 py-1 sm:py-2 rounded-full border border-blue-200">
-                                <span className="mr-1 sm:mr-2">🏭</span>
+                                <Factory className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                                 <span className="font-medium truncate max-w-[120px] sm:max-w-none">
                                   {idea.industry}
                                 </span>
@@ -1324,7 +1362,7 @@ const MyIdeas: React.FC = () => {
                             )}
                             {idea.stage && (
                               <div className="flex items-center text-gray-700 bg-purple-50 px-2 sm:px-4 py-1 sm:py-2 rounded-full border border-purple-200">
-                                <span className="mr-1 sm:mr-2">📈</span>
+                                <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                                 <span className="font-medium truncate max-w-[120px] sm:max-w-none">
                                   {idea.stage}
                                 </span>
@@ -1334,8 +1372,9 @@ const MyIdeas: React.FC = () => {
 
                           {/* Stats - Mobile Responsive */}
                           <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+                            {" "}
                             <div className="flex items-center text-gray-700 bg-green-50 px-2 sm:px-4 py-1 sm:py-2 rounded-full border border-green-200">
-                              <span className="mr-1 sm:mr-2">👁️</span>
+                              <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                               <span className="font-medium">
                                 {idea.views_count}
                               </span>
@@ -1344,7 +1383,7 @@ const MyIdeas: React.FC = () => {
                               </span>
                             </div>
                             <div className="flex items-center text-gray-700 bg-orange-50 px-2 sm:px-4 py-1 sm:py-2 rounded-full border border-orange-200">
-                              <span className="mr-1 sm:mr-2">🤝</span>
+                              <Heart className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                               <span className="font-medium">
                                 {idea.interests_count}
                               </span>
@@ -1384,7 +1423,7 @@ const MyIdeas: React.FC = () => {
                           onClick={() => navigate(`/ideas/${idea.id}`)}
                           className="bg-blue-600 hover:bg-blue-700 px-3 sm:px-4 py-2 transition-all transform hover:scale-105 shadow-sm text-xs sm:text-sm flex-1 sm:flex-none"
                         >
-                          <span className="mr-1">📊</span>
+                          <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                           <span className="hidden sm:inline">View</span>
                           <span className="sm:hidden">View</span>
                         </Button>
@@ -1394,7 +1433,7 @@ const MyIdeas: React.FC = () => {
                           className="border-blue-300 text-blue-600 hover:bg-blue-50 px-3 sm:px-4 py-2 transition-all shadow-sm text-xs sm:text-sm flex-1 sm:flex-none"
                           onClick={() => handleEditIdea(idea)}
                         >
-                          <span className="mr-1">✏️</span>
+                          <Edit3 className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                           <span className="hidden sm:inline">Edit</span>
                           <span className="sm:hidden">Edit</span>
                         </Button>
@@ -1404,7 +1443,7 @@ const MyIdeas: React.FC = () => {
                           className="border-red-300 text-red-600 hover:bg-red-50 px-3 sm:px-4 py-2 transition-all shadow-sm text-xs sm:text-sm flex-1 sm:flex-none"
                           onClick={() => handleDeleteIdea(idea.id)}
                         >
-                          <span className="mr-1">🗑️</span>
+                          <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                           <span className="hidden sm:inline">Delete</span>
                           <span className="sm:hidden">Del</span>
                         </Button>
@@ -1871,7 +1910,7 @@ const MyIdeas: React.FC = () => {
                         key={index}
                         className="flex items-center space-x-2 text-xs sm:text-sm"
                       >
-                        <span>📄</span>
+                        <File className="w-4 h-4" />
                         <span className="truncate flex-1">{file.name}</span>
                         <span className="text-gray-400 text-xs whitespace-nowrap">
                           ({(file.size / 1024 / 1024).toFixed(2)} MB)

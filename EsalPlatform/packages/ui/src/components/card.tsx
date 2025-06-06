@@ -10,16 +10,22 @@ export const Card: React.FC<CardProps> = ({ children, className }) => {
   );
 };
 
-export const CardHeader: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  return <div className="pb-4">{children}</div>;
+export const CardHeader: React.FC<{
+  children: React.ReactNode;
+  className?: string;
+}> = ({ children, className }) => {
+  return <div className={cn("pb-4", className)}>{children}</div>;
 };
 
-export const CardTitle: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  return <h3 className="text-lg font-semibold text-gray-900">{children}</h3>;
+export const CardTitle: React.FC<{
+  children: React.ReactNode;
+  className?: string;
+}> = ({ children, className }) => {
+  return (
+    <h3 className={cn("text-lg font-semibold text-gray-900", className)}>
+      {children}
+    </h3>
+  );
 };
 
 export const CardContent: React.FC<{

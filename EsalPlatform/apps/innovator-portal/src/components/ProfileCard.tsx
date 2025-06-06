@@ -1,5 +1,6 @@
 import React from "react";
 import { Card, CardContent, Button } from "@esal/ui";
+import { Edit2, MapPin, Globe, Briefcase, Twitter, Calendar, RefreshCw } from "lucide-react";
 
 interface UserProfile {
   id: string;
@@ -73,14 +74,13 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
       <div className="h-32 sm:h-40 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 relative">
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-white/10"></div>
-        {showEditButton && onEdit && (
-          <Button
+        {showEditButton && onEdit && (          <Button
             onClick={onEdit}
             variant="secondary"
             size="sm"
             className="absolute top-4 right-4 bg-white/90 hover:bg-white backdrop-blur-sm text-gray-700 hover:text-gray-900 border border-white/20 shadow-lg transition-all duration-200"
           >
-            <span className="mr-1">✏️</span>
+            <Edit2 className="w-4 h-4 mr-1" />
             <span className="hidden sm:inline">Edit</span>
           </Button>
         )}
@@ -148,12 +148,10 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
             <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
               <p className="text-gray-700 leading-relaxed text-sm sm:text-base">{profile.bio}</p>
             </div>
-          )}
-
-          {/* Location - Enhanced design */}
+          )}          {/* Location - Enhanced design */}
           {profile.location && (
             <div className="flex items-center justify-center sm:justify-start text-gray-600 bg-blue-50 rounded-lg p-3">
-              <span className="mr-2 text-lg">📍</span>
+              <MapPin className="w-4 h-4 mr-2 text-blue-600" />
               <span className="text-sm sm:text-base font-medium">{profile.location}</span>
             </div>
           )}
@@ -210,37 +208,34 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
               <h4 className="text-sm font-medium text-gray-900 mb-3 text-center sm:text-left">
                 Connect
               </h4>
-              <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-                {profile.website && (
+              <div className="flex flex-wrap gap-2 justify-center sm:justify-start">                {profile.website && (
                   <a
                     href={profile.website}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center px-3 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-700 text-sm transition-all duration-200 hover:shadow-sm border border-gray-200"
                   >
-                    <span className="mr-2">🌐</span>
+                    <Globe className="w-4 h-4 mr-2" />
                     <span className="hidden sm:inline">Website</span>
                   </a>
-                )}
-                {profile.linkedin && (
+                )}                {profile.linkedin && (
                   <a
                     href={profile.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center px-3 py-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm transition-all duration-200 hover:shadow-sm border border-blue-200"
                   >
-                    <span className="mr-2">💼</span>
+                    <Briefcase className="w-4 h-4 mr-2" />
                     <span className="hidden sm:inline">LinkedIn</span>
                   </a>
-                )}
-                {profile.twitter && (
+                )}                {profile.twitter && (
                   <a
                     href={profile.twitter}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 text-sm transition-all duration-200 hover:shadow-sm border border-sky-200"
                   >
-                    <span className="mr-2">🐦</span>
+                    <Twitter className="w-4 h-4 mr-2" />
                     <span className="hidden sm:inline">Twitter</span>
                   </a>
                 )}
@@ -249,14 +244,13 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
           )}
 
           {/* Enhanced Member Since Section */}
-          <div className="pt-4 border-t border-gray-200 bg-gray-50 rounded-lg p-3 sm:p-4">
-            <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 text-xs sm:text-sm text-gray-500">
+          <div className="pt-4 border-t border-gray-200 bg-gray-50 rounded-lg p-3 sm:p-4">            <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 text-xs sm:text-sm text-gray-500">
               <span className="flex items-center">
-                <span className="mr-1">📅</span>
+                <Calendar className="w-3 h-3 mr-1" />
                 Member since {formatDate(profile.created_at)}
               </span>
               <span className="flex items-center">
-                <span className="mr-1">🔄</span>
+                <RefreshCw className="w-3 h-3 mr-1" />
                 Updated {formatDate(profile.updated_at)}
               </span>
             </div>

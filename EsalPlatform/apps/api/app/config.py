@@ -14,14 +14,18 @@ class Settings(BaseSettings):
     
     # Local Database (Optional - can be disabled)
     USE_LOCAL_DB: bool = False  # Set to False to use only Supabase
-    DATABASE_URL: str = "sqlite:///./esal_dev.db"  # Kept for backward compatibility
-      # Email Configuration (deprecated - email confirmation disabled)
+    DATABASE_URL: str = "sqlite:///./esal_dev.db"  # Kept for backward compatibility    # Email Configuration - Gmail SMTP for verification codes
     SMTP_HOST: str = "smtp.gmail.com"
     SMTP_PORT: int = 587
-    SMTP_USER: str = ""
-    SMTP_PASSWORD: str = ""
-    SMTP_FROM_EMAIL: str = "noreply@esalplatform.com"
-    SMTP_FROM_NAME: str = "ESAL Platform"    # AI APIs
+    SMTP_USER: str = "esalventuresltd@gmail.com"
+    SMTP_PASSWORD: str = "bcij nqlq cgfk vazv"
+    SMTP_FROM_EMAIL: str = "esalventuresltd@gmail.com"
+    SMTP_FROM_NAME: str = "Esal Ventures"
+    
+    # Email verification settings
+    VERIFICATION_CODE_EXPIRY_MINUTES: int = 10
+    SITE_URL: str = "http://localhost:3000"
+    CONFIRM_EMAIL_REDIRECT_URL: str = "http://localhost:3001/email-confirmed"# AI APIs
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "your-gemini-api-key")
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")  # Optional OpenAI API key
 

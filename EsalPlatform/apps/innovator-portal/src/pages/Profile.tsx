@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent, Button } from "@esal/ui";
+import { Lightbulb, Eye, Heart, AlertTriangle, RefreshCw, HelpCircle, User, Edit2, Link, Save, BarChart3, CheckCircle, XCircle, Zap, Lock, Mail, Camera, Package } from "lucide-react";
 import ProfileCard from "../components/ProfileCard";
 
 interface UserProfile {
@@ -41,7 +42,7 @@ interface ProfileStats {
 const Modal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
-  title: string;
+  title: React.ReactNode;
   children: React.ReactNode;
 }> = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
@@ -638,19 +639,17 @@ const Profile: React.FC = () => {
           </p>
         </div>
         <Card className="border-red-200 bg-red-50">
-          <CardContent className="text-center py-12">
-            <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-              <span className="text-red-600 text-2xl">⚠️</span>
+          <CardContent className="text-center py-12">            <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+              <AlertTriangle className="text-red-600 w-8 h-8" />
             </div>
             <h3 className="text-lg font-semibold text-red-900 mb-2">
               Profile Load Error
             </h3>
-            <p className="text-red-700 mb-6">{error}</p>
-            <Button
+            <p className="text-red-700 mb-6">{error}</p>            <Button
               onClick={fetchProfile}
               className="bg-red-600 hover:bg-red-700"
             >
-              <span className="mr-2">🔄</span>
+              <RefreshCw className="w-4 h-4 mr-2" />
               Try Again
             </Button>
           </CardContent>
@@ -666,9 +665,8 @@ const Profile: React.FC = () => {
           <p className="text-gray-600">Profile not found.</p>
         </div>
         <Card className="border-yellow-200 bg-yellow-50">
-          <CardContent className="text-center py-12">
-            <div className="mx-auto w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
-              <span className="text-yellow-600 text-2xl">❓</span>
+          <CardContent className="text-center py-12">            <div className="mx-auto w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
+              <HelpCircle className="text-yellow-600 w-8 h-8" />
             </div>
             <h3 className="text-lg font-semibold text-yellow-900 mb-2">
               Profile Not Found
@@ -679,9 +677,8 @@ const Profile: React.FC = () => {
             </p>
             <Button
               onClick={fetchProfile}
-              className="bg-yellow-600 hover:bg-yellow-700"
-            >
-              <span className="mr-2">🔄</span>
+              className="bg-yellow-600 hover:bg-yellow-700"            >
+              <RefreshCw className="w-4 h-4 mr-2" />
               Try Again
             </Button>
           </CardContent>
@@ -710,9 +707,8 @@ const Profile: React.FC = () => {
                   month: "short",
                 })}
               </p>
-            </div>
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
-              <span className="text-white text-xl">👤</span>
+            </div>            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
+              <User className="text-white w-6 h-6" />
             </div>
           </div>
         </div>
@@ -774,9 +770,8 @@ const Profile: React.FC = () => {
                 <p className="text-xs text-blue-600 mt-1">
                   Your innovative concepts
                 </p>
-              </div>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                <span className="text-blue-600 text-lg sm:text-xl">💡</span>
+              </div>              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                <Lightbulb className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
               </div>
             </div>
           </CardContent>
@@ -795,9 +790,8 @@ const Profile: React.FC = () => {
                 <p className="text-xs text-green-600 mt-1">
                   Community engagement
                 </p>
-              </div>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
-                <span className="text-green-600 text-lg sm:text-xl">👁️</span>
+              </div>              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                <Eye className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
               </div>
             </div>
           </CardContent>
@@ -816,9 +810,8 @@ const Profile: React.FC = () => {
                 <p className="text-xs text-purple-600 mt-1">
                   Investor attention
                 </p>
-              </div>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors">
-                <span className="text-purple-600 text-lg sm:text-xl">❤️</span>
+              </div>              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
               </div>
             </div>
           </CardContent>
@@ -842,10 +835,9 @@ const Profile: React.FC = () => {
           {isEditing && (
             <Card className="shadow-lg border-blue-200">
               <CardHeader>
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200 -mx-6 -mt-6 px-6 pt-6 pb-4 rounded-t-lg">
-                  <CardTitle>
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200 -mx-6 -mt-6 px-6 pt-6 pb-4 rounded-t-lg">                  <CardTitle>
                     <div className="text-blue-900 flex items-center">
-                      <span className="mr-2">✏️</span>
+                      <Edit2 className="w-4 h-4 mr-2" />
                       Edit Profile
                     </div>
                   </CardTitle>
@@ -1011,9 +1003,8 @@ const Profile: React.FC = () => {
                   {/* Collapsible Social Links Section */}
                   <div className="border-t pt-4">
                     <details className="group">
-                      <summary className="flex items-center justify-between cursor-pointer text-sm font-medium text-gray-900 mb-4 p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                        <span className="flex items-center">
-                          <span className="mr-2">🔗</span>
+                      <summary className="flex items-center justify-between cursor-pointer text-sm font-medium text-gray-900 mb-4 p-2 rounded-lg hover:bg-gray-50 transition-colors">                        <span className="flex items-center">
+                          <Link className="w-4 h-4 mr-2" />
                           Social Links
                         </span>
                         <span className="transform group-open:rotate-180 transition-transform">
@@ -1095,9 +1086,8 @@ const Profile: React.FC = () => {
                   </div>
 
                   {formError && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                      <div className="flex items-center">
-                        <span className="text-red-600 mr-2">⚠️</span>
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">                      <div className="flex items-center">
+                        <AlertTriangle className="text-red-600 w-4 h-4 mr-2" />
                         <span className="text-red-700 text-sm font-medium">
                           Error: {formError}
                         </span>
@@ -1116,9 +1106,8 @@ const Profile: React.FC = () => {
                           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                           Saving Changes...
                         </>
-                      ) : (
-                        <>
-                          <span className="mr-2">💾</span>
+                      ) : (                        <>
+                          <Save className="w-4 h-4 mr-2" />
                           Save Changes
                         </>
                       )}
@@ -1160,9 +1149,8 @@ const Profile: React.FC = () => {
           <Card className="shadow-lg">
             <CardHeader>
               <div className="bg-gradient-to-r from-gray-50 to-slate-50 border-b border-gray-200 -mx-6 -mt-6 px-6 pt-6 pb-4 rounded-t-lg">
-                <CardTitle>
-                  <div className="text-gray-900 flex items-center">
-                    <span className="mr-2">📊</span>
+                <CardTitle>                  <div className="text-gray-900 flex items-center">
+                    <BarChart3 className="w-4 h-4 mr-2" />
                     Account Status
                   </div>
                 </CardTitle>
@@ -1180,10 +1168,9 @@ const Profile: React.FC = () => {
                         ? "bg-green-100 text-green-800 border border-green-200"
                         : "bg-red-100 text-red-800 border border-red-200"
                     }`}
-                  >
-                    {profile.is_active && !profile.is_blocked
-                      ? "✅ Active"
-                      : "❌ Inactive"}
+                  >                    {profile.is_active && !profile.is_blocked
+                      ? (<><CheckCircle className="w-4 h-4 inline mr-1" /> Active</>)
+                      : (<><XCircle className="w-4 h-4 inline mr-1" /> Inactive</>)}
                   </span>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded-lg space-y-2 sm:space-y-0">
@@ -1206,9 +1193,8 @@ const Profile: React.FC = () => {
 
               {/* Enhanced Status Messages */}
               {profile.is_blocked && (
-                <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <div className="flex items-start">
-                    <span className="text-red-600 text-lg mr-3 flex-shrink-0">⚠️</span>
+                <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">                  <div className="flex items-start">
+                    <AlertTriangle className="text-red-600 w-5 h-5 mr-3 flex-shrink-0" />
                     <div>
                       <h4 className="text-red-800 font-medium mb-1">
                         Account Blocked
@@ -1222,9 +1208,8 @@ const Profile: React.FC = () => {
                 </div>
               )}
               {!profile.is_active && !profile.is_blocked && (
-                <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <div className="flex items-start">
-                    <span className="text-yellow-600 text-lg mr-3 flex-shrink-0">⚠️</span>
+                <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">                  <div className="flex items-start">
+                    <AlertTriangle className="text-yellow-600 w-5 h-5 mr-3 flex-shrink-0" />
                     <div>
                       <h4 className="text-yellow-800 font-medium mb-1">
                         Account Inactive
@@ -1238,9 +1223,8 @@ const Profile: React.FC = () => {
                 </div>
               )}
               {profile.is_active && !profile.is_blocked && (
-                <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <div className="flex items-start">
-                    <span className="text-green-600 text-lg mr-3 flex-shrink-0">✅</span>
+                <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">                  <div className="flex items-start">
+                    <CheckCircle className="text-green-600 w-5 h-5 mr-3 flex-shrink-0" />
                     <div>
                       <h4 className="text-green-800 font-medium mb-1">
                         Account Active
@@ -1258,9 +1242,8 @@ const Profile: React.FC = () => {
           <Card className="shadow-lg">
             <CardHeader>
               <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-indigo-200 -mx-6 -mt-6 px-6 pt-6 pb-4 rounded-t-lg">
-                <CardTitle>
-                  <div className="text-indigo-900 flex items-center">
-                    <span className="mr-2">⚡</span>
+                <CardTitle>                  <div className="text-indigo-900 flex items-center">
+                    <Zap className="w-4 h-4 mr-2" />
                     Quick Actions
                   </div>
                 </CardTitle>
@@ -1273,9 +1256,8 @@ const Profile: React.FC = () => {
                   variant="outline"
                   onClick={() => setShowChangePasswordModal(true)}
                 >
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 group-hover:bg-red-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0 transition-colors">
-                      <span className="text-red-600 text-base sm:text-lg">🔒</span>
+                  <div className="flex items-center">                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 group-hover:bg-red-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0 transition-colors">
+                      <Lock className="text-red-600 w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <div className="text-left">
                       <div className="font-medium text-sm sm:text-base">Change Password</div>
@@ -1291,9 +1273,8 @@ const Profile: React.FC = () => {
                   variant="outline"
                   onClick={() => setShowNotificationsModal(true)}
                 >
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 group-hover:bg-blue-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0 transition-colors">
-                      <span className="text-blue-600 text-base sm:text-lg">📧</span>
+                  <div className="flex items-center">                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 group-hover:bg-blue-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0 transition-colors">
+                      <Mail className="text-blue-600 w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <div className="text-left">
                       <div className="font-medium text-sm sm:text-base">Manage Notifications</div>
@@ -1309,9 +1290,8 @@ const Profile: React.FC = () => {
                   variant="outline"
                   onClick={() => setShowAvatarModal(true)}
                 >
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 group-hover:bg-purple-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0 transition-colors">
-                      <span className="text-purple-600 text-base sm:text-lg">📸</span>
+                  <div className="flex items-center">                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 group-hover:bg-purple-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0 transition-colors">
+                      <Camera className="text-purple-600 w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <div className="text-left">
                       <div className="font-medium text-sm sm:text-base">Update Avatar</div>
@@ -1327,9 +1307,8 @@ const Profile: React.FC = () => {
                   variant="outline"
                   onClick={() => setShowExportModal(true)}
                 >
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 group-hover:bg-green-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0 transition-colors">
-                      <span className="text-green-600 text-base sm:text-lg">📦</span>
+                  <div className="flex items-center">                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 group-hover:bg-green-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0 transition-colors">
+                      <Package className="text-green-600 w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <div className="text-left">
                       <div className="font-medium text-sm sm:text-base">Export My Data</div>
@@ -1346,9 +1325,8 @@ const Profile: React.FC = () => {
       </div>{" "}
       {/* Enhanced Change Password Modal */}
       <Modal
-        isOpen={showChangePasswordModal}
-        onClose={() => setShowChangePasswordModal(false)}
-        title="🔒 Change Password"
+        isOpen={showChangePasswordModal}        onClose={() => setShowChangePasswordModal(false)}
+        title={<><Lock className="w-4 h-4 mr-2" />Change Password</>}
       >
         <div className="space-y-4">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
@@ -1424,10 +1402,9 @@ const Profile: React.FC = () => {
               />
             </div>
 
-            {passwordError && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            {passwordError && (              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <div className="flex items-center">
-                  <span className="text-red-600 mr-2">⚠️</span>
+                  <AlertTriangle className="text-red-600 w-4 h-4 mr-2" />
                   <span className="text-red-700 text-sm font-medium">
                     Error: {passwordError}
                   </span>
@@ -1445,10 +1422,9 @@ const Profile: React.FC = () => {
                   <>
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                     Changing Password...
-                  </>
-                ) : (
+                  </>                ) : (
                   <>
-                    <span className="mr-2">🔒</span>
+                    <Lock className="w-4 h-4 mr-2" />
                     Change Password
                   </>
                 )}
@@ -1469,7 +1445,7 @@ const Profile: React.FC = () => {
       <Modal
         isOpen={showNotificationsModal}
         onClose={() => setShowNotificationsModal(false)}
-        title="📧 Manage Notifications"
+        title={<><Mail className="w-4 h-4 mr-2" />Manage Notifications</>}
       >
         <div className="space-y-6">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
@@ -1574,13 +1550,12 @@ const Profile: React.FC = () => {
                 <>
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                   Saving Preferences...
-                </>
-              ) : (
-                <>
-                  <span className="mr-2">💾</span>
-                  Save Preferences
-                </>
-              )}
+                </>                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Preferences
+                  </>
+                )}
             </Button>
             <Button
               type="button"
@@ -1597,7 +1572,7 @@ const Profile: React.FC = () => {
       <Modal
         isOpen={showExportModal}
         onClose={() => setShowExportModal(false)}
-        title="📦 Export My Data"
+        title={<><Package className="w-4 h-4 mr-2" />Export My Data</>}
       >
         <div className="space-y-6">
           <div className="bg-green-50 border border-green-200 rounded-lg p-4">
@@ -1611,11 +1586,9 @@ const Profile: React.FC = () => {
               <li>• Uploaded files and documents</li>
               <li>• Account activity history</li>
             </ul>
-          </div>
-
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          </div>          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div className="flex items-start">
-              <span className="text-blue-600 text-lg mr-3">ℹ️</span>
+              <AlertTriangle className="text-blue-600 w-5 h-5 mr-3" />
               <div>
                 <h4 className="text-blue-800 font-medium mb-1">
                   Export Process
@@ -1629,9 +1602,8 @@ const Profile: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <div className="flex items-start">
-              <span className="text-yellow-600 text-lg mr-3">⚠️</span>
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">            <div className="flex items-start">
+              <AlertTriangle className="text-yellow-600 w-5 h-5 mr-3" />
               <div>
                 <h4 className="text-yellow-800 font-medium mb-1">
                   Important Note
@@ -1656,13 +1628,12 @@ const Profile: React.FC = () => {
                 <>
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                   Preparing Export...
-                </>
-              ) : (
-                <>
-                  <span className="mr-2">📦</span>
-                  Export My Data
-                </>
-              )}
+                </>                ) : (
+                  <>
+                    <Package className="w-4 h-4 mr-2" />
+                    Export My Data
+                  </>
+                )}
             </Button>
             <Button
               type="button"
@@ -1679,7 +1650,7 @@ const Profile: React.FC = () => {
       <Modal
         isOpen={showAvatarModal}
         onClose={() => setShowAvatarModal(false)}
-        title="📸 Update Avatar"
+        title={<><Camera className="w-4 h-4 mr-2" />Update Avatar</>}
       >
         <div className="space-y-4">
           <div className="flex flex-col items-center">

@@ -54,8 +54,24 @@ class UserLoginForm(BaseModel):
 
 class TokenResponse(BaseModel):
     access_token: str
-    token_type: str
+    token_type: str = "bearer"
     user: UserResponse
+
+
+# Email verification schemas
+class EmailVerificationRequest(BaseModel):
+    email: EmailStr
+
+
+class VerifyCodeRequest(BaseModel):
+    user_id: str
+    code: str
+
+
+class VerificationResponse(BaseModel):
+    message: str
+    requires_verification: bool = False
+    user_id: Optional[str] = None
 
 
 # Idea schemas

@@ -15,6 +15,17 @@ import {
   Bar,
   Legend,
 } from "recharts";
+import {
+  Eye,
+  Heart,
+  Lightbulb,
+  Bot,
+  TrendingUp,
+  BarChart3,
+  Factory,
+  Target,
+  AlertTriangle,
+} from "lucide-react";
 
 interface MetricsData {
   id: string;
@@ -31,7 +42,7 @@ interface PerformanceMetrics {
   totalInterests: number;
   totalIdeas: number;
   avgScore: number;
-  icon?: string;
+  icon?: React.ReactNode;
   description?: string;
   trend?: string;
   color?: string;
@@ -100,13 +111,12 @@ const Metrics: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedMetric, setSelectedMetric] = useState("views");
-
   // Enhanced mock data for demonstration
   const enhancedPerformanceData = [
     {
       metric: "Total Views",
       value: performanceData.totalViews?.toLocaleString() || "0",
-      icon: "👀",
+      icon: <Eye className="w-5 h-5" />,
       description: "Views across all ideas",
       trend: "+12%",
       color: "from-blue-500 to-blue-600",
@@ -115,7 +125,7 @@ const Metrics: React.FC = () => {
     {
       metric: "Total Interests",
       value: performanceData.totalInterests?.toLocaleString() || "0",
-      icon: "❤️",
+      icon: <Heart className="w-5 h-5" />,
       description: "Investor interests generated",
       trend: "+8%",
       color: "from-red-500 to-red-600",
@@ -124,7 +134,7 @@ const Metrics: React.FC = () => {
     {
       metric: "Total Ideas",
       value: performanceData.totalIdeas?.toLocaleString() || "0",
-      icon: "💡",
+      icon: <Lightbulb className="w-5 h-5" />,
       description: "Ideas created",
       trend: "+3",
       color: "from-yellow-500 to-yellow-600",
@@ -133,13 +143,11 @@ const Metrics: React.FC = () => {
     {
       metric: "Average AI Score",
       value: performanceData.avgScore?.toFixed(1) || "0.0",
-      icon: "🤖",
+      icon: <Bot className="w-5 h-5" />,
       description: "AI evaluation score",
       trend: performanceData.avgScore >= 7 ? "+0.5" : "-0.2",
       color: "from-purple-500 to-purple-600",
-      changeType: (performanceData.avgScore >= 7
-        ? "positive"
-        : "negative") as const,
+      changeType: performanceData.avgScore >= 7 ? "positive" : "negative",
     },
   ];
 
@@ -432,8 +440,9 @@ const Metrics: React.FC = () => {
 
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+          {" "}
           <div className="flex items-center space-x-3">
-            <span className="text-red-600 text-xl">⚠️</span>
+            <AlertTriangle className="w-5 h-5 text-red-600" />
             <div className="text-red-700">
               <strong>Error loading data:</strong> {error}
             </div>
@@ -497,8 +506,10 @@ const Metrics: React.FC = () => {
                 </p>
               </div>
               <div className="flex items-center space-x-2">
+                {" "}
                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
-                  📈 Trending
+                  <TrendingUp className="w-3 h-3 mr-1" />
+                  Trending
                 </span>
               </div>
             </div>
@@ -554,7 +565,9 @@ const Metrics: React.FC = () => {
               ) : (
                 <div className="flex items-center justify-center h-full text-gray-500">
                   <div className="text-center">
-                    <div className="text-6xl mb-4">📊</div>
+                    <div className="mb-4">
+                      <BarChart3 className="w-16 h-16 mx-auto text-gray-400" />
+                    </div>
                     <div className="text-lg font-medium">
                       No analytics data available
                     </div>
@@ -581,8 +594,10 @@ const Metrics: React.FC = () => {
                 </p>
               </div>
               <div className="flex items-center space-x-2">
+                {" "}
                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-purple-100 text-purple-800">
-                  🏭 Categories
+                  <Factory className="w-3 h-3 mr-1" />
+                  Categories
                 </span>
               </div>
             </div>
@@ -623,7 +638,9 @@ const Metrics: React.FC = () => {
               ) : (
                 <div className="flex items-center justify-center h-full text-gray-500">
                   <div className="text-center">
-                    <div className="text-6xl mb-4">🏭</div>
+                    <div className="mb-4">
+                      <Factory className="w-16 h-16 mx-auto text-gray-400" />
+                    </div>
                     <div className="text-lg font-medium">
                       No industry data available
                     </div>
@@ -714,7 +731,9 @@ const Metrics: React.FC = () => {
             ) : (
               <div className="flex items-center justify-center h-full text-gray-500">
                 <div className="text-center">
-                  <div className="text-6xl mb-4">📈</div>
+                  <div className="mb-4">
+                    <TrendingUp className="w-16 h-16 mx-auto text-gray-400" />
+                  </div>
                   <div className="text-lg font-medium">No ideas to compare</div>
                   <div className="text-sm mt-2 text-gray-400">
                     Create your first idea to see performance data
@@ -786,8 +805,9 @@ const Metrics: React.FC = () => {
                           </div>
                         </td>
                         <td className="py-4 px-6 text-center">
+                          {" "}
                           <div className="flex items-center justify-center space-x-1">
-                            <span className="text-lg">👀</span>
+                            <Eye className="w-4 h-4 text-gray-400" />
                             <span className="font-medium text-gray-900">
                               {idea.views}
                             </span>
@@ -795,7 +815,7 @@ const Metrics: React.FC = () => {
                         </td>
                         <td className="py-4 px-6 text-center">
                           <div className="flex items-center justify-center space-x-1">
-                            <span className="text-lg">❤️</span>
+                            <Heart className="w-4 h-4 text-gray-400" />
                             <span className="font-medium text-gray-900">
                               {idea.interests}
                             </span>
@@ -841,7 +861,9 @@ const Metrics: React.FC = () => {
               </table>
             ) : (
               <div className="text-center py-16 px-6">
-                <div className="text-6xl mb-6">💡</div>
+                <div className="mb-6">
+                  <Lightbulb className="w-16 h-16 mx-auto text-gray-400" />
+                </div>
                 <div className="text-xl font-semibold text-gray-900 mb-2">
                   No ideas yet
                 </div>
@@ -927,7 +949,9 @@ const Metrics: React.FC = () => {
                 )
               ) : (
                 <div className="text-center text-gray-500 py-12">
-                  <div className="text-4xl mb-4">🤖</div>
+                  <div className="mb-4">
+                    <Bot className="w-12 h-12 mx-auto text-gray-400" />
+                  </div>
                   <div className="text-lg font-medium">
                     No recommendations available
                   </div>
@@ -951,10 +975,9 @@ const generateRecommendations = (
   if (!backendAnalytics || !metricsData.length) {
     return [];
   }
-
   const recommendations: Array<{
     type: "success" | "warning" | "error";
-    icon: string;
+    icon: React.ReactNode;
     title: string;
     message: string;
   }> = [];
@@ -966,7 +989,7 @@ const generateRecommendations = (
   ) {
     recommendations.push({
       type: "warning",
-      icon: "💡",
+      icon: <Lightbulb className="w-5 h-5" />,
       title: "Low Conversion Rate",
       message:
         "You have views but no investor interests. Consider improving your pitch content and value proposition.",
@@ -976,7 +999,7 @@ const generateRecommendations = (
   if (backendAnalytics.overview.avg_ai_score < 7) {
     recommendations.push({
       type: "error",
-      icon: "⚠️",
+      icon: <TrendingUp className="w-5 h-5" />,
       title: "AI Score Needs Improvement",
       message: `Your average AI score is ${backendAnalytics.overview.avg_ai_score.toFixed(1)}. Add more market validation data and strengthen your business model.`,
     });
@@ -988,7 +1011,7 @@ const generateRecommendations = (
   ) {
     recommendations.push({
       type: "success",
-      icon: "📈",
+      icon: <TrendingUp className="w-5 h-5" />,
       title: "Strong Performance",
       message:
         "Your ideas are performing exceptionally well. Consider reaching out to interested investors and scaling your best concepts.",
@@ -1003,7 +1026,7 @@ const generateRecommendations = (
   ) {
     recommendations.push({
       type: "success",
-      icon: "🎯",
+      icon: <Target className="w-5 h-5" />,
       title: "High Engagement Rate",
       message:
         "Your ideas are generating strong investor interest. Focus on nurturing these relationships and preparing for meetings.",

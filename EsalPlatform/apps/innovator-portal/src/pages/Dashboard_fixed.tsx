@@ -1,6 +1,27 @@
 // filepath: d:\esalPlatform\EsalPlatform\apps\innovator-portal\src\pages\Dashboard_fixed.tsx
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, Button } from "@esal/ui";
+import {
+  Lightbulb,
+  Eye,
+  Heart,
+  Calendar,
+  TrendingUp,
+  TrendingDown,
+  Sparkles,
+  Bot,
+  BarChart3,
+  Target,
+  Plus,
+  ArrowRight,
+  Rocket,
+  CheckCircle,
+  Users,
+  Building,
+  MapPin,
+  Zap,
+  User,
+} from "lucide-react";
 
 interface RecentIdea {
   id: number;
@@ -56,7 +77,7 @@ interface ExtendedProfile {
 const StatCard: React.FC<{
   title: string;
   value: string | number;
-  icon: string;
+  icon: React.ReactNode;
   gradient: string;
   trend?: { value: string; isUp: boolean };
 }> = ({ title, value, icon, gradient, trend }) => (
@@ -69,12 +90,16 @@ const StatCard: React.FC<{
           <p className="text-white/80 text-xs sm:text-sm font-medium truncate">
             {title}
           </p>
-          <p className="text-2xl sm:text-3xl font-bold mt-1 sm:mt-2">{value}</p>
+          <p className="text-2xl sm:text-3xl font-bold mt-1 sm:mt-2">{value}</p>{" "}
           {trend && (
             <div
               className={`flex items-center mt-1 sm:mt-2 text-xs sm:text-sm ${trend.isUp ? "text-green-200" : "text-red-200"}`}
             >
-              <span className="mr-1">{trend.isUp ? "↗️" : "↘️"}</span>
+              {trend.isUp ? (
+                <TrendingUp className="w-3 h-3 mr-1" />
+              ) : (
+                <TrendingDown className="w-3 h-3 mr-1" />
+              )}
               <span className="truncate">{trend.value}</span>
             </div>
           )}
@@ -93,7 +118,7 @@ const StatCard: React.FC<{
 const QuickActionCard: React.FC<{
   title: string;
   description: string;
-  icon: string;
+  icon: React.ReactNode;
   action: () => void;
   variant?: "primary" | "secondary" | "accent";
 }> = ({ title, description, icon, action, variant = "primary" }) => {
@@ -165,17 +190,18 @@ const IdeaCard: React.FC<{ idea: RecentIdea; onView: () => void }> = ({
         </div>
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+          {" "}
           <div className="flex items-center space-x-3 sm:space-x-4 text-sm text-gray-500">
             <div className="flex items-center space-x-1">
-              <span>👁️</span>
+              <Eye className="w-4 h-4" />
               <span className="font-medium">{idea.view_count || 0}</span>
             </div>
             <div className="flex items-center space-x-1">
-              <span>💝</span>
+              <Heart className="w-4 h-4" />
               <span className="font-medium">{idea.interest_count || 0}</span>
             </div>
             <div className="flex items-center space-x-1">
-              <span>📅</span>
+              <Calendar className="w-4 h-4" />
               <span className="hidden sm:inline">
                 {formatDate(idea.created_at)}
               </span>
@@ -278,19 +304,18 @@ const DashboardModern: React.FC = () => {
       "Innovator"
     );
   };
-
   const formatStatsData = () => [
     {
       title: "Total Ideas",
       value: stats.total_ideas,
-      icon: "💡",
+      icon: <Lightbulb className="w-6 h-6" />,
       gradient: "bg-gradient-to-br from-blue-500 to-blue-600",
       trend: { value: "+12% this month", isUp: true },
     },
     {
       title: "Active Ideas",
       value: stats.active_ideas,
-      icon: "🚀",
+      icon: <Rocket className="w-6 h-6" />,
       gradient: "bg-gradient-to-br from-green-500 to-green-600",
       trend: { value: "+5% this week", isUp: true },
     },
@@ -300,38 +325,37 @@ const DashboardModern: React.FC = () => {
         stats.total_views >= 1000
           ? `${(stats.total_views / 1000).toFixed(1)}k`
           : stats.total_views.toString(),
-      icon: "👁️",
+      icon: <Eye className="w-6 h-6" />,
       gradient: "bg-gradient-to-br from-purple-500 to-purple-600",
       trend: { value: "+23% this month", isUp: true },
     },
     {
       title: "Investor Interest",
       value: stats.total_interests,
-      icon: "💝",
+      icon: <Heart className="w-6 h-6" />,
       gradient: "bg-gradient-to-br from-pink-500 to-pink-600",
       trend: { value: "+8% this week", isUp: true },
     },
   ];
-
   const quickActions = [
     {
       title: "Create New Idea",
       description: "Share your innovative startup concept",
-      icon: "✨",
+      icon: <Sparkles className="w-6 h-6" />,
       action: () => (window.location.href = "/my-ideas?create=true"),
       variant: "primary" as const,
     },
     {
       title: "AI Generator",
       description: "Generate ideas with artificial intelligence",
-      icon: "🤖",
+      icon: <Bot className="w-6 h-6" />,
       action: () => (window.location.href = "/ai-generator"),
       variant: "secondary" as const,
     },
     {
       title: "Analytics",
       description: "View detailed performance metrics",
-      icon: "📊",
+      icon: <BarChart3 className="w-6 h-6" />,
       action: () => (window.location.href = "/metrics"),
       variant: "accent" as const,
     },
@@ -359,9 +383,22 @@ const DashboardModern: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="container mx-auto px-6 py-8">
+          {" "}
           <Card className="max-w-md mx-auto mt-20 border-0 shadow-xl">
             <CardContent className="p-8 text-center">
-              <div className="text-6xl mb-4">⚠️</div>
+              <div className="text-red-500 mb-4 flex justify-center">
+                <svg
+                  className="w-16 h-16"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 Unable to Load Dashboard
               </h3>
@@ -384,8 +421,9 @@ const DashboardModern: React.FC = () => {
       <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
         {/* Header Section */}
         <div className="text-center md:text-left">
+          {" "}
           <div className="inline-flex items-center px-3 sm:px-4 py-2 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 text-xs sm:text-sm font-medium mb-4">
-            <span className="mr-2">🌟</span>
+            <Sparkles className="w-4 h-4 mr-2" />
             <span className="truncate">
               {getGreeting()}, ready to innovate?
             </span>
@@ -405,8 +443,9 @@ const DashboardModern: React.FC = () => {
         </div>{" "}
         {/* Quick Actions */}
         <div>
+          {" "}
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center">
-            <span className="mr-2 sm:mr-3">⚡</span>
+            <Zap className="w-6 h-6 mr-2 sm:mr-3" />
             Quick Actions
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -418,8 +457,9 @@ const DashboardModern: React.FC = () => {
         {/* Recent Ideas */}
         <div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3 sm:gap-0">
+            {" "}
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
-              <span className="mr-2 sm:mr-3">💡</span>
+              <Lightbulb className="w-6 h-6 mr-2 sm:mr-3" />
               Recent Ideas
             </h2>
             <Button
@@ -444,7 +484,9 @@ const DashboardModern: React.FC = () => {
           ) : (
             <Card className="border-0 shadow-lg bg-gradient-to-r from-blue-50 to-purple-50">
               <CardContent className="p-6 sm:p-8 lg:p-12 text-center">
-                <div className="text-4xl sm:text-6xl mb-4 sm:mb-6">🚀</div>
+                <div className="text-blue-500 mb-4 sm:mb-6 flex justify-center">
+                  <Rocket className="w-16 h-16 sm:w-24 sm:h-24" />
+                </div>
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
                   Ready to Launch Your First Idea?
                 </h3>
@@ -460,7 +502,7 @@ const DashboardModern: React.FC = () => {
                     }
                     className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-0 px-6 sm:px-8 py-2 sm:py-3 w-full sm:w-auto"
                   >
-                    <span className="mr-2">✨</span>
+                    <Sparkles className="w-4 h-4 mr-2" />
                     Create Your First Idea
                   </Button>
                   <Button
@@ -468,7 +510,7 @@ const DashboardModern: React.FC = () => {
                     onClick={() => (window.location.href = "/ai-generator")}
                     className="bg-white/80 border-gray-200 hover:bg-white hover:shadow-md px-6 sm:px-8 py-2 sm:py-3 w-full sm:w-auto"
                   >
-                    <span className="mr-2">🤖</span>
+                    <Bot className="w-4 h-4 mr-2" />
                     Try AI Generator
                   </Button>
                 </div>
@@ -479,8 +521,9 @@ const DashboardModern: React.FC = () => {
         {/* Profile Summary (Enhanced) */}
         {extendedProfile && (
           <div>
+            {" "}
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center">
-              <span className="mr-2 sm:mr-3">👤</span>
+              <User className="w-5 h-5 mr-2 sm:mr-3" />
               Profile Overview
             </h2>
             <Card className="border-0 shadow-lg bg-gradient-to-r from-white to-blue-50/30">
@@ -515,7 +558,7 @@ const DashboardModern: React.FC = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                       {extendedProfile.company && (
                         <div className="flex items-center justify-center lg:justify-start text-gray-600 text-sm sm:text-base">
-                          <span className="mr-2">🏢</span>
+                          <Building className="w-4 h-4 mr-2" />
                           <span className="truncate">
                             {extendedProfile.position} at{" "}
                             {extendedProfile.company}
@@ -524,7 +567,7 @@ const DashboardModern: React.FC = () => {
                       )}
                       {extendedProfile.location && (
                         <div className="flex items-center justify-center lg:justify-start text-gray-600 text-sm sm:text-base">
-                          <span className="mr-2">📍</span>
+                          <MapPin className="w-4 h-4 mr-2" />
                           <span className="truncate">
                             {extendedProfile.location}
                           </span>
@@ -575,16 +618,21 @@ const DashboardModern: React.FC = () => {
         {/* Success Tips for New Users */}
         {stats.total_ideas === 0 && (
           <div>
+            {" "}
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center">
-              <span className="mr-2 sm:mr-3">🎯</span>
+              <Target className="w-6 h-6 mr-2 sm:mr-3" />
               Your Innovation Journey
             </h2>
             <Card className="border-0 shadow-lg bg-gradient-to-r from-emerald-50 to-teal-50">
               <CardContent className="p-4 sm:p-6 lg:p-8">
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
                   <div>
+                    {" "}
                     <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">
-                      🚀 Get Started in 3 Steps
+                      <div className="flex items-center">
+                        <Rocket className="w-5 h-5 mr-2" />
+                        Get Started in 3 Steps
+                      </div>
                     </h3>
                     <div className="space-y-3 sm:space-y-4">
                       {[
@@ -628,8 +676,12 @@ const DashboardModern: React.FC = () => {
                   </div>
 
                   <div>
+                    {" "}
                     <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">
-                      💡 Pro Tips for Success
+                      <div className="flex items-center">
+                        <Lightbulb className="w-5 h-5 mr-2" />
+                        Pro Tips for Success
+                      </div>
                     </h3>
                     <div className="space-y-2 sm:space-y-3">
                       {[
@@ -640,24 +692,22 @@ const DashboardModern: React.FC = () => {
                         "Engage actively with the investor community",
                       ].map((tip, index) => (
                         <div key={index} className="flex items-start space-x-3">
-                          <span className="text-emerald-500 font-bold flex-shrink-0 mt-0.5">
-                            ✓
-                          </span>
+                          <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
                           <span className="text-gray-700 text-xs sm:text-sm">
                             {tip}
                           </span>
                         </div>
                       ))}
                     </div>
-
                     <div className="mt-4 sm:mt-6 space-y-3">
+                      {" "}
                       <Button
                         onClick={() =>
                           (window.location.href = "/my-ideas?create=true")
                         }
                         className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 border-0"
                       >
-                        <span className="mr-2">🚀</span>
+                        <Rocket className="w-4 h-4 mr-2" />
                         Start Your Journey
                       </Button>
                       <Button
@@ -665,7 +715,7 @@ const DashboardModern: React.FC = () => {
                         onClick={() => (window.location.href = "/ai-generator")}
                         className="w-full bg-white/80 border-gray-200 hover:bg-white hover:shadow-md"
                       >
-                        <span className="mr-2">🤖</span>
+                        <Bot className="w-4 h-4 mr-2" />
                         Explore AI Tools
                       </Button>
                     </div>

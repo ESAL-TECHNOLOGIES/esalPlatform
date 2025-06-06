@@ -31,18 +31,18 @@ class GeminiAIService:
             
             # Extract pitch text
             pitch_text = response.text.strip()
-            
             return PitchResponse(
                 pitch=pitch_text,
-                generated_at=datetime.utcnow()
+                generated_at=datetime.utcnow().isoformat()
             )
             
         except Exception as e:
             # Fallback pitch if AI service fails
             fallback_pitch = self._create_fallback_pitch(pitch_request)
+            
             return PitchResponse(
                 pitch=fallback_pitch,
-                generated_at=datetime.utcnow()
+                generated_at=datetime.utcnow().isoformat()
             )
     
     def _create_pitch_prompt(self, pitch_request: PitchRequest) -> str:
@@ -129,11 +129,10 @@ IMPORTANT: Write everything as flowing paragraphs. Do NOT use any numbered lists
             response = self.model.generate_content(prompt)
             print(f"🔧 DEBUG: Gemini API response received successfully")
             print(f"🔧 DEBUG: Response length: {len(response.text)} characters")
-            
             return AIInteractionResponse(
                 response_text=response.text.strip(),
                 confidence_score=0.85,
-                generated_at=datetime.utcnow(),
+                generated_at=datetime.utcnow().isoformat(),
                 metadata={"source": "gemini-api", "api_success": True}
             )
             
@@ -165,12 +164,12 @@ Be constructive, specific, and provide actionable advice."""
             response = self.model.generate_content(prompt)
             
             # Extract suggestions from response
-            suggestions = self._extract_suggestions_from_text(response.text)
+            suggestions = self._extract_suggestions_from_text(response.text)            
             return AIInteractionResponse(
                 response_text=response.text.strip(),
                 suggestions=suggestions,
                 confidence_score=0.88,
-                generated_at=datetime.utcnow(),
+                generated_at=datetime.utcnow().isoformat(),
                 metadata={}
             )
             
@@ -211,9 +210,8 @@ Be honest, constructive, and specific in your evaluation."""
                     weaknesses=eval_data.get('weaknesses', []),
                     improvement_suggestions=eval_data.get('improvement_suggestions', []),
                     market_viability=eval_data.get('market_viability', 6.0),
-                    technical_feasibility=eval_data.get('technical_feasibility', 7.0),
-                    business_potential=eval_data.get('business_potential', 6.5),
-                    generated_at=datetime.utcnow(),
+                    technical_feasibility=eval_data.get('technical_feasibility', 7.0),                    business_potential=eval_data.get('business_potential', 6.5),
+                    generated_at=datetime.utcnow().isoformat(),
                     metadata={}
                 )
             except json.JSONDecodeError:
@@ -246,12 +244,12 @@ Be specific, actionable, and tailored to their portfolio of ideas."""
 
             response = self.model.generate_content(prompt)
             
-            suggestions = self._extract_action_items_from_text(response.text)
+            suggestions = self._extract_action_items_from_text(response.text)            
             return AIInteractionResponse(
                 response_text=response.text.strip(),
                 suggestions=suggestions,
                 confidence_score=0.82,
-                generated_at=datetime.utcnow(),
+                generated_at=datetime.utcnow().isoformat(),
                 metadata={}
             )
         except Exception as e:
@@ -277,11 +275,10 @@ Be specific, actionable, and tailored to their portfolio of ideas."""
 **Next Steps:** Survey potential users about their current challenges and pain points. Build a simple MVP to test core features and validate the concept. Connect with industry experts for feedback and validation.
 
 [AI-generated idea - Fallback mode]"""
-        
         return AIInteractionResponse(
             response_text=fallback,
             confidence_score=0.6,
-            generated_at=datetime.utcnow(),
+            generated_at=datetime.utcnow().isoformat(),
             metadata={"source": "fallback", "api_success": False}
         )
     
@@ -339,10 +336,9 @@ Your {request.improvement_focus} shows potential but could be strengthened with 
                 "Conduct user interviews to validate problem",
                 "Research competitors and differentiation",
                 "Develop detailed financial projections",
-                "Create minimum viable product plan"            ],
-            market_viability=6.0,
+                "Create minimum viable product plan"            ],            market_viability=6.0,
             technical_feasibility=7.0,            business_potential=6.5,
-            generated_at=datetime.utcnow(),
+            generated_at=datetime.utcnow().isoformat(),
             metadata={}
         )
     

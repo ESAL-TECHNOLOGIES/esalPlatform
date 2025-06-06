@@ -67,22 +67,23 @@ const Signup: React.FC = () => {
         },
         body: JSON.stringify(requestBody),
       });
-
       if (response.ok) {
         const data = await response.json();
 
-        // Use auth context to login
-        await login(data.access_token, data.refresh_token);
-
-        // Show success message and redirect
+        // Show success message and redirect to email verification
         setSuccess(
           data.message ||
-            "Account created successfully! Redirecting to dashboard..."
+            "Account created successfully! Please check your email for verification."
         );
 
-        // Redirect to dashboard after a short delay
+        // Redirect to email verification with user data
         setTimeout(() => {
-          navigate("/");
+          navigate("/email-verification", {
+            state: {
+              email: formData.email,
+              userId: data.user_id,
+            },
+          });
         }, 1500);
       } else if (response.status === 500) {
         // Most likely the backend error with the User.created_at attribute

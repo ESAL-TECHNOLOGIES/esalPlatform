@@ -44,6 +44,21 @@ class TokenResponse(BaseModel):
     user: UserResponse
 
 
+class EmailVerificationRequest(BaseModel):
+    email: EmailStr
+
+
+class VerifyCodeRequest(BaseModel):
+    user_id: str
+    code: str
+
+
+class VerificationResponse(BaseModel):
+    message: str
+    requires_verification: bool = False
+    user_id: Optional[str] = None
+
+
 # Ideas schemas
 class IdeaBase(BaseModel):
     title: str
@@ -230,7 +245,7 @@ class AIInteractionResponse(BaseModel):
     response_text: str
     suggestions: Optional[List[str]] = None
     confidence_score: Optional[float] = None
-    generated_at: datetime
+    generated_at: str
     metadata: Optional[Dict[str, Any]] = None
     
     class Config:
@@ -245,7 +260,7 @@ class AIJudgeResponse(BaseModel):
     market_viability: float
     technical_feasibility: float
     business_potential: float
-    generated_at: datetime
+    generated_at: str
     metadata: Optional[Dict[str, Any]] = None
     
     class Config:
@@ -272,8 +287,11 @@ class SessionInfo(BaseModel):
     browser: str
     ip_address: str
     location: str
-    last_active: datetime
+    last_active: str
     is_current: bool = False
+    
+    class Config:
+        from_attributes = True
 
 
 class NotificationPreferences(BaseModel):
@@ -351,7 +369,7 @@ class MatchingHistory(BaseModel):
     investor_id: str
     preferences: InvestorPreferences
     matches_found: int
-    created_at: datetime
+    created_at: str
     
     class Config:
         from_attributes = True
