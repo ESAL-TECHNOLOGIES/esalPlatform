@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Lightbulb } from "lucide-react";
 import { cn } from "../utils";
 import type { SidebarProps } from "../types";
 
@@ -255,11 +256,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {stats?.views ?? "-"}
                 </div>
               </div>
-            </div>
+            </div>{" "}
             {/* Innovation Tip */}
             <div className="p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
               <div className="flex items-start space-x-2">
-                <span className="text-lg">💡</span>
+                <Lightbulb
+                  size={18}
+                  className="text-yellow-500 stroke-2 mt-0.5"
+                />
                 <div>
                   <p className="text-xs font-medium text-gray-800">Daily Tip</p>
                   <p className="text-xs text-gray-600 mt-1">
@@ -273,7 +277,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         ) : (
           <div className="flex flex-col items-center space-y-2">
             <div className="w-8 h-8 bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg flex items-center justify-center">
-              <span className="text-sm">💡</span>
+              <Lightbulb size={14} className="text-yellow-500 stroke-2" />
             </div>
             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
           </div>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Clock, User, Settings, LogOut } from "lucide-react";
 import type { NavbarProps } from "../types";
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -80,16 +81,14 @@ export const Navbar: React.FC<NavbarProps> = ({
               {title.split(" ")[0]}
             </h1>
           </div>
-        </div>
-
+        </div>{" "}
         {/* Center Section - Time Display (Hidden on Mobile) */}
         <div className="hidden lg:flex items-center space-x-2 bg-gradient-to-r from-blue-50 to-purple-50 px-4 py-2 rounded-full">
-          <span className="text-blue-500 text-sm">🕐</span>
+          <Clock size={16} className="text-blue-500 stroke-2" />
           <span className="text-sm font-medium text-gray-700">
             {getCurrentTime()}
           </span>
         </div>
-
         {/* Right Section - User Menu */}
         {user && (
           <div className="relative">
@@ -178,6 +177,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                   {/* Menu Items */}
                   <div className="py-2">
+                    {" "}
                     <button
                       onClick={() => {
                         window.location.href = "/profile";
@@ -185,10 +185,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                       }}
                       className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     >
-                      <span className="mr-3 text-blue-500">👤</span>
+                      <User size={16} className="mr-3 text-blue-500 stroke-2" />
                       <span className="font-medium">View Profile</span>
                     </button>
-
                     <button
                       onClick={() => {
                         window.location.href = "/settings";
@@ -196,20 +195,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                       }}
                       className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     >
-                      <span className="mr-3 text-gray-500">⚙️</span>
+                      <Settings
+                        size={16}
+                        className="mr-3 text-gray-500 stroke-2"
+                      />
                       <span className="font-medium">Settings</span>
-                    </button>
-
+                    </button>{" "}
                     {/* Time Display for Mobile */}
                     <div className="lg:hidden px-4 py-3 border-t border-gray-100">
                       <div className="flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-50 to-purple-50 px-3 py-2 rounded-lg">
-                        <span className="text-blue-500 text-sm">🕐</span>
+                        <Clock size={16} className="text-blue-500 stroke-2" />
                         <span className="text-sm font-medium text-gray-700">
                           {getCurrentTime()}
                         </span>
                       </div>
-                    </div>
-
+                    </div>{" "}
                     {/* Logout */}
                     {onLogout && (
                       <div className="border-t border-gray-100 pt-2">
@@ -220,7 +220,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                           }}
                           className="w-full flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
                         >
-                          <span className="mr-3">🚪</span>
+                          <LogOut size={16} className="mr-3 stroke-2" />
                           <span className="font-medium">Sign Out</span>
                         </button>
                       </div>

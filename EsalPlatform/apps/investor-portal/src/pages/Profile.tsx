@@ -1,5 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent, Button } from "@esal/ui";
+import {
+  User,
+  Edit3,
+  X,
+  MapPin,
+  Building2,
+  DollarSign,
+  Target,
+  BarChart3,
+  Calendar,
+  Globe,
+  Linkedin,
+  Twitter,
+  TrendingUp,
+  Award,
+  Briefcase,
+  Mail,
+  Phone,
+  CheckCircle2,
+  AlertCircle,
+  XCircle,
+} from "lucide-react";
 
 interface InvestorProfile {
   id: string;
@@ -48,19 +70,7 @@ const Modal: React.FC<{
               className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-2 transition-colors"
               aria-label="Close modal"
             >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              <X className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -84,12 +94,17 @@ const ProfileCard: React.FC<{
       .toUpperCase()
       .slice(0, 2);
   };
-
   const getStatusColor = () => {
     if (profile.is_blocked) return "bg-red-100 text-red-800 border-red-200";
     if (!profile.is_active)
       return "bg-yellow-100 text-yellow-800 border-yellow-200";
     return "bg-green-100 text-green-800 border-green-200";
+  };
+
+  const getStatusIcon = () => {
+    if (profile.is_blocked) return <XCircle className="h-4 w-4" />;
+    if (!profile.is_active) return <AlertCircle className="h-4 w-4" />;
+    return <CheckCircle2 className="h-4 w-4" />;
   };
 
   const getStatusText = () => {
@@ -106,19 +121,19 @@ const ProfileCard: React.FC<{
     };
     return new Date(dateString).toLocaleDateString("en-US", options);
   };
-
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden shadow-xl border-0">
       {/* Cover/Background with emerald/teal theming */}
-      <div className="h-32 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 relative">
+      <div className="h-32 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 relative">
         <div className="absolute inset-0 bg-black bg-opacity-20"></div>
         <Button
           onClick={onEdit}
           variant="secondary"
           size="sm"
-          className="absolute top-4 right-4 bg-white bg-opacity-90 hover:bg-opacity-100"
+          className="absolute top-4 right-4 bg-white bg-opacity-90 hover:bg-opacity-100 flex items-center space-x-2 shadow-lg"
         >
-          ✏️ Edit
+          <Edit3 className="h-4 w-4" />
+          <span>Edit</span>
         </Button>
       </div>
 
@@ -134,7 +149,7 @@ const ProfileCard: React.FC<{
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
+                <div className="w-full h-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center">
                   <span className="text-white text-xl font-bold">
                     {getInitials(profile.full_name || profile.email)}
                   </span>
@@ -149,114 +164,137 @@ const ProfileCard: React.FC<{
                   : "bg-gray-400"
               }`}
             ></div>
-          </div>
-
+          </div>{" "}
           {/* Status badge */}
           <div className="ml-4 mb-2">
             <span
-              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor()}`}
+              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border space-x-1 ${getStatusColor()}`}
             >
-              {getStatusText()}
+              {getStatusIcon()}
+              <span>{getStatusText()}</span>
             </span>
           </div>
         </div>
 
         {/* Profile Info */}
         <div className="space-y-4">
+          {" "}
           {/* Name and Title */}
           <div>
             <h2 className="text-2xl font-bold text-gray-900">
               {profile.full_name || "No name provided"}
             </h2>
-            <p className="text-gray-600 font-medium capitalize">
-              {profile.role} Investor
-            </p>
-            <p className="text-gray-500 text-sm">{profile.email}</p>
-          </div>
-
+            <div className="flex items-center space-x-2 mt-1">
+              <Briefcase className="h-4 w-4 text-blue-600" />
+              <p className="text-gray-600 font-medium capitalize">
+                {profile.role} Investor
+              </p>
+            </div>
+            <div className="flex items-center space-x-2 mt-1">
+              <Mail className="h-4 w-4 text-gray-400" />
+              <p className="text-gray-500 text-sm">{profile.email}</p>
+            </div>
+          </div>{" "}
           {/* Bio */}
           {profile.bio && (
-            <div>
+            <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4">
+              <div className="flex items-center space-x-2 mb-2">
+                <User className="h-4 w-4 text-blue-600" />
+                <span className="text-sm font-medium text-gray-700">About</span>
+              </div>
               <p className="text-gray-700 leading-relaxed">{profile.bio}</p>
             </div>
           )}
-
           {/* Location */}
           {profile.location && (
-            <div className="flex items-center text-gray-600">
-              <span className="mr-2">📍</span>
+            <div className="flex items-center text-gray-600 space-x-2">
+              <MapPin className="h-4 w-4 text-blue-600" />
               <span>{profile.location}</span>
             </div>
           )}
-
           {/* Company */}
           {profile.company && (
-            <div className="flex items-center text-gray-600">
-              <span className="mr-2">🏢</span>
+            <div className="flex items-center text-gray-600 space-x-2">
+              <Building2 className="h-4 w-4 text-blue-600" />
               <span>
                 {profile.company} {profile.position && `• ${profile.position}`}
               </span>
             </div>
           )}
-
+          {/* Phone */}
+          {profile.phone && (
+            <div className="flex items-center text-gray-600 space-x-2">
+              <Phone className="h-4 w-4 text-blue-600" />
+              <span>{profile.phone}</span>
+            </div>
+          )}{" "}
           {/* Investment Focus */}
           {profile.investment_focus && profile.investment_focus.length > 0 && (
-            <div>
-              <h4 className="text-sm font-medium text-gray-700 mb-2">
-                Investment Focus
-              </h4>
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4">
+              <div className="flex items-center space-x-2 mb-3">
+                <Target className="h-4 w-4 text-blue-600" />
+                <h4 className="text-sm font-medium text-gray-700">
+                  Investment Focus
+                </h4>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {profile.investment_focus.slice(0, 5).map((focus, index) => (
                   <span
                     key={index}
-                    className="px-2 py-1 text-xs bg-emerald-100 text-emerald-800 rounded-full"
+                    className="px-3 py-1 text-xs bg-blue-100 text-blue-800 rounded-full font-medium"
                   >
                     {focus}
                   </span>
                 ))}
                 {profile.investment_focus.length > 5 && (
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-gray-500 px-2 py-1">
                     +{profile.investment_focus.length - 5} more
                   </span>
                 )}
               </div>
             </div>
           )}
-
           {/* Investment Range */}
           {(profile.investment_range_min || profile.investment_range_max) && (
-            <div className="flex items-center text-gray-600">
-              <span className="mr-2">💰</span>
+            <div className="flex items-center text-gray-600 space-x-2">
+              <DollarSign className="h-4 w-4 text-green-600" />
               <span>
                 Investment Range: $
                 {profile.investment_range_min?.toLocaleString() || "0"} - $
                 {profile.investment_range_max?.toLocaleString() || "unlimited"}
               </span>
             </div>
-          )}
-
+          )}{" "}
           {/* Portfolio Stats */}
           <div className="grid grid-cols-3 gap-4 pt-4 border-t">
-            <div className="text-center">
-              <div className="text-lg font-bold text-emerald-600">
+            <div className="text-center p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg">
+              <div className="flex items-center justify-center mb-1">
+                <BarChart3 className="h-4 w-4 text-blue-600" />
+              </div>
+              <div className="text-lg font-bold text-blue-600">
                 {profile.total_investments || 0}
               </div>
               <div className="text-sm text-gray-600">Investments</div>
             </div>
-            <div className="text-center">
-              <div className="text-lg font-bold text-emerald-600">
+            <div className="text-center p-3 bg-gradient-to-r from-green-50 to-green-100 rounded-lg">
+              <div className="flex items-center justify-center mb-1">
+                <TrendingUp className="h-4 w-4 text-green-600" />
+              </div>
+              <div className="text-lg font-bold text-green-600">
                 {profile.portfolio_size || 0}
               </div>
               <div className="text-sm text-gray-600">Portfolio Size</div>
             </div>
-            <div className="text-center">
-              <div className="text-lg font-bold text-emerald-600">
+            <div className="text-center p-3 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg">
+              <div className="flex items-center justify-center mb-1">
+                <Award className="h-4 w-4 text-purple-600" />
+              </div>
+              <div className="text-lg font-bold text-purple-600">
                 {profile.experience_years || 0}
               </div>
               <div className="text-sm text-gray-600">Years Experience</div>
             </div>
-          </div>
-
+          </div>{" "}
           {/* Social Links */}
           {(profile.website_url ||
             profile.linkedin_url ||
@@ -267,9 +305,10 @@ const ProfileCard: React.FC<{
                   href={profile.website_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-emerald-600 hover:text-emerald-700"
+                  className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors bg-blue-50 px-3 py-2 rounded-lg"
                 >
-                  🌐 Website
+                  <Globe className="h-4 w-4" />
+                  <span>Website</span>
                 </a>
               )}
               {profile.linkedin_url && (
@@ -277,9 +316,10 @@ const ProfileCard: React.FC<{
                   href={profile.linkedin_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-emerald-600 hover:text-emerald-700"
+                  className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors bg-blue-50 px-3 py-2 rounded-lg"
                 >
-                  💼 LinkedIn
+                  <Linkedin className="h-4 w-4" />
+                  <span>LinkedIn</span>
                 </a>
               )}
               {profile.twitter_url && (
@@ -287,19 +327,20 @@ const ProfileCard: React.FC<{
                   href={profile.twitter_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-emerald-600 hover:text-emerald-700"
+                  className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors bg-blue-50 px-3 py-2 rounded-lg"
                 >
-                  🐦 Twitter
+                  <Twitter className="h-4 w-4" />
+                  <span>Twitter</span>
                 </a>
               )}
             </div>
           )}
-
           {/* Member Since */}
           <div className="pt-4 border-t">
-            <p className="text-sm text-gray-500">
-              Member since {formatDate(profile.created_at)}
-            </p>
+            <div className="flex items-center space-x-2 text-sm text-gray-500">
+              <Calendar className="h-4 w-4" />
+              <span>Member since {formatDate(profile.created_at)}</span>
+            </div>
           </div>
         </div>
       </CardContent>
@@ -415,12 +456,12 @@ const Profile: React.FC = () => {
         <p className="text-gray-600">
           Manage your investor profile and preferences.
         </p>
-      </div>
+      </div>{" "}
       {/* Success Message */}
       {successMessage && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <div className="flex items-center">
-            <span className="text-green-600 mr-2">✅</span>
+            <CheckCircle2 size={16} className="text-green-600 mr-2 stroke-2" />
             <span className="text-green-700 text-sm font-medium">
               {successMessage}
             </span>
@@ -445,24 +486,28 @@ const Profile: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
+                {" "}
                 {profile.is_blocked && (
                   <div className="p-4 bg-red-50 rounded-lg">
-                    <p className="text-sm text-red-700">
-                      ⚠️ Your account has been blocked. Please contact support.
+                    <p className="text-sm text-red-700 flex items-center">
+                      <AlertCircle size={16} className="mr-2 stroke-2" />
+                      Your account has been blocked. Please contact support.
                     </p>
                   </div>
                 )}
                 {!profile.is_active && (
                   <div className="p-4 bg-yellow-50 rounded-lg">
-                    <p className="text-sm text-yellow-700">
-                      ⚠️ Your account is inactive. Please contact support.
+                    <p className="text-sm text-yellow-700 flex items-center">
+                      <AlertCircle size={16} className="mr-2 stroke-2" />
+                      Your account is inactive. Please contact support.
                     </p>
                   </div>
                 )}
                 {profile.is_active && !profile.is_blocked && (
                   <div className="p-4 bg-green-50 rounded-lg">
-                    <p className="text-sm text-green-700">
-                      ✅ Your account is active and ready for investing.
+                    <p className="text-sm text-green-700 flex items-center">
+                      <CheckCircle2 size={16} className="mr-2 stroke-2" />
+                      Your account is active and ready for investing.
                     </p>
                   </div>
                 )}
@@ -523,7 +568,6 @@ const Profile: React.FC = () => {
               placeholder="Enter your full name"
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Bio
@@ -538,7 +582,6 @@ const Profile: React.FC = () => {
               placeholder="Tell us about your investment philosophy and interests..."
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Location
@@ -553,7 +596,6 @@ const Profile: React.FC = () => {
               placeholder="Enter your location"
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Company
@@ -568,7 +610,6 @@ const Profile: React.FC = () => {
               placeholder="Enter your company name"
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Position
@@ -583,7 +624,6 @@ const Profile: React.FC = () => {
               placeholder="Enter your position/title"
             />
           </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -619,20 +659,18 @@ const Profile: React.FC = () => {
                 placeholder="Max amount"
               />
             </div>{" "}
-          </div>
-
+          </div>{" "}
           {/* Error Message */}
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <div className="flex items-center">
-                <span className="text-red-600 mr-2">⚠️</span>
+                <AlertCircle size={16} className="text-red-600 mr-2 stroke-2" />
                 <span className="text-red-700 text-sm font-medium">
                   {error}
                 </span>
               </div>
             </div>
           )}
-
           <div className="flex space-x-3 pt-4">
             {" "}
             <Button

@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent, Button } from "@esal/ui";
 import { API_ENDPOINTS } from "../utils/api";
+import {
+  Target,
+  Settings,
+  Zap,
+  TrendingUp,
+  Building2,
+  Clock,
+  BarChart3,
+  Search,
+} from "lucide-react";
 
 interface MatchHighlight {
   reason: string;
@@ -42,7 +52,6 @@ interface SavedPreferences {
   stages: string[];
   min_funding_amount: string | null;
   max_funding_amount: string | null;
-  geographic_preferences: string[];
   risk_tolerance: string;
 }
 
@@ -52,7 +61,6 @@ const Matching: React.FC = () => {
     stages: [] as string[],
     minFunding: "",
     maxFunding: "",
-    geography: [] as string[],
     riskTolerance: "medium",
   });
   const [matches, setMatches] = useState<StartupMatch[]>([]);
@@ -77,21 +85,12 @@ const Matching: React.FC = () => {
     "AgriTech",
     "SpaceTech",
   ];
-
   const stageOptions = [
     "Pre-Seed",
     "Seed",
     "Series A",
     "Series B",
     "Series C+",
-  ];
-
-  const geographyOptions = [
-    "North America",
-    "Europe",
-    "Asia-Pacific",
-    "Latin America",
-    "Middle East & Africa",
   ];
 
   const handleIndustryToggle = (industry: string) => {
@@ -102,22 +101,12 @@ const Matching: React.FC = () => {
         : [...prev.industries, industry],
     }));
   };
-
   const handleStageToggle = (stage: string) => {
     setPreferences((prev) => ({
       ...prev,
       stages: prev.stages.includes(stage)
         ? prev.stages.filter((s) => s !== stage)
         : [...prev.stages, stage],
-    }));
-  };
-
-  const handleGeographyToggle = (geo: string) => {
-    setPreferences((prev) => ({
-      ...prev,
-      geography: prev.geography.includes(geo)
-        ? prev.geography.filter((g) => g !== geo)
-        : [...prev.geography, geo],
     }));
   };
 
@@ -164,7 +153,6 @@ const Matching: React.FC = () => {
             stages: data.preferences.stages || [],
             minFunding: data.preferences.min_funding_amount?.toString() || "",
             maxFunding: data.preferences.max_funding_amount?.toString() || "",
-            geography: data.preferences.geographic_preferences || [],
             riskTolerance: data.preferences.risk_tolerance || "medium",
           });
         }
@@ -196,14 +184,12 @@ const Matching: React.FC = () => {
       const maxFunding = preferences.maxFunding
         ? parseFloat(preferences.maxFunding.replace(/[,$]/g, ""))
         : undefined;
-
       const matchingRequest = {
         preferences: {
           industries: preferences.industries,
           stages: preferences.stages,
           min_funding_amount: minFunding,
           max_funding_amount: maxFunding,
-          geographic_preferences: preferences.geography,
           risk_tolerance: preferences.riskTolerance,
           investment_timeline: "6_months", // Default value
         },
@@ -288,7 +274,6 @@ const Matching: React.FC = () => {
         stages: preferences.stages,
         min_funding_amount: preferences.minFunding,
         max_funding_amount: preferences.maxFunding,
-        geographic_preferences: preferences.geography,
         risk_tolerance: preferences.riskTolerance,
       };
       const response = await fetch(API_ENDPOINTS.INVESTOR.PREFERENCES, {
@@ -355,14 +340,12 @@ const Matching: React.FC = () => {
       console.error("Delete preferences error:", err);
     }
   };
-
   const handleApplySavedPreferences = (prefs: SavedPreferences) => {
     setPreferences({
       industries: prefs.industries,
       stages: prefs.stages,
       minFunding: prefs.min_funding_amount || "",
       maxFunding: prefs.max_funding_amount || "",
-      geography: prefs.geographic_preferences,
       riskTolerance: prefs.risk_tolerance,
     });
   };
@@ -370,42 +353,73 @@ const Matching: React.FC = () => {
   useEffect(() => {
     fetchSavedPreferences();
   }, []);
-
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">
-          AI-Powered Matching
-        </h1>
-        <p className="text-gray-600">
-          Configure your investment preferences and let our AI find the perfect
-          startup matches.
-        </p>
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-700 rounded-xl p-8 text-white">
+        <div className="flex items-center space-x-3 mb-4">
+          <div className="p-2 bg-white/20 rounded-lg">
+            <Target className="h-6 w-6" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold">AI-Powered Matching</h1>
+            <p className="text-indigo-100">
+              Configure your investment preferences and let our AI find the
+              perfect startup matches
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center space-x-6 text-sm">
+          <div className="flex items-center space-x-2">
+            <Zap className="h-4 w-4" />
+            <span>Smart AI Algorithm</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <BarChart3 className="h-4 w-4" />
+            <span>Real-time Scoring</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Clock className="h-4 w-4" />
+            <span>Instant Results</span>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Preferences Panel */}
         <div className="lg:col-span-1">
-          <Card>
+          <Card className="border-0 shadow-lg">
+            {" "}
             <CardHeader>
-              <CardTitle>Investment Preferences</CardTitle>
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 -m-6 mb-0">
+                <CardTitle>
+                  <div className="flex items-center space-x-2">
+                    <Settings className="h-5 w-5 text-blue-600" />
+                    <span>Investment Preferences</span>
+                  </div>
+                </CardTitle>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-6 pt-6">
               {/* Industries */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Industries of Interest
+                <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center space-x-2">
+                  <Building2 className="h-4 w-4 text-blue-600" />
+                  <span>Industries of Interest</span>
                 </label>
                 <div className="space-y-2">
                   {industryOptions.map((industry) => (
-                    <label key={industry} className="flex items-center">
+                    <label
+                      key={industry}
+                      className="flex items-center group hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                    >
                       <input
                         type="checkbox"
                         checked={preferences.industries.includes(industry)}
                         onChange={() => handleIndustryToggle(industry)}
                         className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                       />
-                      <span className="ml-2 text-sm text-gray-700">
+                      <span className="ml-3 text-sm text-gray-700 group-hover:text-gray-900">
                         {industry}
                       </span>
                     </label>
@@ -414,17 +428,21 @@ const Matching: React.FC = () => {
               </div>
               {/* Funding Stages */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Funding Stages
+                <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center space-x-2">
+                  <TrendingUp className="h-4 w-4 text-green-600" />
+                  <span>Funding Stages</span>
                 </label>
                 <div className="space-y-2">
                   {stageOptions.map((stage) => (
-                    <label key={stage} className="flex items-center">
+                    <label
+                      key={stage}
+                      className="flex items-center group hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                    >
                       <input
                         type="checkbox"
                         checked={preferences.stages.includes(stage)}
                         onChange={() => handleStageToggle(stage)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded border-gray-300 text-green-600 focus:ring-green-500"
                       />
                       <span className="ml-2 text-sm text-gray-700">
                         {stage}
@@ -465,26 +483,7 @@ const Matching: React.FC = () => {
                     }
                     className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                </div>
-              </div>
-              {/* Geography */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Geographic Preferences
-                </label>
-                <div className="space-y-2">
-                  {geographyOptions.map((geo) => (
-                    <label key={geo} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={preferences.geography.includes(geo)}
-                        onChange={() => handleGeographyToggle(geo)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">{geo}</span>
-                    </label>
-                  ))}
-                </div>
+                </div>{" "}
               </div>
               {/* Risk Tolerance */}
               <div>
@@ -631,7 +630,9 @@ const Matching: React.FC = () => {
                 </div>
               ) : matches.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="text-6xl mb-4">🔍</div>
+                  <div className="p-4 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                    <Search size={32} className="stroke-2 text-gray-400" />
+                  </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
                     No matches yet
                   </h3>

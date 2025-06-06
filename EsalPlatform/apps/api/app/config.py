@@ -2,62 +2,72 @@
 Configuration settings for ESAL Platform Backend
 """
 from pydantic_settings import BaseSettings
+from pydantic import Field
 from typing import List, Union
 import os
 
 
 class Settings(BaseSettings):
-    """Application settings"""    # Supabase Configuration (Primary Database)
-    SUPABASE_URL: str = "https://ppvkucdspgoeqsxxydxg.supabase.co"    
-    SUPABASE_ANON_KEY: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBwdmt1Y2RzcGdvZXFzeHh5ZHhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxNTkzMzAsImV4cCI6MjA2MzczNTMzMH0.6VVpA6qEcjNPJvPvn0dMh7CUNkNTCYGWsMwb6WS0XGE"  # Keep for reference
-    SUPABASE_SERVICE_ROLE_KEY: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBwdmt1Y2RzcGdvZXFzeHh5ZHhnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0ODE1OTMzMCwiZXhwIjoyMDYzNzM1MzMwfQ.Tt2F9WnX6Dai3Yi2TBgzfUPK38XR4tIpLLh5rFMlU-s"  # Service role key - bypasses RLS
+    """Application settings"""
     
+    # Supabase Configuration (Primary Database)
+    SUPABASE_URL: str = Field(default="", description="Supabase project URL")
+    SUPABASE_ANON_KEY: str = Field(default="", description="Supabase anonymous key")
+    SUPABASE_SERVICE_ROLE_KEY: str = Field(default="", description="Supabase service role key")    
     # Local Database (Optional - can be disabled)
-    USE_LOCAL_DB: bool = False  # Set to False to use only Supabase
-    DATABASE_URL: str = "sqlite:///./esal_dev.db"  # Kept for backward compatibility    # Email Configuration - Gmail SMTP for verification codes
-    SMTP_HOST: str = "smtp.gmail.com"
-    SMTP_PORT: int = 587
-    SMTP_USER: str = "esalventuresltd@gmail.com"
-    SMTP_PASSWORD: str = "bcij nqlq cgfk vazv"
-    SMTP_FROM_EMAIL: str = "esalventuresltd@gmail.com"
-    SMTP_FROM_NAME: str = "Esal Ventures"
+    USE_LOCAL_DB: bool = Field(default=False, description="Use local SQLite database")
+    DATABASE_URL: str = Field(default="sqlite:///./esal_dev.db", description="Database URL")
+    
+    # Email Configuration - Gmail SMTP for verification codes
+    SMTP_HOST: str = Field(default="smtp.gmail.com", description="SMTP server host")
+    SMTP_PORT: int = Field(default=587, description="SMTP server port")
+    SMTP_USER: str = Field(default="", description="SMTP username")
+    SMTP_PASSWORD: str = Field(default="", description="SMTP password")
+    SMTP_FROM_EMAIL: str = Field(default="", description="Email sender address")
+    SMTP_FROM_NAME: str = Field(default="ESAL Platform", description="Email sender name")
     
     # Email verification settings
-    VERIFICATION_CODE_EXPIRY_MINUTES: int = 10
-    SITE_URL: str = "http://localhost:3000"
-    CONFIRM_EMAIL_REDIRECT_URL: str = "http://localhost:3001/email-confirmed"# AI APIs
-    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "your-gemini-api-key")
-    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")  # Optional OpenAI API key
-
+    VERIFICATION_CODE_EXPIRY_MINUTES: int = Field(default=10, description="Code expiry time in minutes")
+    SITE_URL: str = Field(default="http://localhost:3000", description="Site base URL")
+    CONFIRM_EMAIL_REDIRECT_URL: str = Field(default="http://localhost:3001/email-confirmed", description="Email confirmation redirect URL")
+    
+    # AI APIs
+    GEMINI_API_KEY: str = Field(default="your-gemini-api-key", description="Google Gemini API key")
+    OPENAI_API_KEY: str = Field(default="", description="OpenAI API key")
+    
     # JWT
-    JWT_SECRET_KEY: str = "hzuQ0vV09u6lDiKEb7a+5SG0uNRpepuaImQW7F/8+pePoatdth4/YyJWkgB/IjnwH6qYTMJWgny1bs0fB/nS8A=="
-    JWT_ALGORITHM: str = "HS256"
-    JWT_EXPIRATION_TIME: int = 3600  # 1 hour
-      # CORS - Handle as string and convert to list
-    ALLOWED_ORIGINS: Union[str, List[str]] = [
-        "http://localhost:3000",  # Landing page
-        "http://localhost:3001",  # Innovator portal
-        "http://localhost:3002",  # Investor portal
-        "http://localhost:3003",  # Hub portal
-        "http://localhost:3004",  # Admin portal
-        "http://localhost:5173",  # Vite default dev server
-        "http://localhost:8080",  # Alternative dev server
-        "http://localhost:5000",  # Alternative dev server
-        "http://127.0.0.1:3000",  # Landing page (127.0.0.1)
-        "http://127.0.0.1:3001",  # Innovator portal (127.0.0.1)
-        "http://127.0.0.1:3002",  # Investor portal (127.0.0.1)
-        "http://127.0.0.1:3003",  # Hub portal (127.0.0.1)
-        "http://127.0.0.1:3004",  # Admin portal (127.0.0.1)
-        "http://127.0.0.1:5173",  # Vite default (127.0.0.1)
-        "https://esal-platform.vercel.app"  # Production deployment
-    ]
+    JWT_SECRET_KEY: str = Field(default="dev-change-this-in-production", description="JWT secret key")
+    JWT_ALGORITHM: str = Field(default="HS256", description="JWT algorithm")
+    JWT_EXPIRATION_TIME: int = Field(default=3600, description="JWT expiration time in seconds")    
+    # CORS - Handle as string and convert to list
+    ALLOWED_ORIGINS: Union[str, List[str]] = Field(
+        default=[
+            "http://localhost:3000",  # Landing page
+            "http://localhost:3001",  # Innovator portal
+            "http://localhost:3002",  # Investor portal
+            "http://localhost:3003",  # Hub portal
+            "http://localhost:3004",  # Admin portal
+            "http://localhost:5173",  # Vite default dev server
+            "http://localhost:8080",  # Alternative dev server
+            "http://localhost:5000",  # Alternative dev server
+            "http://127.0.0.1:3000",  # Landing page (127.0.0.1)
+            "http://127.0.0.1:3001",  # Innovator portal (127.0.0.1)
+            "http://127.0.0.1:3002",  # Investor portal (127.0.0.1)
+            "http://127.0.0.1:3003",  # Hub portal (127.0.0.1)
+            "http://127.0.0.1:3004",  # Admin portal (127.0.0.1)
+            "http://127.0.0.1:5173",  # Vite default (127.0.0.1)
+            "https://esal-platform.vercel.app"  # Production deployment
+        ],
+        description="Allowed CORS origins"
+    )
     
     # App
-    DEBUG: bool = True
-    
-    class Config:
-        env_file = ".env"
-        extra = "ignore"  # Ignore extra environment variables
+    DEBUG: bool = Field(default=True, description="Debug mode")    
+    model_config = {
+        "env_file": ".env",
+        "env_file_encoding": "utf-8",
+        "extra": "ignore"
+    }
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

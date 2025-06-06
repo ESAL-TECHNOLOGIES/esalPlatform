@@ -10,13 +10,34 @@ import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import EmailVerification from "./pages/EmailVerification";
+import { BarChart3, Rocket, Target, Calendar, User } from "lucide-react";
 
 const sidebarItems = [
-  { label: "Dashboard", href: "/", icon: "📊" },
-  { label: "Browse Startups", href: "/startups", icon: "🚀" },
-  { label: "AI Matching", href: "/matching", icon: "🎯" },
-  { label: "Schedule", href: "/schedule", icon: "📅" },
-  { label: "Profile", href: "/profile", icon: "👤" },
+  {
+    label: "Dashboard",
+    href: "/",
+    icon: <BarChart3 size={18} className="stroke-2" />,
+  },
+  {
+    label: "Browse Startups",
+    href: "/startups",
+    icon: <Rocket size={18} className="stroke-2" />,
+  },
+  {
+    label: "AI Matching",
+    href: "/matching",
+    icon: <Target size={18} className="stroke-2" />,
+  },
+  {
+    label: "Schedule",
+    href: "/schedule",
+    icon: <Calendar size={18} className="stroke-2" />,
+  },
+  {
+    label: "Profile",
+    href: "/profile",
+    icon: <User size={18} className="stroke-2" />,
+  },
 ];
 
 function AppContent() {
