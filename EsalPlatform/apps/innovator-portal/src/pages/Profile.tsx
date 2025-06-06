@@ -688,31 +688,53 @@ const Profile: React.FC = () => {
         </Card>
       </div>
     );
-  }
-  return (
+  }  return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
-          <p className="text-gray-600 mt-1">
-            Manage your personal information and preferences
-          </p>
-        </div>
-        <div className="flex items-center space-x-3">
-          <div className="text-right">
-            <p className="text-sm text-gray-500">Member since</p>
-            <p className="text-sm font-medium text-gray-900">
-              {new Date(profile.created_at).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-              })}
+      {/* Enhanced Header with Gradient Background and Tabs */}
+      <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 border border-blue-200 rounded-2xl p-6 sm:p-8 shadow-lg">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
+          <div className="text-center sm:text-left">
+            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              My Profile
+            </h1>
+            <p className="text-gray-600 mt-2 text-base sm:text-lg">
+              Manage your personal information and preferences
             </p>
           </div>
+          <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
+            <div className="text-center sm:text-right">
+              <p className="text-sm text-gray-500">Member since</p>
+              <p className="text-sm font-medium text-gray-900">
+                {new Date(profile.created_at).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                })}
+              </p>
+            </div>
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
+              <span className="text-white text-xl">👤</span>
+            </div>
+          </div>
         </div>
-      </div>
-      {/* Enhanced Success Message */}
+        
+        {/* Profile Tabs */}
+        <div className="mt-8 flex flex-wrap gap-2 justify-center sm:justify-start">
+          <div className="flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium border border-blue-200">
+            <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+            Profile Overview
+          </div>
+          <div className="flex items-center px-4 py-2 bg-white text-gray-600 rounded-full text-sm border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer">
+            <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+            Settings
+          </div>
+          <div className="flex items-center px-4 py-2 bg-white text-gray-600 rounded-full text-sm border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer">
+            <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+            Privacy
+          </div>
+        </div>
+      </div>      {/* Enhanced Success Message */}
       {successMessage && (
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 shadow-sm">
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 shadow-sm">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -736,66 +758,74 @@ const Profile: React.FC = () => {
           </div>
         </div>
       )}
-      {/* Profile Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+
+      {/* Enhanced Profile Statistics Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 hover:shadow-lg transition-all duration-200 cursor-pointer group">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-blue-600 group-hover:text-blue-700">
                   Total Ideas
                 </p>
-                <p className="text-3xl font-bold text-blue-900">
+                <p className="text-2xl sm:text-3xl font-bold text-blue-900">
                   {stats.total_ideas}
                 </p>
+                <p className="text-xs text-blue-600 mt-1">
+                  Your innovative concepts
+                </p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                <span className="text-blue-600 text-xl">💡</span>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                <span className="text-blue-600 text-lg sm:text-xl">💡</span>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 hover:shadow-lg transition-all duration-200 cursor-pointer group">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-green-600 group-hover:text-green-700">
                   Total Views
                 </p>
-                <p className="text-3xl font-bold text-green-900">
+                <p className="text-2xl sm:text-3xl font-bold text-green-900">
                   {stats.total_views}
                 </p>
+                <p className="text-xs text-green-600 mt-1">
+                  Community engagement
+                </p>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
-                <span className="text-green-600 text-xl">👁️</span>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                <span className="text-green-600 text-lg sm:text-xl">👁️</span>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200 hover:shadow-lg transition-all duration-200 cursor-pointer group">
-          <CardContent className="p-6">
+        <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200 hover:shadow-lg transition-all duration-200 cursor-pointer group sm:col-span-2 lg:col-span-1">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-purple-600 group-hover:text-purple-700">
                   Total Interests
                 </p>
-                <p className="text-3xl font-bold text-purple-900">
+                <p className="text-2xl sm:text-3xl font-bold text-purple-900">
                   {stats.total_interests}
                 </p>
+                <p className="text-xs text-purple-600 mt-1">
+                  Investor attention
+                </p>
               </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors">
-                <span className="text-purple-600 text-xl">❤️</span>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                <span className="text-purple-600 text-lg sm:text-xl">❤️</span>
               </div>
             </div>
           </CardContent>
         </Card>
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Profile Card */}
-        <div className="lg:col-span-2">
-          {" "}
+      </div>      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {/* Profile Card - Takes up 2 columns on xl screens */}
+        <div className="xl:col-span-2">
           <ProfileCard
             profile={profile}
             onEdit={() => setIsEditing(true)}
@@ -804,8 +834,9 @@ const Profile: React.FC = () => {
             viewsCount={stats.total_views}
             interestsCount={stats.total_interests}
           />
-        </div>{" "}
-        {/* Sidebar */}
+        </div>
+
+        {/* Sidebar - Takes up 1 column on xl screens */}
         <div className="space-y-6">
           {/* Enhanced Edit Form */}
           {isEditing && (
@@ -820,9 +851,9 @@ const Profile: React.FC = () => {
                   </CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="p-6">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <CardContent className="p-4 sm:p-6">
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Full Name
@@ -832,7 +863,7 @@ const Profile: React.FC = () => {
                         name="full_name"
                         value={formData.full_name}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
                         placeholder="Enter your full name"
                       />
                     </div>
@@ -846,7 +877,7 @@ const Profile: React.FC = () => {
                         name="username"
                         value={formData.username}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
                         placeholder="Choose a username"
                       />
                     </div>
@@ -864,12 +895,12 @@ const Profile: React.FC = () => {
                       value={formData.bio}
                       onChange={handleInputChange}
                       rows={4}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none text-sm"
                       placeholder="Tell us about yourself, your background, and your innovation interests..."
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Location
@@ -879,7 +910,7 @@ const Profile: React.FC = () => {
                         name="location"
                         value={formData.location}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
                         placeholder="City, Country"
                       />
                     </div>
@@ -893,13 +924,13 @@ const Profile: React.FC = () => {
                         name="company"
                         value={formData.company}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
                         placeholder="Your company or organization"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Position
@@ -909,7 +940,7 @@ const Profile: React.FC = () => {
                         name="position"
                         value={formData.position}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
                         placeholder="Your job title or role"
                       />
                     </div>
@@ -925,7 +956,7 @@ const Profile: React.FC = () => {
                         onChange={handleInputChange}
                         min="0"
                         max="50"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
                         placeholder="Years of experience"
                       />
                     </div>
@@ -940,7 +971,7 @@ const Profile: React.FC = () => {
                       name="education"
                       value={formData.education}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
                       placeholder="Your educational background"
                     />
                   </div>
@@ -956,7 +987,7 @@ const Profile: React.FC = () => {
                       type="text"
                       value={formData.skills.join(", ")}
                       onChange={handleSkillsChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
                       placeholder="e.g. JavaScript, React, AI, Machine Learning"
                     />
                   </div>
@@ -972,86 +1003,95 @@ const Profile: React.FC = () => {
                       type="text"
                       value={formData.interests.join(", ")}
                       onChange={handleInterestsChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
                       placeholder="e.g. Healthcare, FinTech, Sustainability, IoT"
                     />
                   </div>
 
+                  {/* Collapsible Social Links Section */}
                   <div className="border-t pt-4">
-                    <h4 className="text-sm font-medium text-gray-900 mb-4">
-                      Social Links
-                    </h4>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Website URL
-                        </label>
-                        <input
-                          type="url"
-                          name="website_url"
-                          value={formData.website_url}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                          placeholder="https://your-website.com"
-                        />
-                      </div>
+                    <details className="group">
+                      <summary className="flex items-center justify-between cursor-pointer text-sm font-medium text-gray-900 mb-4 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                        <span className="flex items-center">
+                          <span className="mr-2">🔗</span>
+                          Social Links
+                        </span>
+                        <span className="transform group-open:rotate-180 transition-transform">
+                          ▼
+                        </span>
+                      </summary>
+                      <div className="space-y-4 pl-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Website URL
+                          </label>
+                          <input
+                            type="url"
+                            name="website_url"
+                            value={formData.website_url}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                            placeholder="https://your-website.com"
+                          />
+                        </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          LinkedIn URL
-                        </label>
-                        <input
-                          type="url"
-                          name="linkedin_url"
-                          value={formData.linkedin_url}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                          placeholder="https://linkedin.com/in/username"
-                        />
-                      </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            LinkedIn URL
+                          </label>
+                          <input
+                            type="url"
+                            name="linkedin_url"
+                            value={formData.linkedin_url}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                            placeholder="https://linkedin.com/in/username"
+                          />
+                        </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Twitter URL
-                        </label>
-                        <input
-                          type="url"
-                          name="twitter_url"
-                          value={formData.twitter_url}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                          placeholder="https://twitter.com/username"
-                        />
-                      </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Twitter URL
+                          </label>
+                          <input
+                            type="url"
+                            name="twitter_url"
+                            value={formData.twitter_url}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                            placeholder="https://twitter.com/username"
+                          />
+                        </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          GitHub URL
-                        </label>
-                        <input
-                          type="url"
-                          name="github_url"
-                          value={formData.github_url}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                          placeholder="https://github.com/username"
-                        />
-                      </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            GitHub URL
+                          </label>
+                          <input
+                            type="url"
+                            name="github_url"
+                            value={formData.github_url}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                            placeholder="https://github.com/username"
+                          />
+                        </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Phone Number
-                        </label>
-                        <input
-                          type="tel"
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                          placeholder="+1 (555) 123-4567"
-                        />
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Phone Number
+                          </label>
+                          <input
+                            type="tel"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                            placeholder="+1 (555) 123-4567"
+                          />
+                        </div>
                       </div>
-                    </div>
+                    </details>
                   </div>
 
                   {formError && (
@@ -1069,7 +1109,7 @@ const Profile: React.FC = () => {
                     <Button
                       type="submit"
                       disabled={isSaving}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-medium"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-base font-medium"
                     >
                       {isSaving ? (
                         <>
@@ -1108,7 +1148,7 @@ const Profile: React.FC = () => {
                           education: profile.education || "",
                         });
                       }}
-                      className="w-full py-3 text-lg"
+                      className="w-full py-3 text-base"
                     >
                       Cancel
                     </Button>
@@ -1116,8 +1156,7 @@ const Profile: React.FC = () => {
                 </form>
               </CardContent>
             </Card>
-          )}{" "}
-          {/* Enhanced Account Status */}{" "}
+          )}          {/* Enhanced Account Status */}
           <Card className="shadow-lg">
             <CardHeader>
               <div className="bg-gradient-to-r from-gray-50 to-slate-50 border-b border-gray-200 -mx-6 -mt-6 px-6 pt-6 pb-4 rounded-t-lg">
@@ -1129,14 +1168,14 @@ const Profile: React.FC = () => {
                 </CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <CardContent className="p-4 sm:p-6">
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded-lg space-y-2 sm:space-y-0">
                   <span className="text-sm font-medium text-gray-700">
                     Status:
                   </span>
                   <span
-                    className={`px-4 py-2 text-sm font-medium rounded-full ${
+                    className={`inline-flex items-center justify-center sm:justify-start px-4 py-2 text-sm font-medium rounded-full ${
                       profile.is_active && !profile.is_blocked
                         ? "bg-green-100 text-green-800 border border-green-200"
                         : "bg-red-100 text-red-800 border border-red-200"
@@ -1147,19 +1186,19 @@ const Profile: React.FC = () => {
                       : "❌ Inactive"}
                   </span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded-lg space-y-2 sm:space-y-0">
                   <span className="text-sm font-medium text-gray-700">
                     Account ID:
                   </span>
-                  <span className="text-xs font-mono bg-white px-3 py-1 rounded border">
+                  <span className="text-xs font-mono bg-white px-3 py-1 rounded border text-center sm:text-left">
                     {profile.id.substring(0, 8)}...
                   </span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded-lg space-y-2 sm:space-y-0">
                   <span className="text-sm font-medium text-gray-700">
                     Role:
                   </span>
-                  <span className="text-sm font-medium text-blue-600 capitalize">
+                  <span className="text-sm font-medium text-blue-600 capitalize text-center sm:text-left">
                     {profile.role} Innovator
                   </span>
                 </div>
@@ -1169,7 +1208,7 @@ const Profile: React.FC = () => {
               {profile.is_blocked && (
                 <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                   <div className="flex items-start">
-                    <span className="text-red-600 text-lg mr-3">⚠️</span>
+                    <span className="text-red-600 text-lg mr-3 flex-shrink-0">⚠️</span>
                     <div>
                       <h4 className="text-red-800 font-medium mb-1">
                         Account Blocked
@@ -1185,7 +1224,7 @@ const Profile: React.FC = () => {
               {!profile.is_active && !profile.is_blocked && (
                 <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <div className="flex items-start">
-                    <span className="text-yellow-600 text-lg mr-3">⚠️</span>
+                    <span className="text-yellow-600 text-lg mr-3 flex-shrink-0">⚠️</span>
                     <div>
                       <h4 className="text-yellow-800 font-medium mb-1">
                         Account Inactive
@@ -1201,7 +1240,7 @@ const Profile: React.FC = () => {
               {profile.is_active && !profile.is_blocked && (
                 <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
                   <div className="flex items-start">
-                    <span className="text-green-600 text-lg mr-3">✅</span>
+                    <span className="text-green-600 text-lg mr-3 flex-shrink-0">✅</span>
                     <div>
                       <h4 className="text-green-800 font-medium mb-1">
                         Account Active
@@ -1215,8 +1254,7 @@ const Profile: React.FC = () => {
                 </div>
               )}
             </CardContent>
-          </Card>{" "}
-          {/* Enhanced Quick Actions */}{" "}
+          </Card>{/* Enhanced Quick Actions */}
           <Card className="shadow-lg">
             <CardHeader>
               <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-indigo-200 -mx-6 -mt-6 px-6 pt-6 pb-4 rounded-t-lg">
@@ -1228,71 +1266,74 @@ const Profile: React.FC = () => {
                 </CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="p-6">
-              <div className="space-y-3">
+            <CardContent className="p-4 sm:p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
                 <Button
-                  className="w-full text-left justify-start h-14 bg-white hover:bg-red-50 border-red-200 hover:border-red-300 text-red-700 hover:text-red-800 transition-all duration-200 group"
+                  className="w-full text-left justify-start h-auto sm:h-14 bg-white hover:bg-red-50 border-red-200 hover:border-red-300 text-red-700 hover:text-red-800 transition-all duration-200 group p-3 sm:p-4"
                   variant="outline"
                   onClick={() => setShowChangePasswordModal(true)}
                 >
                   <div className="flex items-center">
-                    <div className="w-10 h-10 bg-red-100 group-hover:bg-red-200 rounded-full flex items-center justify-center mr-3 transition-colors">
-                      <span className="text-red-600 text-lg">🔒</span>
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 group-hover:bg-red-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0 transition-colors">
+                      <span className="text-red-600 text-base sm:text-lg">🔒</span>
                     </div>
-                    <div>
-                      <div className="font-medium">Change Password</div>
-                      <div className="text-xs text-red-600">
+                    <div className="text-left">
+                      <div className="font-medium text-sm sm:text-base">Change Password</div>
+                      <div className="text-xs text-red-600 mt-0.5">
                         Update your account security
                       </div>
                     </div>
                   </div>
                 </Button>
+                
                 <Button
-                  className="w-full text-left justify-start h-14 bg-white hover:bg-blue-50 border-blue-200 hover:border-blue-300 text-blue-700 hover:text-blue-800 transition-all duration-200 group"
+                  className="w-full text-left justify-start h-auto sm:h-14 bg-white hover:bg-blue-50 border-blue-200 hover:border-blue-300 text-blue-700 hover:text-blue-800 transition-all duration-200 group p-3 sm:p-4"
                   variant="outline"
                   onClick={() => setShowNotificationsModal(true)}
                 >
                   <div className="flex items-center">
-                    <div className="w-10 h-10 bg-blue-100 group-hover:bg-blue-200 rounded-full flex items-center justify-center mr-3 transition-colors">
-                      <span className="text-blue-600 text-lg">📧</span>
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 group-hover:bg-blue-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0 transition-colors">
+                      <span className="text-blue-600 text-base sm:text-lg">📧</span>
                     </div>
-                    <div>
-                      <div className="font-medium">Manage Notifications</div>
-                      <div className="text-xs text-blue-600">
+                    <div className="text-left">
+                      <div className="font-medium text-sm sm:text-base">Manage Notifications</div>
+                      <div className="text-xs text-blue-600 mt-0.5">
                         Configure your preferences
                       </div>
                     </div>
                   </div>
-                </Button>{" "}
+                </Button>
+                
                 <Button
-                  className="w-full text-left justify-start h-14 bg-white hover:bg-purple-50 border-purple-200 hover:border-purple-300 text-purple-700 hover:text-purple-800 transition-all duration-200 group"
+                  className="w-full text-left justify-start h-auto sm:h-14 bg-white hover:bg-purple-50 border-purple-200 hover:border-purple-300 text-purple-700 hover:text-purple-800 transition-all duration-200 group p-3 sm:p-4"
                   variant="outline"
                   onClick={() => setShowAvatarModal(true)}
                 >
                   <div className="flex items-center">
-                    <div className="w-10 h-10 bg-purple-100 group-hover:bg-purple-200 rounded-full flex items-center justify-center mr-3 transition-colors">
-                      <span className="text-purple-600 text-lg">📸</span>
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 group-hover:bg-purple-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0 transition-colors">
+                      <span className="text-purple-600 text-base sm:text-lg">📸</span>
                     </div>
-                    <div>
-                      <div className="font-medium">Update Avatar</div>
-                      <div className="text-xs text-purple-600">
+                    <div className="text-left">
+                      <div className="font-medium text-sm sm:text-base">Update Avatar</div>
+                      <div className="text-xs text-purple-600 mt-0.5">
                         Change your profile picture
                       </div>
                     </div>
                   </div>
                 </Button>
+                
                 <Button
-                  className="w-full text-left justify-start h-14 bg-white hover:bg-green-50 border-green-200 hover:border-green-300 text-green-700 hover:text-green-800 transition-all duration-200 group"
+                  className="w-full text-left justify-start h-auto sm:h-14 bg-white hover:bg-green-50 border-green-200 hover:border-green-300 text-green-700 hover:text-green-800 transition-all duration-200 group p-3 sm:p-4"
                   variant="outline"
                   onClick={() => setShowExportModal(true)}
                 >
                   <div className="flex items-center">
-                    <div className="w-10 h-10 bg-green-100 group-hover:bg-green-200 rounded-full flex items-center justify-center mr-3 transition-colors">
-                      <span className="text-green-600 text-lg">📦</span>
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 group-hover:bg-green-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0 transition-colors">
+                      <span className="text-green-600 text-base sm:text-lg">📦</span>
                     </div>
-                    <div>
-                      <div className="font-medium">Export My Data</div>
-                      <div className="text-xs text-green-600">
+                    <div className="text-left">
+                      <div className="font-medium text-sm sm:text-base">Export My Data</div>
+                      <div className="text-xs text-green-600 mt-0.5">
                         Download your information
                       </div>
                     </div>

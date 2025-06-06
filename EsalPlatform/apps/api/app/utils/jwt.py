@@ -150,3 +150,14 @@ def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication failed"
         )
+
+
+async def get_current_user_from_token(token: str) -> Optional[UserResponse]:
+    """Get current user from JWT token - for middleware use"""
+    try:
+        return get_current_user(token)
+    except HTTPException:
+        return None
+    except Exception as e:
+        logger.debug(f"Error getting user from token: {e}")
+        return None

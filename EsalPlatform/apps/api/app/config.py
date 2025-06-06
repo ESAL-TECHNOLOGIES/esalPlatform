@@ -21,14 +21,11 @@ class Settings(BaseSettings):
     SMTP_USER: str = ""
     SMTP_PASSWORD: str = ""
     SMTP_FROM_EMAIL: str = "noreply@esalplatform.com"
-    SMTP_FROM_NAME: str = "ESAL Platform"
-    
-    # Site Configuration
-    SITE_URL: str = "http://localhost:3001"
-    # CONFIRM_EMAIL_REDIRECT_URL removed - email confirmation disabled    # AI APIs
+    SMTP_FROM_NAME: str = "ESAL Platform"    # AI APIs
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "your-gemini-api-key")
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")  # Optional OpenAI API key
-      # JWT
+
+    # JWT
     JWT_SECRET_KEY: str = "hzuQ0vV09u6lDiKEb7a+5SG0uNRpepuaImQW7F/8+pePoatdth4/YyJWkgB/IjnwH6qYTMJWgny1bs0fB/nS8A=="
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRATION_TIME: int = 3600  # 1 hour

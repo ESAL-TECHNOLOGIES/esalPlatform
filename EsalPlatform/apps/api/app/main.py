@@ -50,11 +50,20 @@ if settings.DEBUG:
 # CORS middleware - Configure before other middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for development
+    allow_origins=[
+        "http://localhost:3000",  # Main web app
+        "http://localhost:3001",  # Admin portal
+        "http://localhost:3002",  # Innovator portal
+        "http://localhost:3003",  # Investor portal
+        "http://localhost:3004",  # Admin portal (alternate port)
+        "http://localhost:5173",  # Vite dev server
+        "*"  # Allow all for development
+    ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"],
     allow_headers=["*"],
     expose_headers=["*"],
+    max_age=3600,  # Cache preflight requests for 1 hour
 )
 
 # Include routers with consistent API versioning
@@ -65,6 +74,18 @@ app.include_router(investor.router, prefix="/api/v1/investor", tags=["Investor"]
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])
 app.include_router(ideas.router, prefix="/api/v1/ideas", tags=["Ideas"])
 app.include_router(users.router, prefix="/api/v1/users", tags=["User Management"])
+
+
+@app.options("/{path:path}")
+async def options_handler(path: str, request: Request):
+    """Handle CORS preflight requests"""
+    response = Response()
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Max-Age"] = "3600"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    return response
 
 
 @app.get("/")

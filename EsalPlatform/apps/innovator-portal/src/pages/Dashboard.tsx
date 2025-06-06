@@ -1,3 +1,4 @@
+// filepath: d:\esalPlatform\EsalPlatform\apps\innovator-portal\src\pages\Dashboard_fixed.tsx
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent, Button } from "@esal/ui";
 
@@ -51,7 +52,129 @@ interface ExtendedProfile {
   updated_at: string;
 }
 
-const Dashboard: React.FC = () => {
+// Enhanced Components
+const StatCard: React.FC<{
+  title: string;
+  value: string | number;
+  icon: string;
+  gradient: string;
+  trend?: { value: string; isUp: boolean };
+}> = ({ title, value, icon, gradient, trend }) => (
+  <Card className={`relative overflow-hidden border-0 ${gradient} text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105`}>
+    <CardContent className="p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-white/80 text-sm font-medium">{title}</p>
+          <p className="text-3xl font-bold mt-2">{value}</p>
+          {trend && (
+            <div className={`flex items-center mt-2 text-sm ${trend.isUp ? 'text-green-200' : 'text-red-200'}`}>
+              <span className="mr-1">{trend.isUp ? '↗️' : '↘️'}</span>
+              <span>{trend.value}</span>
+            </div>
+          )}
+        </div>
+        <div className="text-4xl opacity-80">{icon}</div>
+      </div>
+      <div className="absolute -right-4 -bottom-4 text-6xl opacity-10">{icon}</div>
+    </CardContent>
+  </Card>
+);
+
+const QuickActionCard: React.FC<{
+  title: string;
+  description: string;
+  icon: string;
+  action: () => void;
+  variant?: 'primary' | 'secondary' | 'accent';
+}> = ({ title, description, icon, action, variant = 'primary' }) => {
+  const variantStyles = {
+    primary: 'bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700',
+    secondary: 'bg-gradient-to-br from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700',
+    accent: 'bg-gradient-to-br from-orange-500 to-pink-600 hover:from-orange-600 hover:to-pink-700'
+  };
+
+  return (
+    <Card 
+      className={`cursor-pointer border-0 text-white ${variantStyles[variant]} shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}
+      onClick={action}
+    >
+      <CardContent className="p-6 text-center">
+        <div className="text-4xl mb-4">{icon}</div>
+        <h3 className="text-lg font-semibold mb-2">{title}</h3>
+        <p className="text-white/80 text-sm">{description}</p>
+      </CardContent>
+    </Card>
+  );
+};
+
+const IdeaCard: React.FC<{ idea: RecentIdea; onView: () => void }> = ({ idea, onView }) => {
+  const getStatusColor = (status: string) => {
+    const colors = {
+      featured: 'bg-gradient-to-r from-green-500 to-emerald-500',
+      active: 'bg-gradient-to-r from-blue-500 to-cyan-500',
+      under_review: 'bg-gradient-to-r from-yellow-500 to-amber-500',
+      draft: 'bg-gradient-to-r from-gray-500 to-slate-500',
+      rejected: 'bg-gradient-to-r from-red-500 to-rose-500',
+    };
+    return colors[status as keyof typeof colors] || 'bg-gradient-to-r from-gray-500 to-slate-500';
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
+  return (
+    <Card className="group cursor-pointer border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] bg-white/90 backdrop-blur-sm">
+      <CardContent className="p-6" onClick={onView}>
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1">
+            <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-200 line-clamp-1">
+              {idea.title}
+            </h3>
+            <p className="text-gray-600 text-sm mt-2 line-clamp-2">{idea.description}</p>
+          </div>
+          <div className={`px-3 py-1 rounded-full text-white text-xs font-medium ${getStatusColor(idea.status)}`}>
+            {idea.status.replace('_', ' ').toUpperCase()}
+          </div>
+        </div>
+        
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4 text-sm text-gray-500">
+            <div className="flex items-center space-x-1">
+              <span>👁️</span>
+              <span className="font-medium">{idea.view_count || 0}</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span>💝</span>
+              <span className="font-medium">{idea.interest_count || 0}</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span>📅</span>
+              <span>{formatDate(idea.created_at)}</span>
+            </div>
+          </div>
+          <Button
+            size="sm"
+            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-0"
+            onClick={(e) => {
+              e.stopPropagation();
+              onView();
+            }}
+          >
+            View Details →
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+const DashboardModern: React.FC = () => {
   const [recentIdeas, setRecentIdeas] = useState<RecentIdea[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
     total_ideas: 0,
@@ -60,14 +183,17 @@ const Dashboard: React.FC = () => {
     total_interests: 0,
   });
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [extendedProfile, setExtendedProfile] =
-    useState<ExtendedProfile | null>(null);
+  const [extendedProfile, setExtendedProfile] = useState<ExtendedProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     fetchDashboardData();
+    const timer = setInterval(() => setCurrentTime(new Date()), 60000); // Update every minute
+    return () => clearInterval(timer);
   }, []);
+
   const fetchDashboardData = async () => {
     setIsLoading(true);
     setError(null);
@@ -83,7 +209,6 @@ const Dashboard: React.FC = () => {
         "Content-Type": "application/json",
       };
 
-      // Fetch dashboard data (includes user profile, ideas, and stats)
       const dashboardResponse = await fetch(
         "http://localhost:8000/api/v1/innovator/dashboard",
         {
@@ -93,104 +218,105 @@ const Dashboard: React.FC = () => {
       );
 
       if (dashboardResponse.ok) {
-        const dashboardData = await dashboardResponse.json(); // Set user profile
+        const dashboardData = await dashboardResponse.json();
         setUserProfile(dashboardData.user);
-
-        // Set extended profile if available
         if (dashboardData.profile) {
           setExtendedProfile(dashboardData.profile);
         }
-
-        // Set recent ideas
         setRecentIdeas(dashboardData.recent_ideas || []);
-
-        // Set stats
         setStats(dashboardData.stats);
       } else {
         throw new Error("Failed to fetch dashboard data");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
-      // Don't set fallback data - show proper error state instead
     } finally {
       setIsLoading(false);
     }
   };
 
-  const getStatusDisplay = (status: string) => {
-    const statusMap: Record<string, { label: string; className: string }> = {
-      featured: {
-        label: "Featured",
-        className: "bg-green-100 text-green-800",
-      },
-      active: {
-        label: "Active",
-        className: "bg-blue-100 text-blue-800",
-      },
-      under_review: {
-        label: "Under Review",
-        className: "bg-yellow-100 text-yellow-800",
-      },
-      draft: {
-        label: "Draft",
-        className: "bg-gray-100 text-gray-800",
-      },
-      rejected: {
-        label: "Rejected",
-        className: "bg-red-100 text-red-800",
-      },
-    };
-
-    return (
-      statusMap[status] || {
-        label: status,
-        className: "bg-gray-100 text-gray-800",
-      }
-    );
+  const getGreeting = () => {
+    const hour = currentTime.getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 17) return "Good afternoon";
+    return "Good evening";
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
+  const getUserName = () => {
+    return extendedProfile?.full_name || 
+           userProfile?.full_name || 
+           extendedProfile?.username || 
+           userProfile?.username || 
+           "Innovator";
   };
+
   const formatStatsData = () => [
     {
-      label: "Ideas Submitted",
-      value: stats.total_ideas.toString(),
+      title: "Total Ideas",
+      value: stats.total_ideas,
       icon: "💡",
+      gradient: "bg-gradient-to-br from-blue-500 to-blue-600",
+      trend: { value: "+12% this month", isUp: true }
     },
     {
-      label: "Active Ideas",
-      value: stats.active_ideas.toString(),
-      icon: "✅",
+      title: "Active Ideas",
+      value: stats.active_ideas,
+      icon: "🚀",
+      gradient: "bg-gradient-to-br from-green-500 to-green-600",
+      trend: { value: "+5% this week", isUp: true }
     },
     {
-      label: "Total Views",
-      value:
-        stats.total_views >= 1000
-          ? `${(stats.total_views / 1000).toFixed(1)}k`
-          : stats.total_views.toString(),
-      icon: "👀",
+      title: "Total Views",
+      value: stats.total_views >= 1000 
+        ? `${(stats.total_views / 1000).toFixed(1)}k` 
+        : stats.total_views.toString(),
+      icon: "👁️",
+      gradient: "bg-gradient-to-br from-purple-500 to-purple-600",
+      trend: { value: "+23% this month", isUp: true }
     },
     {
-      label: "Investor Interest",
-      value: stats.total_interests.toString(),
-      icon: "🤝",
+      title: "Investor Interest",
+      value: stats.total_interests,
+      icon: "💝",
+      gradient: "bg-gradient-to-br from-pink-500 to-pink-600",
+      trend: { value: "+8% this week", isUp: true }
     },
+  ];
+
+  const quickActions = [
+    {
+      title: "Create New Idea",
+      description: "Share your innovative startup concept",
+      icon: "✨",
+      action: () => window.location.href = "/my-ideas?create=true",
+      variant: "primary" as const
+    },
+    {
+      title: "AI Generator",
+      description: "Generate ideas with artificial intelligence",
+      icon: "🤖",
+      action: () => window.location.href = "/ai-generator",
+      variant: "secondary" as const
+    },
+    {
+      title: "Analytics",
+      description: "View detailed performance metrics",
+      icon: "📊",
+      action: () => window.location.href = "/metrics",
+      variant: "accent" as const
+    }
   ];
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">
-            Welcome back! Here's what's happening with your startup ideas.
-          </p>
-        </div>
-        <div className="flex items-center justify-center h-64">
-          <div className="flex flex-col items-center space-y-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className="text-gray-500 text-sm">Loading your dashboard...</p>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <div className="container mx-auto px-6 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
+              <p className="text-gray-600 text-lg">Loading your dashboard...</p>
+              <p className="text-gray-400 text-sm mt-2">Preparing your innovation workspace</p>
+            </div>
           </div>
         </div>
       </div>
@@ -199,540 +325,297 @@ const Dashboard: React.FC = () => {
 
   if (error) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">
-            Welcome back! Here's what's happening with your startup ideas.
-          </p>
-        </div>
-        <Card>
-          <CardContent className="p-8">
-            <div className="text-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <div className="container mx-auto px-6 py-8">
+          <Card className="max-w-md mx-auto mt-20 border-0 shadow-xl">
+            <CardContent className="p-8 text-center">
               <div className="text-6xl mb-4">⚠️</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 Unable to Load Dashboard
               </h3>
               <p className="text-gray-600 mb-6">{error}</p>
-              <Button onClick={fetchDashboardData}>Try Again</Button>
-            </div>
-          </CardContent>
-        </Card>
+              <Button 
+                onClick={fetchDashboardData}
+                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-0"
+              >
+                Try Again
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>{" "}
-        <p className="text-gray-600">
-          Welcome back
-          {extendedProfile?.full_name
-            ? `, ${extendedProfile.full_name}`
-            : userProfile?.full_name
-              ? `, ${userProfile.full_name}`
-              : ""}
-          ! Here's what's happening with your startup ideas.
-        </p>
-      </div>{" "}
-      {error && (
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
-          <div className="flex">
-            <div className="text-red-600 text-sm">
-              ❌ Error loading dashboard data: {error}
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="container mx-auto px-6 py-8 space-y-8">
+        {/* Header Section */}
+        <div className="text-center md:text-left">
+          <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 text-sm font-medium mb-4">
+            <span className="mr-2">🌟</span>
+            {getGreeting()}, ready to innovate?
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+            Welcome back, {getUserName()}!
+          </h1>
+          <p className="text-gray-600 text-lg">
+            Here's your innovation dashboard - where great ideas come to life.
+          </p>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {formatStatsData().map((stat, index) => (
+            <StatCard key={index} {...stat} />
+          ))}
+        </div>
+
+        {/* Quick Actions */}
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+            <span className="mr-3">⚡</span>
+            Quick Actions
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {quickActions.map((action, index) => (
+              <QuickActionCard key={index} {...action} />
+            ))}
           </div>
         </div>
-      )}
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {formatStatsData().map((stat, index) => (
-          <Card
-            key={index}
-            className="text-center hover:shadow-lg transition-shadow"
-          >
-            <CardContent className="p-6">
-              <div className="text-4xl mb-3">{stat.icon}</div>
-              <div className="text-3xl font-bold text-gray-900 mb-1">
-                {stat.value}
-              </div>
-              <div className="text-sm text-gray-600">{stat.label}</div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-        </CardHeader>{" "}
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {" "}
-            <Button
-              className="w-full h-14 flex items-center justify-center space-x-2"
-              onClick={() => (window.location.href = "/my-ideas?create=true")}
-            >
-              <span className="text-lg">💡</span>
-              <span>Create New Idea</span>
-            </Button>
-            <Button
-              variant="secondary"
-              className="w-full h-14 flex items-center justify-center space-x-2"
-              onClick={() => (window.location.href = "/ai-generator")}
-            >
-              <span className="text-lg">🤖</span>
-              <span>Generate with AI</span>
-            </Button>
+
+        {/* Recent Ideas */}
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+              <span className="mr-3">💡</span>
+              Recent Ideas
+            </h2>
             <Button
               variant="outline"
-              className="w-full h-14 flex items-center justify-center space-x-2"
-              onClick={() => (window.location.href = "/metrics")}
+              onClick={() => window.location.href = "/my-ideas"}
+              className="bg-white/80 border-gray-200 hover:bg-white hover:shadow-md"
             >
-              <span className="text-lg">📊</span>
-              <span>View Analytics</span>
+              View All Ideas →
             </Button>
           </div>
-        </CardContent>
-      </Card>
-      {/* Recent Ideas */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Ideas</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {recentIdeas.length > 0 ? (
-              recentIdeas.map((idea) => {
-                const statusInfo = getStatusDisplay(idea.status);
-                return (
-                  <div
-                    key={idea.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 hover:shadow-md transition-all cursor-pointer"
-                    onClick={() => (window.location.href = `/ideas/${idea.id}`)}
-                  >
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 text-lg hover:text-blue-600 transition-colors">
-                        {idea.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 mt-1">
-                        Created {formatDate(idea.created_at)}
-                      </p>
-                      <div className="mt-3 flex items-center space-x-6 text-sm text-gray-500">
-                        <div className="flex items-center space-x-1">
-                          <span>👀</span>
-                          <span className="font-medium">
-                            {idea.view_count || 0}
-                          </span>
-                          <span>views</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <span>🤝</span>
-                          <span className="font-medium">
-                            {idea.interest_count || 0}
-                          </span>
-                          <span>interests</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <span
-                        className={`px-3 py-1 text-xs font-medium rounded-full ${statusInfo.className}`}
-                      >
-                        {statusInfo.label}
-                      </span>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          window.location.href = `/ideas/${idea.id}`;
-                        }}
-                      >
-                        View →
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="text-center py-12 text-gray-500">
-                <div className="text-6xl mb-4">💡</div>
-                <p className="text-xl font-medium mb-2">
-                  Ready to Share Your Ideas?
-                </p>
-                <p className="text-sm mb-6 max-w-md mx-auto">
-                  Your innovative startup ideas could be the next big thing.
-                  Start by uploading your first idea and connecting with
-                  potential investors.
-                </p>{" "}
-                <div className="space-y-3">
-                  {" "}
-                  <Button
-                    className="px-6 py-3"
-                    onClick={() =>
-                      (window.location.href = "/my-ideas?create=true")
-                    }
-                  >
-                    🚀 Create Your First Idea
-                  </Button>
-                  <div className="text-xs text-gray-400">
-                    or{" "}
-                    <button
-                      className="text-blue-600 hover:underline"
-                      onClick={() => (window.location.href = "/ai-generator")}
-                    >
-                      generate ideas with AI
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>{" "}
-      {/* Enhanced Profile Information */}
-      {extendedProfile && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Profile Summary</CardTitle>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => (window.location.href = "/profile")}
-              >
-                Edit Profile
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
+          
+          {recentIdeas.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="flex items-start space-x-4">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                  {extendedProfile.avatar_url ? (
-                    <img
-                      src={extendedProfile.avatar_url}
-                      alt="Profile Avatar"
-                      className="w-20 h-20 rounded-full object-cover"
-                    />
-                  ) : (
-                    (
-                      extendedProfile.full_name ||
-                      extendedProfile.username ||
-                      "A"
-                    )
-                      .charAt(0)
-                      .toUpperCase()
-                  )}
+              {recentIdeas.slice(0, 4).map((idea) => (
+                <IdeaCard
+                  key={idea.id}
+                  idea={idea}
+                  onView={() => window.location.href = `/ideas/${idea.id}`}
+                />
+              ))}
+            </div>
+          ) : (
+            <Card className="border-0 shadow-lg bg-gradient-to-r from-blue-50 to-purple-50">
+              <CardContent className="p-12 text-center">
+                <div className="text-6xl mb-6">🚀</div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  Ready to Launch Your First Idea?
+                </h3>
+                <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+                  Transform your innovative concepts into reality. Start by creating your first startup idea 
+                  and connecting with potential investors who share your vision.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button
+                    onClick={() => window.location.href = "/my-ideas?create=true"}
+                    className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-0 px-8 py-3"
+                  >
+                    <span className="mr-2">✨</span>
+                    Create Your First Idea
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => window.location.href = "/ai-generator"}
+                    className="bg-white/80 border-gray-200 hover:bg-white hover:shadow-md px-8 py-3"
+                  >
+                    <span className="mr-2">🤖</span>
+                    Try AI Generator
+                  </Button>
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    {extendedProfile.full_name ||
-                      extendedProfile.username ||
-                      "Anonymous User"}
-                  </h3>
-                  {extendedProfile.bio && (
-                    <p className="text-sm text-gray-600 mt-2 line-clamp-2">
-                      {extendedProfile.bio}
-                    </p>
-                  )}
-                  {extendedProfile.company && (
-                    <div className="mt-3 flex items-center text-sm text-gray-500">
-                      <span className="mr-1">🏢</span>
-                      <span className="font-medium">
-                        {extendedProfile.position || "Professional"}
-                      </span>
-                      {extendedProfile.position && " at "}
-                      <span className="font-medium">
-                        {extendedProfile.company}
-                      </span>
-                    </div>
-                  )}
-                  {extendedProfile.location && (
-                    <div className="text-sm text-gray-500 mt-1">
-                      📍 {extendedProfile.location}
-                    </div>
-                  )}
-                </div>
-              </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
 
-              <div className="space-y-3">
-                {extendedProfile.skills &&
-                  extendedProfile.skills.length > 0 && (
+        {/* Profile Summary (Enhanced) */}
+        {extendedProfile && (
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+              <span className="mr-3">👤</span>
+              Profile Overview
+            </h2>
+            <Card className="border-0 shadow-lg bg-gradient-to-r from-white to-blue-50/30">
+              <CardContent className="p-8">
+                <div className="flex flex-col md:flex-row items-start md:items-center space-y-6 md:space-y-0 md:space-x-8">
+                  <div className="flex-shrink-0">
+                    <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+                      {extendedProfile.avatar_url ? (
+                        <img
+                          src={extendedProfile.avatar_url}
+                          alt="Profile Avatar"
+                          className="w-24 h-24 rounded-full object-cover"
+                        />
+                      ) : (
+                        getUserName().charAt(0).toUpperCase()
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="flex-1 space-y-4">
                     <div>
-                      <span className="text-sm font-medium text-gray-700">
-                        Skills:
-                      </span>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {extendedProfile.skills
-                          .slice(0, 5)
-                          .map((skill, index) => (
+                      <h3 className="text-2xl font-bold text-gray-900">{getUserName()}</h3>
+                      {extendedProfile.bio && (
+                        <p className="text-gray-600 mt-2">{extendedProfile.bio}</p>
+                      )}
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {extendedProfile.company && (
+                        <div className="flex items-center text-gray-600">
+                          <span className="mr-2">🏢</span>
+                          <span>{extendedProfile.position} at {extendedProfile.company}</span>
+                        </div>
+                      )}
+                      {extendedProfile.location && (
+                        <div className="flex items-center text-gray-600">
+                          <span className="mr-2">📍</span>
+                          <span>{extendedProfile.location}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {extendedProfile.skills && extendedProfile.skills.length > 0 && (
+                      <div>
+                        <p className="text-sm font-medium text-gray-700 mb-2">Skills & Expertise:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {extendedProfile.skills.slice(0, 8).map((skill, index) => (
                             <span
                               key={index}
-                              className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full"
+                              className="px-3 py-1 text-xs bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 rounded-full font-medium"
                             >
                               {skill}
                             </span>
                           ))}
-                        {extendedProfile.skills.length > 5 && (
-                          <span className="text-xs text-gray-500">
-                            +{extendedProfile.skills.length - 5} more
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                {extendedProfile.interests &&
-                  extendedProfile.interests.length > 0 && (
-                    <div>
-                      <span className="text-sm font-medium text-gray-700">
-                        Interests:
-                      </span>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {extendedProfile.interests
-                          .slice(0, 5)
-                          .map((interest, index) => (
-                            <span
-                              key={index}
-                              className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full"
-                            >
-                              {interest}
+                          {extendedProfile.skills.length > 8 && (
+                            <span className="px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
+                              +{extendedProfile.skills.length - 8} more
                             </span>
-                          ))}
-                        {extendedProfile.interests.length > 5 && (
-                          <span className="text-xs text-gray-500">
-                            +{extendedProfile.interests.length - 5} more
-                          </span>
-                        )}
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
 
-                <div className="pt-2 border-t">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => (window.location.href = "/profile")}
-                  >
-                    Edit Profile
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-      {/* User Status & Profile */}
-      {userProfile && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Basic Info */}
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-3">
-                  Account Details
-                </h3>
-                <div className="space-y-2">
-                  <div>
-                    <span className="text-sm text-gray-500">Name:</span>
-                    <p className="font-medium">
-                      {userProfile.full_name || "Not provided"}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-sm text-gray-500">Email:</span>
-                    <p className="font-medium">{userProfile.email}</p>
-                  </div>
-                  <div>
-                    <span className="text-sm text-gray-500">Role:</span>
-                    <p className="font-medium capitalize">{userProfile.role}</p>
-                  </div>
-                  <div>
-                    <span className="text-sm text-gray-500">Member since:</span>
-                    <p className="font-medium">
-                      {formatDate(userProfile.created_at)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Status Info */}
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-3">
-                  Account Status
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">Status:</span>
-                    <span
-                      className={`px-3 py-1 text-sm rounded-full ${
-                        userProfile.is_active && !userProfile.is_blocked
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
+                  <div className="flex-shrink-0">
+                    <Button
+                      onClick={() => window.location.href = "/profile"}
+                      className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-0"
                     >
-                      {userProfile.is_active && !userProfile.is_blocked
-                        ? "Active"
-                        : "Inactive"}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">Account ID:</span>
-                    <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded">
-                      {userProfile.id.substring(0, 8)}...
-                    </span>
+                      Edit Profile
+                    </Button>
                   </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
-            {/* Status Messages */}
-            {userProfile.is_blocked && (
-              <div className="mt-4 p-4 bg-red-50 rounded-lg">
-                <p className="text-sm text-red-700">
-                  ⚠️ Your account has been blocked. Please contact support for
-                  assistance.
-                </p>
-              </div>
-            )}
-            {!userProfile.is_active && (
-              <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
-                <p className="text-sm text-yellow-700">
-                  ⚠️ Your account is inactive. Please contact support to
-                  reactivate your account.
-                </p>
-              </div>
-            )}
-            {userProfile.is_active && !userProfile.is_blocked && (
-              <div className="mt-4 p-4 bg-green-50 rounded-lg">
-                <p className="text-sm text-green-700">
-                  ✅ Your account is active and you have full access to all
-                  platform features.
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
-      {/* Tips and Getting Started (show for users with no ideas) */}
-      {stats.total_ideas === 0 && (
-        <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
-          <CardHeader>
-            <CardTitle>
-              <div className="text-blue-800">
-                🚀 Welcome to Your Innovation Journey!
-              </div>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-3">
-                  Get Started in 3 Easy Steps:
-                </h4>
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                      1
-                    </div>{" "}
-                    <div>
-                      <p className="font-medium text-gray-800">
-                        Create Your First Idea
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Share your startup concept with detailed description and
-                        target market
-                      </p>
+        {/* Success Tips for New Users */}
+        {stats.total_ideas === 0 && (
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+              <span className="mr-3">🎯</span>
+              Your Innovation Journey
+            </h2>
+            <Card className="border-0 shadow-lg bg-gradient-to-r from-emerald-50 to-teal-50">
+              <CardContent className="p-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-6">
+                      🚀 Get Started in 3 Steps
+                    </h3>
+                    <div className="space-y-4">
+                      {[
+                        {
+                          step: 1,
+                          title: "Create Your First Idea",
+                          description: "Share your startup concept with detailed description and market analysis"
+                        },
+                        {
+                          step: 2,
+                          title: "Leverage AI Insights",
+                          description: "Use our AI tools to refine and enhance your innovative concepts"
+                        },
+                        {
+                          step: 3,
+                          title: "Connect with Investors",
+                          description: "Showcase your ideas to potential investors and build valuable partnerships"
+                        }
+                      ].map((item) => (
+                        <div key={item.step} className="flex items-start space-x-4">
+                          <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                            {item.step}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-900">{item.title}</p>
+                            <p className="text-gray-600 text-sm mt-1">{item.description}</p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                      2
+                  
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-6">
+                      💡 Pro Tips for Success
+                    </h3>
+                    <div className="space-y-3">
+                      {[
+                        "Be specific about the problem your idea solves",
+                        "Include comprehensive market research and analysis",
+                        "Add supporting documents and prototypes",
+                        "Keep your profile updated and professional",
+                        "Engage actively with the investor community"
+                      ].map((tip, index) => (
+                        <div key={index} className="flex items-center space-x-3">
+                          <span className="text-emerald-500 font-bold">✓</span>
+                          <span className="text-gray-700 text-sm">{tip}</span>
+                        </div>
+                      ))}
                     </div>
-                    <div>
-                      <p className="font-medium text-gray-800">
-                        Get AI-Powered Insights
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Use our AI generator to refine ideas and discover new
-                        opportunities
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                      3
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-800">
-                        Connect with Investors
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Showcase your ideas to potential investors and partners
-                      </p>
+                    
+                    <div className="mt-6 space-y-3">
+                      <Button
+                        onClick={() => window.location.href = "/my-ideas?create=true"}
+                        className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 border-0"
+                      >
+                        <span className="mr-2">🚀</span>
+                        Start Your Journey
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => window.location.href = "/ai-generator"}
+                        className="w-full bg-white/80 border-gray-200 hover:bg-white hover:shadow-md"
+                      >
+                        <span className="mr-2">🤖</span>
+                        Explore AI Tools
+                      </Button>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-3">
-                  💡 Pro Tips for Success:
-                </h4>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-center space-x-2">
-                    <span className="text-green-500">✓</span>
-                    <span>Be specific about the problem your idea solves</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <span className="text-green-500">✓</span>
-                    <span>
-                      Include market research and target audience details
-                    </span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <span className="text-green-500">✓</span>
-                    <span>
-                      Add supporting documents like business plans or prototypes
-                    </span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <span className="text-green-500">✓</span>
-                    <span>
-                      Update your profile to build credibility with investors
-                    </span>
-                  </li>
-                </ul>{" "}
-                <div className="mt-4 space-x-3">
-                  {" "}
-                  <Button
-                    size="sm"
-                    onClick={() =>
-                      (window.location.href = "/my-ideas?create=true")
-                    }
-                  >
-                    Start Now
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => (window.location.href = "/ai-generator")}
-                  >
-                    Try AI Generator
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-export default Dashboard;
+export default DashboardModern;

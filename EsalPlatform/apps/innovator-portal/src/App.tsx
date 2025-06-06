@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Layout, Navbar, Sidebar } from "@esal/ui";
 import { useState, useEffect } from "react";
-import Dashboard from "./pages/Dashboard";
+import DashboardModern from "./pages/Dashboard_fixed";
 import AIGenerator from "./pages/AIGenerator";
 import Metrics from "./pages/Metrics";
 import Login from "./pages/Login";
@@ -93,7 +93,6 @@ function App() {
       </div>
     );
   }
-
   return (
     <Routes>
       {/* Public routes */}
@@ -143,10 +142,10 @@ function App() {
             >
               {" "}
               <Routes>
-                <Route path="/" element={<Dashboard />} />
+                <Route path="/" element={<DashboardModern />} />
                 <Route path="/ai-generator" element={<AIGenerator />} />
-                <Route path="/metrics" element={<Metrics />} />
-                <Route path="/ideas/:ideaId" element={<IdeaDetails />} />
+                <Route path="/metrics" element={<Metrics />} />{" "}
+                <Route path="/ideas/:ideaId" element={<IdeaDetails />} />{" "}
                 <Route path="/my-ideas" element={<MyIdeas />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/settings" element={<Settings />} />

@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 import logging
 import time
 
-from app.routers import auth_supabase as auth, innovator, hub, investor, admin
+from app.routers import auth_supabase as auth, innovator, hub, investor, admin, ideas, users
 from app.config import settings
 
 # Set up logging
@@ -115,8 +115,9 @@ async def root():
             "authentication": "/api/auth",
             "innovator": "/api/v1/innovator",
             "hub": "/api/v1/hub", 
-            "investor": "/api/v1/investor",
-            "admin": "/api/v1/admin"
+            "investor": "/api/v1/investor",            "admin": "/api/v1/admin",
+            "ideas": "/api/v1/ideas",
+            "users": "/api/v1/users"
         }
     }
 
@@ -127,6 +128,8 @@ app.include_router(innovator.router, prefix="/api/v1/innovator", tags=["Innovato
 app.include_router(hub.router, prefix="/api/v1/hub", tags=["Hub"])
 app.include_router(investor.router, prefix="/api/v1/investor", tags=["Investor"])
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])
+app.include_router(ideas.router, prefix="/api/v1/ideas", tags=["Ideas"])
+app.include_router(users.router, prefix="/api/v1/users", tags=["User Management"])
 
 
 # Request logging middleware (optional)

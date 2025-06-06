@@ -107,16 +107,8 @@ const Settings = () => {
           value: settingsData.notifications.push_notifications,
           type: "boolean",
         },
-      ];
-
-      // Mock integration settings (would come from API)
+      ]; // Mock integration settings (would come from API)
       const integrationDefaults: Setting[] = [
-        {
-          key: "stripe_enabled",
-          label: "Stripe Integration",
-          value: true,
-          type: "boolean",
-        },
         {
           key: "aws_s3_enabled",
           label: "AWS S3 Storage",
@@ -437,10 +429,11 @@ const Settings = () => {
             ))}
           </div>
           <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            {" "}
             <div className="p-4 border rounded-lg">
-              <h3 className="font-medium text-gray-900">Payment Processing</h3>
+              <h3 className="font-medium text-gray-900">Email Service</h3>
               <p className="text-sm text-gray-600 mt-1">
-                Stripe integration for payments
+                SMTP integration for notifications
               </p>
               <div className="mt-2">
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">

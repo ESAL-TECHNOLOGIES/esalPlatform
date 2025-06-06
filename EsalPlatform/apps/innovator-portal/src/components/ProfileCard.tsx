@@ -22,7 +22,6 @@ interface UserProfile {
 interface ProfileCardProps {
   profile: UserProfile;
   onEdit?: () => void;
-  onAvatarEdit?: () => void;
   showEditButton?: boolean;
   ideasCount?: number;
   viewsCount?: number;
@@ -32,7 +31,6 @@ interface ProfileCardProps {
 const ProfileCard: React.FC<ProfileCardProps> = ({
   profile,
   onEdit,
-  onAvatarEdit,
   showEditButton = true,
   ideasCount = 0,
   viewsCount = 0,
@@ -69,148 +67,159 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
     };
     return new Date(dateString).toLocaleDateString("en-US", options);
   };
-
   return (
-    <Card className="overflow-hidden">
-      {/* Cover/Background */}
-      <div className="h-32 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 relative">
-        <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+    <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+      {/* Enhanced Cover/Background with Gradient */}
+      <div className="h-32 sm:h-40 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 relative">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-white/10"></div>
         {showEditButton && onEdit && (
           <Button
             onClick={onEdit}
             variant="secondary"
             size="sm"
-            className="absolute top-4 right-4 bg-white bg-opacity-90 hover:bg-opacity-100"
+            className="absolute top-4 right-4 bg-white/90 hover:bg-white backdrop-blur-sm text-gray-700 hover:text-gray-900 border border-white/20 shadow-lg transition-all duration-200"
           >
-            ✏️ Edit
+            <span className="mr-1">✏️</span>
+            <span className="hidden sm:inline">Edit</span>
           </Button>
         )}
       </div>
 
-      <CardContent className="relative px-6 pb-6">
-        {/* Avatar */}
-        <div className="flex items-end -mt-16 mb-4">
-          <div className="relative">
-            <div className="w-24 h-24 rounded-full border-4 border-white bg-white shadow-lg flex items-center justify-center overflow-hidden">
-              {profile.avatar_url ? (
-                <img
-                  src={profile.avatar_url}
-                  alt={profile.full_name || "Profile"}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                  <span className="text-white text-xl font-bold">
-                    {getInitials(profile.full_name || profile.email)}
-                  </span>
-                </div>
-              )}
+      <CardContent className="relative px-4 sm:px-6 pb-4 sm:pb-6">
+        {/* Enhanced Avatar Section */}
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between -mt-16 sm:-mt-16 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-end">
+            <div className="relative mx-auto sm:mx-0 mb-4 sm:mb-0">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 border-white bg-white shadow-xl flex items-center justify-center overflow-hidden">
+                {profile.avatar_url ? (
+                  <img
+                    src={profile.avatar_url}
+                    alt={profile.full_name || "Profile"}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                    <span className="text-white text-lg sm:text-xl font-bold">
+                      {getInitials(profile.full_name || profile.email)}
+                    </span>
+                  </div>
+                )}
+              </div>
+              {/* Enhanced Status indicator */}
+              <div
+                className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-3 border-white shadow-lg ${
+                  profile.is_active && !profile.is_blocked
+                    ? "bg-green-400"
+                    : "bg-gray-400"
+                }`}
+              >
+                <div className="w-full h-full rounded-full bg-current opacity-20"></div>
+              </div>
             </div>
-            {/* Status indicator */}
-            <div
-              className={`absolute bottom-1 right-1 w-6 h-6 rounded-full border-2 border-white ${
-                profile.is_active && !profile.is_blocked
-                  ? "bg-green-400"
-                  : "bg-gray-400"
-              }`}
-            ></div>
-          </div>
 
-          {/* Status badge */}
-          <div className="ml-4 mb-2">
-            <span
-              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor()}`}
-            >
-              {getStatusText()}
-            </span>
+            {/* Status badge - Better positioned for mobile */}
+            <div className="sm:ml-4 sm:mb-2 text-center sm:text-left">
+              <span
+                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border shadow-sm ${getStatusColor()}`}
+              >
+                <span className="w-2 h-2 rounded-full bg-current mr-2 opacity-60"></span>
+                {getStatusText()}
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Profile Info */}
-        <div className="space-y-4">
-          {/* Name and Title */}
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
+        {/* Enhanced Profile Info */}
+        <div className="space-y-4 sm:space-y-6">
+          {/* Name and Title - Better mobile layout */}
+          <div className="text-center sm:text-left">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">
               {profile.full_name || "No name provided"}
             </h2>
-            <p className="text-gray-600 font-medium capitalize">
+            <p className="text-gray-600 font-medium capitalize text-sm sm:text-base">
               {profile.role} Innovator
             </p>
-            <p className="text-gray-500 text-sm">{profile.email}</p>
+            <p className="text-gray-500 text-xs sm:text-sm mt-1">{profile.email}</p>
           </div>
 
-          {/* Bio */}
+          {/* Bio - Better spacing */}
           {profile.bio && (
-            <div>
-              <p className="text-gray-700 leading-relaxed">{profile.bio}</p>
+            <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+              <p className="text-gray-700 leading-relaxed text-sm sm:text-base">{profile.bio}</p>
             </div>
           )}
 
-          {/* Location */}
+          {/* Location - Enhanced design */}
           {profile.location && (
-            <div className="flex items-center text-gray-600">
-              <span className="mr-2">📍</span>
-              <span>{profile.location}</span>
+            <div className="flex items-center justify-center sm:justify-start text-gray-600 bg-blue-50 rounded-lg p-3">
+              <span className="mr-2 text-lg">📍</span>
+              <span className="text-sm sm:text-base font-medium">{profile.location}</span>
             </div>
           )}
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 py-4 border-t border-gray-200">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">
+          {/* Enhanced Stats with Better Mobile Layout */}
+          <div className="grid grid-cols-3 gap-3 sm:gap-4 py-4 border-t border-gray-200">
+            <div className="text-center bg-blue-50 rounded-lg p-3 hover:bg-blue-100 transition-colors">
+              <div className="text-lg sm:text-2xl font-bold text-blue-600 mb-1">
                 {ideasCount}
               </div>
-              <div className="text-xs text-gray-500">Ideas</div>
+              <div className="text-xs text-gray-500 font-medium">Ideas</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
+            <div className="text-center bg-green-50 rounded-lg p-3 hover:bg-green-100 transition-colors">
+              <div className="text-lg sm:text-2xl font-bold text-green-600 mb-1">
                 {viewsCount}
               </div>
-              <div className="text-xs text-gray-500">Total Views</div>
+              <div className="text-xs text-gray-500 font-medium">Views</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">
+            <div className="text-center bg-purple-50 rounded-lg p-3 hover:bg-purple-100 transition-colors">
+              <div className="text-lg sm:text-2xl font-bold text-purple-600 mb-1">
                 {interestsCount}
               </div>
-              <div className="text-xs text-gray-500">Interests</div>
+              <div className="text-xs text-gray-500 font-medium">Interests</div>
             </div>
           </div>
 
-          {/* Expertise Tags */}
+          {/* Enhanced Expertise Tags */}
           {profile.expertise && profile.expertise.length > 0 && (
             <div>
-              <h4 className="text-sm font-medium text-gray-900 mb-2">
+              <h4 className="text-sm font-medium text-gray-900 mb-3 text-center sm:text-left">
                 Areas of Expertise
               </h4>
-              <div className="flex flex-wrap gap-2">
-                {profile.expertise.map((skill, index) => (
+              <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+                {profile.expertise.slice(0, 6).map((skill, index) => (
                   <span
                     key={index}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200"
+                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border border-blue-200 hover:border-blue-300 transition-colors"
                   >
                     {skill}
                   </span>
                 ))}
+                {profile.expertise.length > 6 && (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
+                    +{profile.expertise.length - 6} more
+                  </span>
+                )}
               </div>
             </div>
           )}
 
-          {/* Social Links */}
+          {/* Enhanced Social Links */}
           {(profile.website || profile.linkedin || profile.twitter) && (
             <div>
-              <h4 className="text-sm font-medium text-gray-900 mb-2">
+              <h4 className="text-sm font-medium text-gray-900 mb-3 text-center sm:text-left">
                 Connect
               </h4>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
                 {profile.website && (
                   <a
                     href={profile.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center px-3 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-700 text-sm transition-colors"
+                    className="inline-flex items-center px-3 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-700 text-sm transition-all duration-200 hover:shadow-sm border border-gray-200"
                   >
                     <span className="mr-2">🌐</span>
-                    Website
+                    <span className="hidden sm:inline">Website</span>
                   </a>
                 )}
                 {profile.linkedin && (
@@ -218,10 +227,10 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                     href={profile.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center px-3 py-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm transition-colors"
+                    className="inline-flex items-center px-3 py-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm transition-all duration-200 hover:shadow-sm border border-blue-200"
                   >
                     <span className="mr-2">💼</span>
-                    LinkedIn
+                    <span className="hidden sm:inline">LinkedIn</span>
                   </a>
                 )}
                 {profile.twitter && (
@@ -229,21 +238,27 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                     href={profile.twitter}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center px-3 py-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 text-sm transition-colors"
+                    className="inline-flex items-center px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 text-sm transition-all duration-200 hover:shadow-sm border border-sky-200"
                   >
                     <span className="mr-2">🐦</span>
-                    Twitter
+                    <span className="hidden sm:inline">Twitter</span>
                   </a>
                 )}
               </div>
             </div>
           )}
 
-          {/* Member Since */}
-          <div className="pt-4 border-t border-gray-200">
-            <div className="flex justify-between text-sm text-gray-500">
-              <span>Member since {formatDate(profile.created_at)}</span>
-              <span>Updated {formatDate(profile.updated_at)}</span>
+          {/* Enhanced Member Since Section */}
+          <div className="pt-4 border-t border-gray-200 bg-gray-50 rounded-lg p-3 sm:p-4">
+            <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 text-xs sm:text-sm text-gray-500">
+              <span className="flex items-center">
+                <span className="mr-1">📅</span>
+                Member since {formatDate(profile.created_at)}
+              </span>
+              <span className="flex items-center">
+                <span className="mr-1">🔄</span>
+                Updated {formatDate(profile.updated_at)}
+              </span>
             </div>
           </div>
         </div>

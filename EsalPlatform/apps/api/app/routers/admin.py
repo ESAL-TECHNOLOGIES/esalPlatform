@@ -4,6 +4,7 @@ Admin router - User management
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import Optional, Dict, Any, List
+import logging
 
 from app.database import get_db
 from app.schemas import (
@@ -17,6 +18,7 @@ from app.utils.roles import require_role
 from app.models import User
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.get("/dashboard", response_model=DashboardStats)
@@ -47,18 +49,31 @@ async def get_all_users(
     current_user: UserResponse = Depends(require_role("admin"))
 ):
     """Get all users, optionally filtered by role"""
-    query = db.query(User)
-    
-    if role:
-        query = query.filter(User.role == role)
-    
-    users = query.offset(skip).limit(limit).all()
-    total = query.count()
-    
-    return UsersListResponse(
-        users=users,
-        total=total
-    )
+    try:
+        logger.info(f"Admin user {current_user.email} requesting users list")
+        logger.info(f"Filters: role={role}, skip={skip}, limit={limit}")        
+
+        query = db.query(User)
+        if role:
+            query = query.filter(User.role == role)
+        users = query.offset(skip).limit(limit).all()
+        total = query.count()
+        
+        logger.info(f"Returning {len(users)} users out of {total} total")
+
+        # Let Pydantic handle the conversion using field serializers
+        user_responses = [UserResponse.model_validate(user) for user in users]
+        
+        return UsersListResponse(
+            users=user_responses,
+            total=total
+        )
+    except Exception as e:
+        logger.error(f"Error fetching users: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching users: {str(e)}"
+        )
 
 
 @router.post("/block-user/{user_id}")
@@ -99,7 +114,6 @@ async def get_users_by_role(
 ):
     """Get users by specific role"""
     valid_roles = ["innovator", "hub", "investor", "admin"]
-    
     if role not in valid_roles:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

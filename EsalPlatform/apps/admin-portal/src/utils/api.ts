@@ -173,7 +173,6 @@ export const adminAPI = {
     });
     return handleResponse(response);
   },
-
   // Update user status (active/inactive/blocked)
   updateUserStatus: async (userId: string, statusData: any) => {
     const response = await fetch(
@@ -184,6 +183,35 @@ export const adminAPI = {
         body: JSON.stringify(statusData),
       }
     );
+    return handleResponse(response);
+  },
+
+  // Create new user
+  createUser: async (userData: any) => {
+    const response = await fetch(`${API_BASE_URL}/admin/users`, {
+      method: "POST",
+      headers: createHeaders(),
+      body: JSON.stringify(userData),
+    });
+    return handleResponse(response);
+  },
+
+  // Update existing user
+  updateUser: async (userId: string, userData: any) => {
+    const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
+      method: "PUT",
+      headers: createHeaders(),
+      body: JSON.stringify(userData),
+    });
+    return handleResponse(response);
+  },
+
+  // Delete user (soft delete)
+  deleteUser: async (userId: string) => {
+    const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
+      method: "DELETE",
+      headers: createHeaders(),
+    });
     return handleResponse(response);
   },
 

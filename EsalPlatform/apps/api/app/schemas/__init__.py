@@ -1,9 +1,10 @@
 """
 Pydantic schemas for request/response validation
 """
-from pydantic import BaseModel, EmailStr
-from typing import Optional, List, Dict, Any
+from pydantic import BaseModel, EmailStr, field_validator, field_serializer
+from typing import Optional, List, Dict, Any, Union
 from datetime import datetime
+import uuid
 
 
 # Base schemas
@@ -23,8 +24,21 @@ class UserResponse(UserBase):
     is_blocked: bool
     created_at: str  # Supabase returns datetime as string
     
-    class Config:
-        from_attributes = True
+    @field_serializer('id')
+    def serialize_id(self, value: Any) -> str:
+        """Convert UUID objects to string"""
+        if isinstance(value, uuid.UUID):
+            return str(value)
+        return str(value)
+    
+    @field_serializer('created_at')
+    def serialize_created_at(self, value: Any) -> str:
+        """Convert datetime objects to ISO format string"""
+        if isinstance(value, datetime):
+            return value.isoformat()
+        return str(value)
+    
+    model_config = {"from_attributes": True}
 
 
 class UserLogin(BaseModel):
@@ -99,6 +113,34 @@ class IdeaResponse(BaseModel):
     tags: Optional[List[str]] = []
     visibility: Optional[str] = "private"
     
+    @field_serializer('id')
+    def serialize_id(self, value: Any) -> str:
+        """Convert UUID objects to string"""
+        if isinstance(value, uuid.UUID):
+            return str(value)
+        return str(value)
+    
+    @field_serializer('user_id')
+    def serialize_user_id(self, value: Any) -> str:
+        """Convert UUID objects to string"""
+        if isinstance(value, uuid.UUID):
+            return str(value)
+        return str(value)
+    
+    @field_serializer('created_at')
+    def serialize_created_at(self, value: Any) -> str:
+        """Convert datetime objects to ISO format string"""
+        if isinstance(value, datetime):
+            return value.isoformat()
+        return str(value)
+    
+    @field_serializer('updated_at')
+    def serialize_updated_at(self, value: Any) -> str:
+        """Convert datetime objects to ISO format string"""
+        if isinstance(value, datetime):
+            return value.isoformat()
+        return str(value)
+    
     class Config:
         from_attributes = True
 
@@ -118,7 +160,14 @@ class PitchRequest(BaseModel):
 
 class PitchResponse(BaseModel):
     pitch: str
-    generated_at: datetime
+    generated_at: str
+    
+    @field_serializer('generated_at')
+    def serialize_generated_at(self, value: Any) -> str:
+        """Convert datetime objects to ISO format string"""
+        if isinstance(value, datetime):
+            return value.isoformat()
+        return str(value)
 
 
 # Admin schemas
@@ -251,8 +300,15 @@ class AIInteractionResponse(BaseModel):
     response_text: str
     suggestions: Optional[List[str]] = None
     confidence_score: Optional[float] = None
-    generated_at: datetime
+    generated_at: str
     metadata: Optional[Dict[str, Any]] = None
+    
+    @field_serializer('generated_at')
+    def serialize_generated_at(self, value: Any) -> str:
+        """Convert datetime objects to ISO format string"""
+        if isinstance(value, datetime):
+            return value.isoformat()
+        return str(value)
     
     class Config:
         from_attributes = True
@@ -266,8 +322,15 @@ class AIJudgeResponse(BaseModel):
     market_viability: float
     technical_feasibility: float
     business_potential: float
-    generated_at: datetime
+    generated_at: str
     metadata: Optional[Dict[str, Any]] = None
+    
+    @field_serializer('generated_at')
+    def serialize_generated_at(self, value: Any) -> str:
+        """Convert datetime objects to ISO format string"""
+        if isinstance(value, datetime):
+            return value.isoformat()
+        return str(value)
     
     class Config:
         from_attributes = True
@@ -347,8 +410,15 @@ class SessionInfo(BaseModel):
     browser: str
     ip_address: str
     location: str
-    last_active: datetime
+    last_active: str
     is_current: bool = False
+    
+    @field_serializer('last_active')
+    def serialize_last_active(self, value: Any) -> str:
+        """Convert datetime objects to ISO format string"""
+        if isinstance(value, datetime):
+            return value.isoformat()
+        return str(value)
 
 
 # AI Matching schemas for Investor Portal
@@ -413,7 +483,28 @@ class MatchingHistory(BaseModel):
     investor_id: str
     preferences: InvestorPreferences
     matches_found: int
-    created_at: datetime
+    created_at: str
+    
+    @field_serializer('id')
+    def serialize_id(self, value: Any) -> str:
+        """Convert UUID objects to string"""
+        if isinstance(value, uuid.UUID):
+            return str(value)
+        return str(value)
+    
+    @field_serializer('investor_id')
+    def serialize_investor_id(self, value: Any) -> str:
+        """Convert UUID objects to string"""
+        if isinstance(value, uuid.UUID):
+            return str(value)
+        return str(value)
+    
+    @field_serializer('created_at')
+    def serialize_created_at(self, value: Any) -> str:
+        """Convert datetime objects to ISO format string"""
+        if isinstance(value, datetime):
+            return value.isoformat()
+        return str(value)
     
     class Config:
         from_attributes = True

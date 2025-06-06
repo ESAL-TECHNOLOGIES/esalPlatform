@@ -18,11 +18,25 @@ export interface NavbarProps {
     avatar_url?: string;
   };
   onLogout?: () => void;
+  onMobileMenuToggle?: () => void;
+  isMobileMenuOpen?: boolean;
 }
 
 export interface SidebarProps {
   items: SidebarItem[];
   currentPath: string;
+  user?: {
+    name: string;
+    email: string;
+    role: string;
+    avatar_url?: string;
+  };
+  stats?: {
+    ideas?: number;
+    views?: number;
+  };
+  isMobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
 export interface SidebarItem {
