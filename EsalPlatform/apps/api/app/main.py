@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 import logging
 
 from app.database import create_tables
-from app.routers import auth, innovator, hub, investor, admin, ideas, users
+from app.routers import auth, innovator, hub, investor, admin, ideas, users, contact
 from app.config import settings
 
 # Set up logging
@@ -74,6 +74,7 @@ app.include_router(investor.router, prefix="/api/v1/investor", tags=["Investor"]
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])
 app.include_router(ideas.router, prefix="/api/v1/ideas", tags=["Ideas"])
 app.include_router(users.router, prefix="/api/v1/users", tags=["User Management"])
+app.include_router(contact.router, prefix="/api/v1/contact", tags=["Contact"])
 
 
 @app.options("/{path:path}")

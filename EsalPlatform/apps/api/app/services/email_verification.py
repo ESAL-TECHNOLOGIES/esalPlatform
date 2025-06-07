@@ -210,7 +210,7 @@ class EmailVerificationService:
                         <p>Best regards,<br>The ESAL Platform Team</p>
                     </div>
                     <div class="footer">
-                        <p>&copy; 2024 Esal Ventures. All rights reserved.</p>
+                        <p>&copy; 2025 Esal Ventures. All rights reserved.</p>
                         <p>Building the future of innovation together.</p>
                     </div>
                 </div>
@@ -235,7 +235,7 @@ class EmailVerificationService:
             Best regards,
             The ESAL Platform Team
             
-            © 2024 Esal Ventures. All rights reserved.
+            © 2025 Esal Ventures. All rights reserved.
             """
             
             # Send email

@@ -1,8 +1,31 @@
 import React, { useState } from "react";
 import { Button } from "@esal/ui";
 
+interface ContactFormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  message: string;
+}
+
 const LandingPage: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Contact form state
+  const [contactForm, setContactForm] = useState<ContactFormData>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    role: "",
+    message: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+  const [formErrors, setFormErrors] = useState<Partial<ContactFormData>>({});
 
   const handleJoinAs = (role: string) => {
     // Redirect to appropriate portal's auth/signup flow
@@ -17,13 +40,119 @@ const LandingPage: React.FC = () => {
       window.location.href = url;
     }
   };
-
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
     }
     setMobileMenuOpen(false);
+  };
+
+  // Contact form handlers
+  const validateForm = (): boolean => {
+    const errors: Partial<ContactFormData> = {};
+
+    if (!contactForm.firstName.trim()) {
+      errors.firstName = "First name is required";
+    }
+
+    if (!contactForm.lastName.trim()) {
+      errors.lastName = "Last name is required";
+    }
+
+    if (!contactForm.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(contactForm.email)) {
+      errors.email = "Please enter a valid email address";
+    }
+
+    if (!contactForm.role || contactForm.role === "Select your role") {
+      errors.role = "Please select your role";
+    }
+
+    if (!contactForm.message.trim()) {
+      errors.message = "Message is required";
+    } else if (contactForm.message.trim().length < 10) {
+      errors.message = "Message must be at least 10 characters long";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setContactForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // Clear specific field error when user starts typing
+    if (formErrors[name as keyof ContactFormData]) {
+      setFormErrors((prev) => ({
+        ...prev,
+        [name]: undefined,
+      }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitMessage(null);
+
+    try {
+      const response = await fetch(
+        "http://localhost:8000/api/v1/contact/submit",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(contactForm),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to send message");
+      }
+
+      setSubmitMessage({
+        type: "success",
+        text: "Thank you for your message! We'll get back to you soon.",
+      });
+
+      // Reset form on success
+      setContactForm({
+        firstName: "",
+        lastName: "",
+        email: "",
+        role: "",
+        message: "",
+      });
+      setFormErrors({});
+    } catch (error) {
+      console.error("Contact form submission error:", error);
+      setSubmitMessage({
+        type: "error",
+        text:
+          error instanceof Error
+            ? error.message
+            : "Failed to send message. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50">
@@ -1244,8 +1373,11 @@ const LandingPage: React.FC = () => {
                   <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                     message
                   </span>
-                </h4>
-                <form className="space-y-4 sm:space-y-6">
+                </h4>{" "}
+                <form
+                  onSubmit={handleSubmit}
+                  className="space-y-4 sm:space-y-6"
+                >
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1253,9 +1385,22 @@ const LandingPage: React.FC = () => {
                       </label>
                       <input
                         type="text"
-                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 text-sm sm:text-base"
+                        name="firstName"
+                        value={contactForm.firstName}
+                        onChange={handleInputChange}
+                        className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 text-sm sm:text-base ${
+                          formErrors.firstName
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        }`}
                         placeholder="John"
+                        disabled={isSubmitting}
                       />
+                      {formErrors.firstName && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {formErrors.firstName}
+                        </p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1263,9 +1408,22 @@ const LandingPage: React.FC = () => {
                       </label>
                       <input
                         type="text"
-                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 text-sm sm:text-base"
+                        name="lastName"
+                        value={contactForm.lastName}
+                        onChange={handleInputChange}
+                        className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 text-sm sm:text-base ${
+                          formErrors.lastName
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        }`}
                         placeholder="Doe"
+                        disabled={isSubmitting}
                       />
+                      {formErrors.lastName && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {formErrors.lastName}
+                        </p>
+                      )}
                     </div>
                   </div>
                   <div>
@@ -1274,24 +1432,50 @@ const LandingPage: React.FC = () => {
                     </label>
                     <input
                       type="email"
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-sm sm:text-base"
+                      name="email"
+                      value={contactForm.email}
+                      onChange={handleInputChange}
+                      className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-sm sm:text-base ${
+                        formErrors.email ? "border-red-500" : "border-gray-300"
+                      }`}
                       placeholder="john@example.com"
+                      disabled={isSubmitting}
                     />
+                    {formErrors.email && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {formErrors.email}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Role
                     </label>
                     <select
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 text-sm sm:text-base"
+                      name="role"
+                      value={contactForm.role}
+                      onChange={handleInputChange}
+                      className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 text-sm sm:text-base ${
+                        formErrors.role ? "border-red-500" : "border-gray-300"
+                      }`}
                       aria-label="Select your role"
+                      disabled={isSubmitting}
                     >
-                      <option>Select your role</option>
-                      <option>Innovator/Entrepreneur</option>
-                      <option>Investor</option>
-                      <option>Innovation Hub/Accelerator</option>
-                      <option>Other</option>
+                      <option value="">Select your role</option>
+                      <option value="Innovator/Entrepreneur">
+                        Innovator/Entrepreneur
+                      </option>
+                      <option value="Investor">Investor</option>
+                      <option value="Innovation Hub/Accelerator">
+                        Innovation Hub/Accelerator
+                      </option>
+                      <option value="Other">Other</option>
                     </select>
+                    {formErrors.role && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {formErrors.role}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1299,12 +1483,68 @@ const LandingPage: React.FC = () => {
                     </label>
                     <textarea
                       rows={4}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 text-sm sm:text-base"
+                      name="message"
+                      value={contactForm.message}
+                      onChange={handleInputChange}
+                      className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 text-sm sm:text-base ${
+                        formErrors.message
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      }`}
                       placeholder="Tell us about your needs..."
-                    ></textarea>
+                      disabled={isSubmitting}
+                    />
+                    {formErrors.message && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {formErrors.message}
+                      </p>
+                    )}
                   </div>
-                  <Button className="w-full bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 text-white font-semibold py-3 sm:py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 text-sm sm:text-base">
-                    Send Message
+                  {/* Submit Message Display */}
+                  {submitMessage && (
+                    <div
+                      className={`p-4 rounded-lg text-sm ${
+                        submitMessage.type === "success"
+                          ? "bg-green-50 text-green-700 border border-green-200"
+                          : "bg-red-50 text-red-700 border border-red-200"
+                      }`}
+                    >
+                      {submitMessage.text}
+                    </div>
+                  )}
+
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 text-white font-semibold py-3 sm:py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? (
+                      <span className="flex items-center justify-center">
+                        <svg
+                          className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Sending...
+                      </span>
+                    ) : (
+                      "Send Message"
+                    )}
                   </Button>
                 </form>
               </div>
