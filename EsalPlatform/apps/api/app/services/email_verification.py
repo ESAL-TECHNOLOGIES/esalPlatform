@@ -8,7 +8,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import Optional, Dict, Any
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from supabase import Client
 
 from app.config import settings
@@ -39,15 +39,14 @@ class EmailVerificationService:
     def generate_verification_code(self) -> str:
         """Generate a 6-digit verification code"""
         return str(random.randint(100000, 999999))
-    
     async def create_verification_code(self, user_id: str, email: str) -> str:
         """Create and store a new verification code"""
         try:
             # Generate code
             code = self.generate_verification_code()
             
-            # Calculate expiry time
-            expires_at = datetime.utcnow() + timedelta(minutes=self.expiry_minutes)
+            # Calculate expiry time - using timezone-aware datetime
+            expires_at = datetime.now(timezone.utc) + timedelta(minutes=self.expiry_minutes)
             
             # Clean up any existing unused codes for this user
             await self._cleanup_existing_codes(user_id)
@@ -70,7 +69,6 @@ class EmailVerificationService:
         except Exception as e:
             logger.error(f"Error creating verification code: {e}")
             raise Exception(f"Failed to create verification code: {str(e)}")
-    
     async def verify_code(self, user_id: str, code: str) -> bool:
         """Verify a 6-digit code"""
         try:
@@ -85,16 +83,23 @@ class EmailVerificationService:
             
             verification = result.data[0]
             
-            # Check if code has expired
-            expires_at = datetime.fromisoformat(verification["expires_at"].replace("Z", "+00:00"))
-            if datetime.utcnow().replace(tzinfo=expires_at.tzinfo) > expires_at:
+            # Check if code has expired - fix timezone comparison
+            expires_at_str = verification["expires_at"].replace("Z", "+00:00")
+            expires_at = datetime.fromisoformat(expires_at_str)
+            current_time = datetime.now(timezone.utc)
+            
+            # Ensure both datetimes are timezone-aware
+            if expires_at.tzinfo is None:
+                expires_at = expires_at.replace(tzinfo=timezone.utc)
+            
+            if current_time > expires_at:
                 logger.warning(f"Verification code expired for user {user_id}")
                 return False
             
             # Mark code as used
             self.supabase.table("email_verifications").update({
                 "is_used": True,
-                "verified_at": datetime.utcnow().isoformat()
+                "verified_at": datetime.now(timezone.utc).isoformat()
             }).eq("id", verification["id"]).execute()
             
             logger.info(f"Successfully verified code for user {user_id}")

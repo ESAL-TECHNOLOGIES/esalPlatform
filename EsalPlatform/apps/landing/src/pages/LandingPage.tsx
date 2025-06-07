@@ -187,12 +187,6 @@ const LandingPage: React.FC = () => {
                 How It Works
               </button>
               <button
-                onClick={() => scrollToSection("pricing")}
-                className="relative text-gray-700 hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 hover:bg-clip-text hover:text-transparent transition-all duration-300 font-medium px-3 py-2 rounded-lg hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:shadow-md"
-              >
-                Pricing
-              </button>
-              <button
                 onClick={() => scrollToSection("contact")}
                 className="relative text-gray-700 hover:bg-gradient-to-r hover:from-purple-600 hover:via-pink-600 hover:to-violet-600 hover:bg-clip-text hover:text-transparent transition-all duration-300 font-medium px-3 py-2 rounded-lg hover:bg-gradient-to-r hover:from-purple-50 hover:to-violet-50 hover:shadow-md"
               >
@@ -247,12 +241,6 @@ const LandingPage: React.FC = () => {
                   className="text-gray-700 hover:bg-gradient-to-r hover:from-blue-600 hover:to-indigo-600 hover:bg-clip-text hover:text-transparent transition-all duration-300 font-medium text-left py-3 px-4 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:shadow-md"
                 >
                   How It Works
-                </button>
-                <button
-                  onClick={() => scrollToSection("pricing")}
-                  className="text-gray-700 hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 hover:bg-clip-text hover:text-transparent transition-all duration-300 font-medium text-left py-3 px-4 rounded-lg hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:shadow-md"
-                >
-                  Pricing
                 </button>
                 <button
                   onClick={() => scrollToSection("contact")}
@@ -762,20 +750,13 @@ const LandingPage: React.FC = () => {
                 <p className="text-gray-600 mb-6 text-lg">
                   Join thousands of innovators, investors, and hubs already
                   transforming the future of innovation.
-                </p>
+                </p>{" "}
                 <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
                   <Button
                     onClick={() => scrollToSection("contact")}
                     className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                   >
                     Start Free Trial
-                  </Button>
-                  <Button
-                    onClick={() => scrollToSection("pricing")}
-                    variant="outline"
-                    className="border-2 border-blue-300 text-blue-600 hover:bg-blue-50 font-semibold py-3 px-8 rounded-xl transition-all duration-300"
-                  >
-                    View Pricing
                   </Button>
                 </div>
               </div>
@@ -897,450 +878,6 @@ const LandingPage: React.FC = () => {
                   Data-driven decisions for better outcomes with comprehensive
                   reporting
                 </p>
-              </div>
-            </div>
-          </div>
-        </section>{" "}
-        {/* Pricing Section */}
-        <section
-          id="pricing"
-          className="py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50"
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12 sm:mb-16">
-              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 px-4">
-                Role-Based Pricing
-              </h3>
-              <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto px-4">
-                Tailored plans for every role in the innovation ecosystem.
-                Choose the plan that fits your journey.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
-              {" "}
-              {/* Innovator Plan */}
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-purple-200 p-6 sm:p-8 text-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-100/50 to-blue-100/50"></div>
-                <div className="relative">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
-                    <svg
-                      className="w-6 h-6 sm:w-8 sm:h-8 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                      />
-                    </svg>
-                  </div>
-                  <h4 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
-                    Innovator
-                  </h4>
-                  <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
-                    Perfect for entrepreneurs and startups
-                  </p>
-                  <div className="mb-6 sm:mb-8">
-                    <span className="text-3xl sm:text-4xl font-bold text-gray-900">
-                      $29
-                    </span>
-                    <span className="text-gray-600 text-sm sm:text-base">
-                      /month
-                    </span>
-                  </div>
-                  <ul className="space-y-2 sm:space-y-3 mb-6 sm:mb-8 text-left">
-                    <li className="flex items-center text-sm sm:text-base">
-                      <svg
-                        className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500 mr-2 sm:mr-3 flex-shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      AI-powered investor matching
-                    </li>
-                    <li className="flex items-center text-sm sm:text-base">
-                      <svg
-                        className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500 mr-2 sm:mr-3 flex-shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      Pitch deck builder & templates
-                    </li>
-                    <li className="flex items-center text-sm sm:text-base">
-                      <svg
-                        className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500 mr-2 sm:mr-3 flex-shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      Progress tracking & milestones
-                    </li>
-                    <li className="flex items-center text-sm sm:text-base">
-                      <svg
-                        className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500 mr-2 sm:mr-3 flex-shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      Hub/accelerator connections
-                    </li>
-                    <li className="flex items-center text-sm sm:text-base">
-                      <svg
-                        className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500 mr-2 sm:mr-3 flex-shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      Community support & mentorship
-                    </li>
-                  </ul>
-                  <Button
-                    onClick={() => handleJoinAs("innovator")}
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-sm sm:text-base py-2 sm:py-3"
-                  >
-                    Start as Innovator
-                  </Button>
-                </div>
-              </div>{" "}
-              {/* Investor Plan */}
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-blue-200 p-6 sm:p-8 text-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-100/50 to-indigo-100/50"></div>
-                <div className="relative">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
-                    <svg
-                      className="w-6 h-6 sm:w-8 sm:h-8 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  </div>
-                  <h4 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
-                    Investor
-                  </h4>
-                  <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
-                    For angels, VCs, and investment firms
-                  </p>
-                  <div className="mb-6 sm:mb-8">
-                    <span className="text-3xl sm:text-4xl font-bold text-gray-900">
-                      $99
-                    </span>
-                    <span className="text-gray-600 text-sm sm:text-base">
-                      /month
-                    </span>
-                  </div>
-                  <ul className="space-y-2 sm:space-y-3 mb-6 sm:mb-8 text-left">
-                    <li className="flex items-center text-sm sm:text-base">
-                      <svg
-                        className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 mr-2 sm:mr-3 flex-shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      AI-curated startup deal flow
-                    </li>
-                    <li className="flex items-center text-sm sm:text-base">
-                      <svg
-                        className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 mr-2 sm:mr-3 flex-shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      Advanced due diligence tools
-                    </li>
-                    <li className="flex items-center text-sm sm:text-base">
-                      <svg
-                        className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 mr-2 sm:mr-3 flex-shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      Portfolio management dashboard
-                    </li>
-                    <li className="flex items-center text-sm sm:text-base">
-                      <svg
-                        className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 mr-2 sm:mr-3 flex-shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      Market analytics & insights
-                    </li>
-                    <li className="flex items-center text-sm sm:text-base">
-                      <svg
-                        className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 mr-2 sm:mr-3 flex-shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      Priority access to deals
-                    </li>
-                  </ul>
-                  <Button
-                    onClick={() => handleJoinAs("investor")}
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-sm sm:text-base py-2 sm:py-3"
-                  >
-                    Start as Investor
-                  </Button>
-                </div>
-              </div>{" "}
-              {/* Hub Plan */}
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-indigo-200 p-6 sm:p-8 text-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-100/50 to-purple-100/50"></div>
-                <div className="relative">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
-                    <svg
-                      className="w-6 h-6 sm:w-8 sm:h-8 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                      />
-                    </svg>
-                  </div>
-                  <h4 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                    Hub/Accelerator
-                  </h4>
-                  <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
-                    For innovation hubs and accelerators
-                  </p>
-                  <div className="mb-6 sm:mb-8">
-                    <span className="text-3xl sm:text-4xl font-bold text-gray-900">
-                      $199
-                    </span>
-                    <span className="text-gray-600 text-sm sm:text-base">
-                      /month
-                    </span>
-                  </div>
-                  <ul className="space-y-2 sm:space-y-3 mb-6 sm:mb-8 text-left">
-                    <li className="flex items-center text-sm sm:text-base">
-                      <svg
-                        className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-500 mr-2 sm:mr-3 flex-shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      Multi-cohort management
-                    </li>
-                    <li className="flex items-center text-sm sm:text-base">
-                      <svg
-                        className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-500 mr-2 sm:mr-3 flex-shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      Event & demo day organization
-                    </li>
-                    <li className="flex items-center text-sm sm:text-base">
-                      <svg
-                        className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-500 mr-2 sm:mr-3 flex-shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      Investor network facilitation
-                    </li>
-                    <li className="flex items-center text-sm sm:text-base">
-                      <svg
-                        className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-500 mr-2 sm:mr-3 flex-shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      Success tracking & reporting
-                    </li>
-                    <li className="flex items-center text-sm sm:text-base">
-                      <svg
-                        className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-500 mr-2 sm:mr-3 flex-shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      White-label customization
-                    </li>
-                  </ul>
-                  <Button
-                    onClick={() => handleJoinAs("hub")}
-                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-sm sm:text-base py-2 sm:py-3"
-                  >
-                    Start as Hub
-                  </Button>
-                </div>
-              </div>
-            </div>{" "}
-            {/* Additional Info */}
-            <div className="mt-12 sm:mt-16 text-center">
-              <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg p-6 sm:p-8 max-w-4xl mx-auto border border-blue-200">
-                <h4 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
-                  All Plans Include
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 text-left">
-                  <div className="flex items-start">
-                    <svg
-                      className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 mr-2 sm:mr-3 mt-1 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    <div>
-                      <h5 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">
-                        AI-Powered Matching
-                      </h5>
-                      <p className="text-gray-600 text-xs sm:text-sm">
-                        Smart algorithms for perfect connections
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <svg
-                      className="w-5 h-5 sm:w-6 sm:h-6 text-purple-500 mr-2 sm:mr-3 mt-1 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                      />
-                    </svg>
-                    <div>
-                      <h5 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">
-                        Enterprise Security
-                      </h5>
-                      <p className="text-gray-600 text-xs sm:text-sm">
-                        Bank-level encryption and data protection
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <svg
-                      className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-500 mr-2 sm:mr-3 mt-1 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    <div>
-                      <h5 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">
-                        24/7 Support
-                      </h5>
-                      <p className="text-gray-600 text-xs sm:text-sm">
-                        Round-the-clock assistance when you need it
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-6 sm:mt-8 text-center">
-                  <p className="text-gray-600 text-sm sm:text-base">
-                    Start with a 14-day free trial. No credit card required.
-                    Cancel anytime.
-                  </p>
-                </div>
               </div>
             </div>
           </div>
@@ -1573,11 +1110,11 @@ const LandingPage: React.FC = () => {
                             d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                           />
                         </svg>
-                      </div>
+                      </div>{" "}
                       <div>
                         <h5 className="font-semibold text-gray-900">Email</h5>
                         <p className="text-gray-600">
-                          support@esalplatform.com
+                          esalventuresltd@gmail.com
                         </p>
                       </div>
                     </div>
@@ -1597,10 +1134,10 @@ const LandingPage: React.FC = () => {
                             d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
                           />
                         </svg>
-                      </div>
+                      </div>{" "}
                       <div>
                         <h5 className="font-semibold text-gray-900">Phone</h5>
-                        <p className="text-gray-600">+1 (555) 123-4567</p>
+                        <p className="text-gray-600">+254719156232</p>
                       </div>
                     </div>
 
@@ -1625,14 +1162,10 @@ const LandingPage: React.FC = () => {
                             d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                           />
                         </svg>
-                      </div>
+                      </div>{" "}
                       <div>
                         <h5 className="font-semibold text-gray-900">Office</h5>
-                        <p className="text-gray-600">
-                          123 Innovation Street
-                          <br />
-                          Tech City, TC 12345
-                        </p>
+                        <p className="text-gray-600">Nairobi, Kenya</p>
                       </div>
                     </div>
                   </div>

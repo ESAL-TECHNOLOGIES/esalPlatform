@@ -5,13 +5,14 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import Optional, Dict, Any, List
 import logging
+from datetime import datetime
+import uuid
 
 from app.database import get_db
 from app.schemas import (
-    UsersListResponse, BlockUserRequest, UserResponse, DashboardStats,
-    AnalyticsResponse, SystemHealthResponse, ActivityResponse, 
-    PendingActionsResponse, ContentStats, ModerationQueueResponse,
-    UserStatistics
+    UserResponse, DashboardStats, AnalyticsResponse, SystemHealthResponse, 
+    ActivityResponse, PendingActionsResponse, ContentStats, ModerationQueueResponse,
+    UserStatistics, UsersListResponse, BlockUserRequest
 )
 from app.services.idea_logic import IdeaService
 from app.utils.roles import require_role
@@ -19,6 +20,23 @@ from app.models import User
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+
+# User creation/update schemas
+class UserCreateRequest:
+    def __init__(self, **data):
+        self.email = data.get('email')
+        self.full_name = data.get('full_name', data.get('name'))
+        self.role = data.get('role', 'innovator')
+        self.is_active = data.get('is_active', True)
+        self.is_blocked = data.get('is_blocked', False)
+
+class UserUpdateRequest:
+    def __init__(self, **data):
+        self.email = data.get('email')
+        self.full_name = data.get('full_name', data.get('name'))
+        self.role = data.get('role')
+        self.is_active = data.get('is_active')
+        self.is_blocked = data.get('is_blocked')
 
 
 @router.get("/dashboard", response_model=DashboardStats)
@@ -72,37 +90,29 @@ async def get_all_users(
         logger.error(f"Error fetching users: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error fetching users: {str(e)}"
-        )
+            detail=f"Error fetching users: {str(e)}"        )
 
 
-@router.post("/block-user/{user_id}")
-async def block_user(
-    user_id: str,
-    request: BlockUserRequest,
+@router.get("/users/stats", response_model=UserStatistics)
+async def get_user_statistics(
     db: Session = Depends(get_db),
     current_user: UserResponse = Depends(require_role("admin"))
 ):
-    """Block/unblock a user"""
-    user = db.query(User).filter(User.id == user_id).first()
+    """Get detailed user statistics"""
+    total_users = db.query(User).count()
+    active_users = db.query(User).filter(User.is_active == True, User.is_blocked == False).count()
+    blocked_users = db.query(User).filter(User.is_blocked == True).count()
     
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
-        )
+    role_counts = {}
+    for role in ["innovator", "investor", "hub", "admin"]:
+        role_counts[role] = db.query(User).filter(User.role == role).count()
     
-    # Toggle block status
-    user.is_blocked = not user.is_blocked
-    db.commit()
-    db.refresh(user)
-    
-    action = "blocked" if user.is_blocked else "unblocked"
     return {
-        "message": f"User {action} successfully",
-        "user_id": user_id,
-        "is_blocked": user.is_blocked,
-        "reason": request.reason
+        "total": total_users,
+        "active": active_users,
+        "blocked": blocked_users,
+        "pending": total_users - active_users - blocked_users,
+        "by_role": role_counts
     }
 
 
@@ -127,6 +137,243 @@ async def get_users_by_role(
         "users": users,
         "count": len(users)
     }
+
+
+@router.get("/users/{user_id}", response_model=UserResponse)
+async def get_user_by_id(
+    user_id: str,
+    db: Session = Depends(get_db),
+    current_user: UserResponse = Depends(require_role("admin"))
+):
+    """Get a specific user by ID"""
+    try:
+        # Convert string ID to UUID for database query
+        user_uuid = uuid.UUID(user_id) if isinstance(user_id, str) else user_id
+        user = db.query(User).filter(User.id == user_uuid).first()
+        
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        return UserResponse.model_validate(user)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid user ID format"
+        )
+
+
+@router.post("/users", response_model=UserResponse)
+async def create_user(
+    user_data: Dict[str, Any],
+    db: Session = Depends(get_db),
+    current_user: UserResponse = Depends(require_role("admin"))
+):
+    """Create a new user (Note: This creates a local user record only. For full user creation with authentication, use Supabase Auth)"""
+    try:
+        logger.info(f"Admin user {current_user.email} creating new user")
+        
+        # Check if user with email already exists
+        existing_user = db.query(User).filter(User.email == user_data.get('email')).first()
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User with this email already exists"
+            )
+        
+        # Validate required fields
+        if not user_data.get('email'):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email is required"
+            )
+        
+        # Create new user (local record only - authentication handled by Supabase)
+        new_user = User(
+            id=uuid.uuid4(),
+            email=user_data['email'],
+            full_name=user_data.get('full_name', user_data.get('name', '')),
+            role=user_data.get('role', 'innovator'),
+            is_active=user_data.get('is_active', True),
+            is_blocked=user_data.get('is_blocked', False),
+            created_at=datetime.utcnow()
+        )
+        
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        
+        logger.info(f"User created successfully: {new_user.email}")
+        return UserResponse.model_validate(new_user)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creating user: {e}")
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error creating user: {str(e)}"
+        )
+
+
+@router.put("/users/{user_id}", response_model=UserResponse)
+async def update_user(
+    user_id: str,
+    user_data: Dict[str, Any],
+    db: Session = Depends(get_db),
+    current_user: UserResponse = Depends(require_role("admin"))
+):
+    """Update an existing user"""
+    try:
+        logger.info(f"Admin user {current_user.email} updating user {user_id}")
+        
+        # Convert string ID to UUID for database query
+        user_uuid = uuid.UUID(user_id) if isinstance(user_id, str) else user_id
+        user = db.query(User).filter(User.id == user_uuid).first()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        # Check if email is being changed and if it already exists
+        new_email = user_data.get('email')
+        if new_email and new_email != user.email:
+            existing_user = db.query(User).filter(User.email == new_email).first()
+            if existing_user:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="User with this email already exists"
+                )
+        
+        # Update user fields
+        if 'email' in user_data:
+            user.email = user_data['email']
+        if 'full_name' in user_data or 'name' in user_data:
+            user.full_name = user_data.get('full_name', user_data.get('name'))
+        if 'role' in user_data:
+            user.role = user_data['role']
+        if 'is_active' in user_data:
+            user.is_active = user_data['is_active']
+        if 'is_blocked' in user_data:
+            user.is_blocked = user_data['is_blocked']
+        
+        db.commit()
+        db.refresh(user)
+        
+        logger.info(f"User updated successfully: {user.email}")
+        return UserResponse.model_validate(user)
+        
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid user ID format"
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating user: {e}")
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error updating user: {str(e)}"
+        )
+
+
+@router.delete("/users/{user_id}")
+async def delete_user(
+    user_id: str,
+    db: Session = Depends(get_db),
+    current_user: UserResponse = Depends(require_role("admin"))
+):
+    """Delete a user (soft delete by setting inactive and blocked)"""
+    try:
+        logger.info(f"Admin user {current_user.email} deleting user {user_id}")
+        
+        # Convert string ID to UUID for database query
+        user_uuid = uuid.UUID(user_id) if isinstance(user_id, str) else user_id
+        user = db.query(User).filter(User.id == user_uuid).first()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        # Prevent self-deletion (compare UUID objects properly)
+        current_user_uuid = uuid.UUID(current_user.id) if isinstance(current_user.id, str) else current_user.id
+        if user.id == current_user_uuid:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Cannot delete your own account"
+            )
+        
+        # Soft delete: set inactive and blocked
+        user.is_active = False
+        user.is_blocked = True
+        
+        db.commit()
+        
+        logger.info(f"User deleted successfully: {user.email}")
+        return {
+            "message": "User deleted successfully",
+            "user_id": user_id,
+            "email": user.email
+        }
+        
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid user ID format"
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting user: {e}")
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error deleting user: {str(e)}"
+        )
+
+
+@router.post("/block-user/{user_id}")
+async def block_user(
+    user_id: str,
+    request: BlockUserRequest,
+    db: Session = Depends(get_db),
+    current_user: UserResponse = Depends(require_role("admin"))
+):
+    """Block/unblock a user"""
+    try:
+        # Convert string ID to UUID for database query
+        user_uuid = uuid.UUID(user_id) if isinstance(user_id, str) else user_id
+        user = db.query(User).filter(User.id == user_uuid).first()
+        
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        # Toggle block status
+        user.is_blocked = not user.is_blocked
+        db.commit()
+        db.refresh(user)
+        
+        action = "blocked" if user.is_blocked else "unblocked"
+        return {
+            "message": f"User {action} successfully",
+            "user_id": user_id,
+            "is_blocked": user.is_blocked,
+            "reason": request.reason
+        }
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,        detail="Invalid user ID format"
+        )
 
 # Analytics endpoints
 @router.get("/analytics", response_model=AnalyticsResponse)
@@ -356,48 +603,38 @@ async def update_user_status(
     current_user: UserResponse = Depends(require_role("admin"))
 ):
     """Update user status (active/inactive/blocked)"""
-    user = db.query(User).filter(User.id == user_id).first()
-    
-    if not user:
+    try:
+        # Debug logging to see exact user_id format
+        logger.info(f"Received user_id: '{user_id}' (type: {type(user_id)}, length: {len(user_id)})")
+        logger.info(f"Status data: {status_data}")
+        
+        # Convert string ID to UUID for database query
+        user_uuid = uuid.UUID(user_id) if isinstance(user_id, str) else user_id
+        user = db.query(User).filter(User.id == user_uuid).first()
+        
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+          # Update user status based on provided data
+        if "is_active" in status_data:
+            user.is_active = status_data["is_active"]
+        if "is_blocked" in status_data:
+            user.is_blocked = status_data["is_blocked"]
+        
+        db.commit()
+        db.refresh(user)
+        
+        return {
+            "message": "User status updated successfully",
+            "user_id": user_id,
+            "is_active": user.is_active,
+            "is_blocked": user.is_blocked
+        }
+    except ValueError as ve:        
+        logger.error(f"UUID conversion failed for user_id: '{user_id}' - Error: {str(ve)}")
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid user ID format: '{user_id}' - {str(ve)}"
         )
-    
-    # Update user status based on provided data
-    if "is_active" in status_data:
-        user.is_active = status_data["is_active"]
-    if "is_blocked" in status_data:
-        user.is_blocked = status_data["is_blocked"]
-    
-    db.commit()
-    db.refresh(user)
-    
-    return {
-        "message": "User status updated successfully",
-        "user_id": user_id,
-        "is_active": user.is_active,
-        "is_blocked": user.is_blocked
-    }
-
-@router.get("/users/stats", response_model=UserStatistics)
-async def get_user_statistics(
-    db: Session = Depends(get_db),
-    current_user: UserResponse = Depends(require_role("admin"))
-):
-    """Get detailed user statistics"""
-    total_users = db.query(User).count()
-    active_users = db.query(User).filter(User.is_active == True, User.is_blocked == False).count()
-    blocked_users = db.query(User).filter(User.is_blocked == True).count()
-    
-    role_counts = {}
-    for role in ["innovator", "investor", "hub", "admin"]:
-        role_counts[role] = db.query(User).filter(User.role == role).count()
-    
-    return {
-        "total": total_users,
-        "active": active_users,
-        "blocked": blocked_users,
-        "pending": total_users - active_users - blocked_users,
-        "by_role": role_counts
-    }

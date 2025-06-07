@@ -5,7 +5,7 @@ from supabase import create_client, Client
 from fastapi import HTTPException, status
 from typing import Dict, Any, Optional
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.config import settings
 from app.schemas import UserCreate, UserLogin, TokenResponse, UserResponse
@@ -139,13 +139,12 @@ class SupabaseAuthService:
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail="User not found"
                 )
-            
-            # Update user metadata to mark as verified and active
+              # Update user metadata to mark as verified and active
             updated_metadata = user_response.user.user_metadata or {}
             updated_metadata.update({
                 "is_active": True,
                 "email_verified": True,
-                "verified_at": datetime.utcnow().isoformat()
+                "verified_at": datetime.now(timezone.utc).isoformat()
             })
             
             # Update user in Supabase

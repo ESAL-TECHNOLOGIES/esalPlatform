@@ -50,6 +50,13 @@ const Users = () => {
     useToast();
   const [selectedTab, setSelectedTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [advancedFilters, setAdvancedFilters] = useState({
+    status: "all", // all, active, inactive, blocked, pending
+    dateRange: "all", // all, today, week, month, year
+    verificationStatus: "all", // all, verified, unverified
+    activityLevel: "all", // all, high, medium, low
+  });
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [showUserModal, setShowUserModal] = useState(false);
@@ -72,9 +79,36 @@ const Users = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [loadingError, setLoadingError] = useState<string | null>(null);
   const [bulkAction, setBulkAction] = useState<string>("");
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  // Auto-refresh functionality
+  useEffect(() => {
+    if (!autoRefresh) return;
+
+    const interval = setInterval(() => {
+      fetchUsers();
+      setLastRefresh(new Date());
+    }, 30000); // Refresh every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [autoRefresh]);
+
+  // Real-time status updates
+  const refreshUserData = async () => {
+    try {
+      info("Refreshing user data...", 1000);
+      await fetchUsers();
+      setLastRefresh(new Date());
+      success("User data refreshed!");
+    } catch (err) {
+      error("Failed to refresh user data");
+    }
+  };
 
   // Transform backend data to match frontend expectations
   const transformUserData = (backendUser: any): User => {
@@ -98,8 +132,8 @@ const Users = () => {
       setIsLoading(true);
       setLoadingError(null);
 
-      // Fetch users from backend
-      const usersData = await adminAPI.getUsers();
+      // Fetch all users from backend (set a high limit to get all users)
+      const usersData = await adminAPI.getUsers(undefined, 0, 10000);
 
       // Transform backend data to match frontend interface
       const transformedUsers = usersData.users.map(transformUserData);
@@ -135,13 +169,50 @@ const Users = () => {
       setIsLoading(false);
     }
   };
-  const handleUserAction = async (userId: string, action: string) => {
+  const handleCreateUser = async (userData: Partial<User>) => {
     try {
-      await adminAPI.updateUserStatus(userId, { action });
-      await fetchUsers(); // Refresh data
+      info("Creating new user...", 1000);
+      await adminAPI.createUser(userData);
+      success("User created successfully!");
+      await fetchUsers();
     } catch (err) {
-      console.error("User action error:", err);
-      // Could add toast notification here
+      console.error("Create user error:", err);
+      error("Failed to create user. Please try again.");
+      throw err;
+    }
+  };
+
+  const handleUpdateUser = async (userData: Partial<User>) => {
+    try {
+      if (!userData.id) {
+        throw new Error("User ID is required for update");
+      }
+      info(`Updating user ${userData.name}...`, 1000);
+      await adminAPI.updateUser(userData.id, userData);
+      success("User updated successfully!");
+      await fetchUsers();
+    } catch (err) {
+      console.error("Update user error:", err);
+      error("Failed to update user. Please try again.");
+      throw err;
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, userName: string) => {
+    const confirmed = window.confirm(
+      `Delete User\n\nAre you sure you want to delete ${userName}? This action cannot be undone.\n\nClick OK to delete or Cancel to abort.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      info(`Deleting user ${userName}...`, 1000);
+      await adminAPI.deleteUser(userId);
+      success(`User ${userName} has been deleted successfully!`);
+      await fetchUsers();
+    } catch (err) {
+      console.error("Delete user error:", err);
+      error("Failed to delete user. Please try again.");
     }
   };
   // Enhanced status action handler with confirmation messages and toast notifications
@@ -261,12 +332,20 @@ const Users = () => {
         : [...prev, userId]
     );
   };
-
   const handleSelectAll = () => {
-    if (selectedUsers.length === filteredUsers.length) {
-      setSelectedUsers([]);
+    const currentPageUsers = paginatedUsers.map((user) => user.id);
+    const allCurrentPageSelected = currentPageUsers.every((id) =>
+      selectedUsers.includes(id)
+    );
+
+    if (allCurrentPageSelected) {
+      // Deselect all users on current page
+      setSelectedUsers((prev) =>
+        prev.filter((id) => !currentPageUsers.includes(id))
+      );
     } else {
-      setSelectedUsers(filteredUsers.map((user) => user.id));
+      // Select all users on current page (add to existing selection)
+      setSelectedUsers((prev) => [...new Set([...prev, ...currentPageUsers])]);
     }
   };
 
@@ -274,10 +353,43 @@ const Users = () => {
     setSelectedUser(user);
     setShowUserModal(true);
   };
-
   const editUser = (user: User) => {
     setSelectedUser(user);
     setShowCreateUserModal(true);
+  };
+
+  const clearAllFilters = () => {
+    setSelectedTab("all");
+    setSearchQuery("");
+    setAdvancedFilters({
+      status: "all",
+      dateRange: "all",
+      verificationStatus: "all",
+      activityLevel: "all",
+    });
+    setCurrentPage(1);
+  };
+
+  const updateAdvancedFilter = (
+    key: keyof typeof advancedFilters,
+    value: string
+  ) => {
+    setAdvancedFilters((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+    setCurrentPage(1); // Reset to first page when filtering
+  };
+
+  const getActiveFiltersCount = () => {
+    let count = 0;
+    if (selectedTab !== "all") count++;
+    if (searchQuery) count++;
+    if (advancedFilters.status !== "all") count++;
+    if (advancedFilters.dateRange !== "all") count++;
+    if (advancedFilters.verificationStatus !== "all") count++;
+    if (advancedFilters.activityLevel !== "all") count++;
+    return count;
   };
   const exportUsers = async () => {
     try {
@@ -310,14 +422,13 @@ const Users = () => {
   };
   const handleSaveUser = async (userData: Partial<User>) => {
     try {
-      if (userData.id) {
+      if (selectedUser && selectedUser.id) {
         // Update existing user
-        await adminAPI.updateUser(userData.id, userData);
+        await handleUpdateUser(userData);
       } else {
         // Create new user
-        await adminAPI.createUser(userData);
+        await handleCreateUser(userData);
       }
-      await fetchUsers();
       setShowCreateUserModal(false);
       setSelectedUser(null);
     } catch (err) {
@@ -326,15 +437,91 @@ const Users = () => {
     }
   };
   const filteredUsers = users.filter((user) => {
+    // Tab-based filtering (role and basic status)
     const matchesTab =
       selectedTab === "all" ||
       user.role === selectedTab ||
       user.status === selectedTab;
+
+    // Text search across multiple fields
+    const searchLower = searchQuery.toLowerCase();
     const matchesSearch =
-      (user.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (user.company || "").toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesTab && matchesSearch;
+      searchQuery === "" ||
+      (user.name || "").toLowerCase().includes(searchLower) ||
+      user.email.toLowerCase().includes(searchLower) ||
+      (user.full_name || "").toLowerCase().includes(searchLower) ||
+      (user.company || "").toLowerCase().includes(searchLower) ||
+      (user.profile?.bio || "").toLowerCase().includes(searchLower) ||
+      (user.profile?.location || "").toLowerCase().includes(searchLower) ||
+      user.role.toLowerCase().includes(searchLower);
+
+    // Advanced status filtering
+    const matchesStatus =
+      advancedFilters.status === "all" ||
+      (advancedFilters.status === "active" &&
+        user.is_active &&
+        !user.is_blocked) ||
+      (advancedFilters.status === "inactive" && !user.is_active) ||
+      (advancedFilters.status === "blocked" && user.is_blocked) ||
+      (advancedFilters.status === "pending" &&
+        !user.is_active &&
+        !user.is_blocked);
+
+    // Date range filtering
+    const matchesDateRange = (() => {
+      if (advancedFilters.dateRange === "all") return true;
+
+      const userDate = new Date(user.created_at);
+      const now = new Date();
+
+      switch (advancedFilters.dateRange) {
+        case "today":
+          return userDate.toDateString() === now.toDateString();
+        case "week":
+          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          return userDate >= weekAgo;
+        case "month":
+          const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          return userDate >= monthAgo;
+        case "year":
+          const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+          return userDate >= yearAgo;
+        default:
+          return true;
+      }
+    })();
+
+    // Verification status filtering
+    const matchesVerification =
+      advancedFilters.verificationStatus === "all" ||
+      (advancedFilters.verificationStatus === "verified" && user.verified) ||
+      (advancedFilters.verificationStatus === "unverified" && !user.verified);
+
+    // Activity level filtering (based on activity score)
+    const matchesActivity = (() => {
+      if (advancedFilters.activityLevel === "all") return true;
+
+      const score = user.activityScore || 0;
+      switch (advancedFilters.activityLevel) {
+        case "high":
+          return score >= 70;
+        case "medium":
+          return score >= 30 && score < 70;
+        case "low":
+          return score < 30;
+        default:
+          return true;
+      }
+    })();
+
+    return (
+      matchesTab &&
+      matchesSearch &&
+      matchesStatus &&
+      matchesDateRange &&
+      matchesVerification &&
+      matchesActivity
+    );
   });
 
   // Sort users
@@ -394,17 +581,44 @@ const Users = () => {
 
   return (
     <div className="space-y-6">
+      {" "}
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-          <p className="text-gray-600">Manage platform users and permissions</p>
-        </div>{" "}
+          <h1 className="text-2xl font-bold text-gray-900">User Management</h1>{" "}
+          <div className="flex items-center space-x-4 mt-1">
+            <p className="text-gray-600">
+              Manage platform users and permissions ({users.length} users
+              loaded)
+            </p>
+            <div className="flex items-center space-x-2 text-sm text-gray-500">
+              <span>Last updated: {lastRefresh.toLocaleTimeString()}</span>
+              <button
+                onClick={refreshUserData}
+                className="text-blue-600 hover:text-blue-700 font-medium"
+                disabled={isLoading}
+              >
+                🔄 Refresh
+              </button>
+              <label className="flex items-center space-x-1">
+                <input
+                  type="checkbox"
+                  checked={autoRefresh}
+                  onChange={(e) => setAutoRefresh(e.target.checked)}
+                  className="h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <span className="text-xs">Auto-refresh</span>
+              </label>
+            </div>
+          </div>
+        </div>
         <div className="flex space-x-3">
           <Button variant="outline" onClick={exportUsers}>
-            Export Users
+            📥 Export Users
           </Button>
-          <Button onClick={() => setShowCreateUserModal(true)}>Add User</Button>
+          <Button onClick={() => setShowCreateUserModal(true)}>
+            ➕ Add User
+          </Button>
         </div>
       </div>
       {/* User Stats */}
@@ -477,19 +691,130 @@ const Users = () => {
                 )
               )}
             </div>
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search users..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span className="text-gray-400">🔍</span>
+            <div className="flex items-center space-x-3">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search users..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span className="text-gray-400">🔍</span>
+                </div>
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                className={`${showAdvancedFilters ? "bg-blue-50 text-blue-700" : ""}`}
+              >
+                🔧 Filters{" "}
+                {getActiveFiltersCount() > 0 && `(${getActiveFiltersCount()})`}
+              </Button>
+              {getActiveFiltersCount() > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearAllFilters}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  Clear All
+                </Button>
+              )}
             </div>
           </div>
+
+          {/* Advanced Filters Panel */}
+          {showAdvancedFilters && (
+            <div className="border-t pt-4 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Status
+                  </label>{" "}
+                  <select
+                    value={advancedFilters.status}
+                    onChange={(e) =>
+                      updateAdvancedFilter("status", e.target.value)
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    aria-label="Filter by user status"
+                  >
+                    <option value="all">All Statuses</option>
+                    <option value="active">Active Only</option>
+                    <option value="inactive">Inactive Only</option>
+                    <option value="blocked">Blocked Only</option>
+                    <option value="pending">Pending Only</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Join Date
+                  </label>{" "}
+                  <select
+                    value={advancedFilters.dateRange}
+                    onChange={(e) =>
+                      updateAdvancedFilter("dateRange", e.target.value)
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    aria-label="Filter by join date range"
+                  >
+                    <option value="all">All Time</option>
+                    <option value="today">Today</option>
+                    <option value="week">Last Week</option>
+                    <option value="month">Last Month</option>
+                    <option value="year">Last Year</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Verification
+                  </label>{" "}
+                  <select
+                    value={advancedFilters.verificationStatus}
+                    onChange={(e) =>
+                      updateAdvancedFilter("verificationStatus", e.target.value)
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    aria-label="Filter by verification status"
+                  >
+                    <option value="all">All Users</option>
+                    <option value="verified">Verified Only</option>
+                    <option value="unverified">Unverified Only</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Activity Level
+                  </label>{" "}
+                  <select
+                    value={advancedFilters.activityLevel}
+                    onChange={(e) =>
+                      updateAdvancedFilter("activityLevel", e.target.value)
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    aria-label="Filter by activity level"
+                  >
+                    <option value="all">All Levels</option>
+                    <option value="high">High Activity (70%+)</option>
+                    <option value="medium">Medium Activity (30-70%)</option>
+                    <option value="low">Low Activity (&lt;30%)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="mt-4 text-sm text-gray-500">
+                Showing {filteredUsers.length} of {users.length} users
+                {getActiveFiltersCount() > 0 &&
+                  ` with ${getActiveFiltersCount()} filter${getActiveFiltersCount() !== 1 ? "s" : ""} applied`}
+              </div>
+            </div>
+          )}
 
           {/* Bulk Actions Bar */}
           {selectedUsers.length > 0 && (
@@ -525,17 +850,19 @@ const Users = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
+                {" "}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {" "}
                   <input
                     type="checkbox"
                     checked={
-                      selectedUsers.length === paginatedUsers.length &&
-                      paginatedUsers.length > 0
+                      paginatedUsers.length > 0 &&
+                      paginatedUsers.every((user) =>
+                        selectedUsers.includes(user.id)
+                      )
                     }
                     onChange={handleSelectAll}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    aria-label="Select all users"
+                    aria-label="Select all users on this page"
                   />
                 </th>
                 <th
@@ -624,8 +951,8 @@ const Users = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50">
+                  {" "}
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {" "}
                     <input
                       type="checkbox"
                       checked={selectedUsers.includes(user.id)}
@@ -677,10 +1004,10 @@ const Users = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {user.company}
-                  </td>
+                  </td>{" "}
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {user.joinDate}
-                  </td>{" "}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-1 bg-gray-200 rounded-full h-2 mr-2">
@@ -698,11 +1025,12 @@ const Users = () => {
                       </div>
                       <span className="text-sm text-gray-900">
                         {user.activityScore}%
-                      </span>
+                      </span>{" "}
                     </div>
-                  </td>{" "}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
+                      {" "}
                       <Button size="sm" onClick={() => viewUserDetails(user)}>
                         👁️ View
                       </Button>
@@ -713,7 +1041,16 @@ const Users = () => {
                       >
                         ✏️ Edit
                       </Button>
-
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 border-red-300 hover:bg-red-50"
+                        onClick={() =>
+                          handleDeleteUser(user.id, user.name || user.email)
+                        }
+                      >
+                        🗑️ Delete
+                      </Button>
                       {/* Status-based Action Buttons */}
                       {user.status === "pending" && (
                         <>
@@ -733,7 +1070,6 @@ const Users = () => {
                           </Button>
                         </>
                       )}
-
                       {user.status === "active" && (
                         <>
                           <Button
@@ -754,7 +1090,6 @@ const Users = () => {
                           </Button>
                         </>
                       )}
-
                       {user.status === "blocked" && (
                         <Button
                           size="sm"
@@ -845,8 +1180,8 @@ const Users = () => {
         onBlock={async (userId) => {
           const user = users.find((u) => u.id === userId);
           if (user) {
-            await handleUserAction(
-              userId,
+            await handleStatusAction(
+              user,
               user.is_blocked ? "unblock" : "block"
             );
           }
@@ -854,7 +1189,10 @@ const Users = () => {
           setSelectedUser(null);
         }}
         onActivate={async (userId) => {
-          await handleUserAction(userId, "activate");
+          const user = users.find((u) => u.id === userId);
+          if (user) {
+            await handleStatusAction(user, "activate");
+          }
           setShowUserModal(false);
           setSelectedUser(null);
         }}

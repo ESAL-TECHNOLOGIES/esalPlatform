@@ -24,19 +24,21 @@ class UserResponse(UserBase):
     is_blocked: bool
     created_at: str  # Supabase returns datetime as string
     
-    @field_serializer('id')
-    def serialize_id(self, value: Any) -> str:
-        """Convert UUID objects to string"""
-        if isinstance(value, uuid.UUID):
-            return str(value)
-        return str(value)
+    @field_validator('id', mode='before')
+    @classmethod
+    def validate_id(cls, v: Any) -> str:
+        """Convert UUID objects to string during validation"""
+        if isinstance(v, uuid.UUID):
+            return str(v)
+        return str(v)
     
-    @field_serializer('created_at')
-    def serialize_created_at(self, value: Any) -> str:
-        """Convert datetime objects to ISO format string"""
-        if isinstance(value, datetime):
-            return value.isoformat()
-        return str(value)
+    @field_validator('created_at', mode='before')
+    @classmethod 
+    def validate_created_at(cls, v: Any) -> str:
+        """Convert datetime objects to ISO format string during validation"""
+        if isinstance(v, datetime):
+            return v.isoformat()
+        return str(v)
     
     model_config = {"from_attributes": True}
 
