@@ -82,10 +82,26 @@
   * {
     border-color: hsl(var(--border));
   }
-  
-  body {
+    body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
     font-family: var(--font-geist-sans);
   }
+}
+
+/* Dynamic Progress Bar Styles */
+.progress-indicator {
+  width: var(--indicator-size, 1rem);
+  height: var(--indicator-size, 1rem);
+  background-color: var(--indicator-color, #6b7280);
+  border-radius: 50%;
+}
+
+.progress-bar {
+  height: var(--bar-height, 0.75rem);
+  border-radius: 9999px;
+  transition: all 1000ms ease-out;
+  width: var(--progress-width, 0%);
+  background-color: var(--progress-color, #6b7280);
+  box-shadow: var(--progress-shadow, 0 2px 4px rgba(107, 114, 128, 0.2));
 }

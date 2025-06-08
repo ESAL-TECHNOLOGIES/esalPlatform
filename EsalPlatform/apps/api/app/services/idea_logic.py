@@ -79,3 +79,13 @@ class IdeaService:
         """Get ideas by status"""
         ideas = self.db.query(Idea).filter(Idea.status == status).all()
         return [IdeaResponse.model_validate(idea) for idea in ideas]
+    
+    def get_recent_ideas(self, limit: int = 10) -> List[IdeaResponse]:
+        """Get most recently created ideas"""
+        ideas = self.db.query(Idea).order_by(Idea.created_at.desc()).limit(limit).all()
+        return [IdeaResponse.model_validate(idea) for idea in ideas]
+    
+    def get_all_ideas(self) -> List[IdeaResponse]:
+        """Get all ideas for admin purposes"""
+        ideas = self.db.query(Idea).all()
+        return [IdeaResponse.model_validate(idea) for idea in ideas]

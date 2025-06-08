@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Card, CardHeader, CardTitle, CardContent } from "@esal/ui";
+import { useAuth } from "../contexts/AuthContext";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -18,55 +20,19 @@ const Login: React.FC = () => {
       [name]: value,
     }));
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
     try {
-      // API call to backend using JSON endpoint
-      const response = await fetch(
-        "http://localhost:8000/api/v1/auth/login-json",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-          }),
-        }
-      );
+      // Use AuthContext login method
+      await login(formData.email, formData.password);
 
-      if (response.ok) {
-        const data = await response.json();
-
-        // Verify user has admin role
-        if (data.user && data.user.role !== "admin") {
-          setError("Access denied. Admin privileges required.");
-          return;
-        }
-
-        // Store token in localStorage
-        localStorage.setItem("access_token", data.access_token);
-        if (data.refresh_token) {
-          localStorage.setItem("refresh_token", data.refresh_token);
-        }
-
-        // Store user info for admin context
-        localStorage.setItem("admin_user", JSON.stringify(data.user));
-
-        // Redirect to admin dashboard
-        navigate("/");
-      } else {
-        const errorData = await response.json();
-        const errorMessage = errorData.detail || "Login failed";
-        setError(errorMessage);
-      }
-    } catch (err) {
-      setError("Network error. Please try again.");
+      // Redirect to admin dashboard
+      navigate("/");
+    } catch (err: any) {
+      setError(err.message || "Login failed");
       console.error("Login error:", err);
     } finally {
       setIsLoading(false);

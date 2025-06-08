@@ -37,6 +37,7 @@
   "dependencies": {
     "@esal/ui": "file:",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^2.5.4"
+    "tailwind-merge": "^2.5.4",
+    "lucide-react": "^0.263.1"
   }
 }

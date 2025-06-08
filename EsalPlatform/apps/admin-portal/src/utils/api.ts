@@ -423,30 +423,53 @@ export const contentAPI = {
 export const settingsAPI = {
   // System settings endpoints
   getSystemSettings: async () => {
-    return {
-      general: {
-        platform_name: "ESAL Platform",
-        maintenance_mode: false,
-        registration_enabled: true,
-        max_file_size: "10MB",
-      },
-      security: {
-        session_timeout: 30,
-        password_requirements: "Strong",
-        two_factor_enabled: true,
-        ip_whitelist_enabled: false,
-      },
-      notifications: {
-        email_notifications: true,
-        sms_notifications: false,
-        push_notifications: true,
-      },
-    };
+    const response = await fetch(`${API_BASE_URL}/admin/settings/system`, {
+      method: "GET",
+      headers: createHeaders(),
+    });
+    return handleResponse(response);
   },
 
   updateSystemSettings: async (settings: any) => {
-    // This would update system settings
-    return { success: true, message: "Settings updated successfully" };
+    const response = await fetch(`${API_BASE_URL}/admin/settings/system`, {
+      method: "PUT",
+      headers: createHeaders(),
+      body: JSON.stringify(settings),
+    });
+    return handleResponse(response);
+  },
+
+  // Integration settings endpoints
+  getIntegrationSettings: async () => {
+    const response = await fetch(
+      `${API_BASE_URL}/admin/settings/integrations`,
+      {
+        method: "GET",
+        headers: createHeaders(),
+      }
+    );
+    return handleResponse(response);
+  },
+
+  updateIntegrationSettings: async (settings: any) => {
+    const response = await fetch(
+      `${API_BASE_URL}/admin/settings/integrations`,
+      {
+        method: "PUT",
+        headers: createHeaders(),
+        body: JSON.stringify(settings),
+      }
+    );
+    return handleResponse(response);
+  },
+
+  // System logs endpoints
+  getSystemLogs: async (limit: number = 100) => {
+    const response = await fetch(`${API_BASE_URL}/admin/logs?limit=${limit}`, {
+      method: "GET",
+      headers: createHeaders(),
+    });
+    return handleResponse(response);
   },
 };
 

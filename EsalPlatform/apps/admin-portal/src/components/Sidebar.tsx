@@ -1,60 +1,87 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import {
+  Home,
+  Users,
+  BarChart3,
+  FileText,
+  Monitor,
+  Settings,
+  UserCheck,
+  LogOut,
+  Activity,
+  CheckCircle,
+  Clock,
+  ChevronLeft,
+  ChevronRight,
+  X,
+} from "lucide-react";
 
 interface NavItem {
   path: string;
   label: string;
-  icon: string;
+  icon: React.ReactNode;
   description?: string;
+}
+
+interface SidebarProps {
+  isMobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
 const navItems: NavItem[] = [
   {
     path: "/dashboard",
     label: "Dashboard",
-    icon: "🏠",
+    icon: <Home className="w-5 h-5" />,
     description: "Overview & Analytics",
   },
   {
     path: "/users",
     label: "User Management",
-    icon: "👥",
+    icon: <Users className="w-5 h-5" />,
     description: "Manage platform users",
   },
   {
     path: "/analytics",
     label: "Analytics",
-    icon: "📊",
+    icon: <BarChart3 className="w-5 h-5" />,
     description: "Platform insights",
   },
   {
     path: "/content",
     label: "Content Moderation",
-    icon: "📝",
+    icon: <FileText className="w-5 h-5" />,
     description: "Review content",
   },
   {
     path: "/system",
     label: "System Health",
-    icon: "⚙️",
+    icon: <Monitor className="w-5 h-5" />,
     description: "Monitor platform",
   },
   {
     path: "/settings",
     label: "Settings",
-    icon: "🔧",
+    icon: <Settings className="w-5 h-5" />,
     description: "Admin configuration",
   },
 ];
 
-export const Sidebar: React.FC = () => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  isMobileOpen = false,
+  onMobileClose,
+}) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-
   const handleNavigation = (path: string) => {
     navigate(path);
+    // Close mobile sidebar when navigating
+    if (onMobileClose) {
+      onMobileClose();
+    }
   };
 
   const handleLogout = () => {
@@ -63,14 +90,26 @@ export const Sidebar: React.FC = () => {
       navigate("/login");
     }
   };
-
   return (
     <div className="w-64 bg-white shadow-lg h-screen flex flex-col">
+      {/* Mobile Close Button */}
+      {isMobileOpen && onMobileClose && (
+        <div className="flex justify-end p-4 lg:hidden">
+          <button
+            onClick={onMobileClose}
+            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            aria-label="Close menu"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      )}
+
       {/* Admin Profile Section */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-xl">
-            👨‍💼
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white">
+            <UserCheck className="w-6 h-6" />
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="text-sm font-semibold text-gray-900 truncate">
@@ -127,7 +166,6 @@ export const Sidebar: React.FC = () => {
             <span className="text-xs text-green-600 font-medium">Online</span>
           </div>
         </div>
-
         {/* Quick Stats */}
         <div className="grid grid-cols-2 gap-2 mb-4">
           <div className="text-center p-2 bg-gray-50 rounded">
@@ -138,14 +176,13 @@ export const Sidebar: React.FC = () => {
             <div className="text-xs text-gray-500">System</div>
             <div className="text-sm font-semibold text-green-600">Healthy</div>
           </div>
-        </div>
-
+        </div>{" "}
         {/* Logout Button */}
         <button
           onClick={handleLogout}
           className="w-full flex items-center justify-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
         >
-          <span>🚪</span>
+          <LogOut className="w-4 h-4" />
           <span>Logout</span>
         </button>
       </div>

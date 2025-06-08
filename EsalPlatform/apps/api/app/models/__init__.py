@@ -44,3 +44,18 @@ class Idea(Base):
     
     # Relationships
     user = relationship("User", back_populates="ideas")
+
+
+class SystemSettings(Base):
+    """System settings and configuration"""
+    __tablename__ = "system_settings"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    category = Column(String(50), nullable=False)
+    key = Column(String(100), nullable=False)
+    value = Column(Text)
+    data_type = Column(String(20), default="string")  # string, number, boolean, json
+    description = Column(Text)
+    is_public = Column(Boolean, default=False)  # whether non-admin users can access
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

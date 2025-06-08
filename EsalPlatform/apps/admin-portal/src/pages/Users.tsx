@@ -7,6 +7,32 @@ import { useToast, ToastContainer } from "../components/Toast";
 import UserDetailsModal from "../components/UserDetailsModal";
 import CreateEditUserModal from "../components/CreateEditUserModal";
 import BulkActionsModal from "../components/BulkActionsModal";
+import {
+  AlertTriangle,
+  RefreshCw,
+  Download,
+  UserPlus,
+  Search,
+  Settings,
+  Eye,
+  Edit,
+  Trash2,
+  CheckCircle,
+  X,
+  Pause,
+  Ban,
+  Unlock,
+  ArrowUp,
+  ArrowDown,
+  ArrowUpDown,
+  ChevronLeft,
+  ChevronRight,
+  Shield,
+  Users as UsersIcon,
+  Building,
+  Calendar,
+  Activity,
+} from "lucide-react";
 
 interface User {
   id: string; // Backend uses string IDs
@@ -563,12 +589,15 @@ const Users = () => {
       </div>
     );
   }
-
   if (loadingError) {
     return (
       <div className="flex items-center justify-center min-h-96">
         <div className="text-center">
-          <div className="text-red-600 text-4xl mb-4">⚠️</div>
+          <div className="flex justify-center mb-4">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+              <AlertTriangle className="w-8 h-8 text-red-600" />
+            </div>
+          </div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             Failed to Load Users
           </h2>
@@ -578,27 +607,30 @@ const Users = () => {
       </div>
     );
   }
-
   return (
-    <div className="space-y-6">
-      {" "}
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">User Management</h1>{" "}
-          <div className="flex items-center space-x-4 mt-1">
-            <p className="text-gray-600">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+            User Management
+          </h1>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-1 space-y-2 sm:space-y-0">
+            <p className="text-sm sm:text-base text-gray-600">
               Manage platform users and permissions ({users.length} users
               loaded)
             </p>
-            <div className="flex items-center space-x-2 text-sm text-gray-500">
-              <span>Last updated: {lastRefresh.toLocaleTimeString()}</span>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500">
+              <span className="hidden sm:inline">
+                Last updated: {lastRefresh.toLocaleTimeString()}
+              </span>
               <button
                 onClick={refreshUserData}
-                className="text-blue-600 hover:text-blue-700 font-medium"
+                className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 font-medium transition-colors"
                 disabled={isLoading}
               >
-                🔄 Refresh
+                <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span>Refresh</span>
               </button>
               <label className="flex items-center space-x-1">
                 <input
@@ -612,75 +644,113 @@ const Users = () => {
             </div>
           </div>
         </div>
-        <div className="flex space-x-3">
-          <Button variant="outline" onClick={exportUsers}>
-            📥 Export Users
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+          <Button
+            variant="outline"
+            onClick={exportUsers}
+            className="flex items-center justify-center space-x-2 w-full sm:w-auto"
+            size="sm"
+          >
+            <Download className="w-4 h-4" />
+            <span className="hidden sm:inline">Export Users</span>
+            <span className="sm:hidden">Export</span>
           </Button>
-          <Button onClick={() => setShowCreateUserModal(true)}>
-            ➕ Add User
+          <Button
+            onClick={() => setShowCreateUserModal(true)}
+            className="flex items-center justify-center space-x-2 w-full sm:w-auto"
+            size="sm"
+          >
+            <UserPlus className="w-4 h-4" />
+            <span className="hidden sm:inline">Add User</span>
+            <span className="sm:hidden">Add</span>
           </Button>
         </div>
-      </div>
+      </div>{" "}
       {/* User Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
         {[
           {
             label: "Total",
             value: userStats.total,
             color: "bg-blue-100 text-blue-800",
+            icon: UsersIcon,
+            bgGradient: "from-blue-500 to-blue-600",
           },
           {
             label: "Active",
             value: userStats.active,
             color: "bg-green-100 text-green-800",
+            icon: CheckCircle,
+            bgGradient: "from-green-500 to-green-600",
           },
           {
             label: "Pending",
             value: userStats.pending,
             color: "bg-yellow-100 text-yellow-800",
+            icon: Calendar,
+            bgGradient: "from-yellow-500 to-yellow-600",
           },
           {
             label: "Innovators",
             value: userStats.innovators,
             color: "bg-blue-100 text-blue-800",
+            icon: Activity,
+            bgGradient: "from-blue-500 to-blue-600",
           },
           {
             label: "Investors",
             value: userStats.investors,
             color: "bg-purple-100 text-purple-800",
+            icon: Building,
+            bgGradient: "from-purple-500 to-purple-600",
           },
           {
             label: "Hubs",
             value: userStats.hubs,
             color: "bg-orange-100 text-orange-800",
+            icon: Building,
+            bgGradient: "from-orange-500 to-orange-600",
           },
           {
             label: "Admins",
             value: userStats.admins,
             color: "bg-gray-100 text-gray-800",
+            icon: Shield,
+            bgGradient: "from-gray-500 to-gray-600",
           },
         ].map((stat, index) => (
-          <Card key={index} className="p-4 text-center">
-            <div
-              className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${stat.color}`}
-            >
+          <Card
+            key={index}
+            className="p-3 sm:p-4 text-center hover:shadow-md transition-shadow"
+          >
+            <div className="flex items-center justify-center mb-2 sm:mb-3">
+              <div
+                className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r ${stat.bgGradient} flex items-center justify-center`}
+              >
+                <stat.icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+              </div>
+            </div>
+            <div className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
               {stat.label}
             </div>
-            <div className="text-xl font-bold text-gray-900">{stat.value}</div>
+            <div className="text-lg sm:text-xl font-bold text-gray-900">
+              {stat.value}
+            </div>
           </Card>
         ))}
       </div>{" "}
       {/* Search and Filters */}
-      <Card className="p-6">
+      <Card className="p-4 sm:p-6">
         <div className="flex flex-col space-y-4">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-            <div className="flex space-x-2">
+          <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
+            {/* Tab Navigation - Mobile Responsive */}
+            <div className="flex flex-wrap gap-2">
               {["all", "innovator", "investor", "hub", "admin", "pending"].map(
                 (tab) => (
                   <button
                     key={tab}
                     onClick={() => setSelectedTab(tab)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium capitalize ${
+                    className={`px-3 py-2 sm:px-4 rounded-lg text-xs sm:text-sm font-medium capitalize whitespace-nowrap ${
                       selectedTab === tab
                         ? "bg-blue-100 text-blue-700"
                         : "text-gray-600 hover:text-gray-900"
@@ -691,55 +761,64 @@ const Users = () => {
                 )
               )}
             </div>
-            <div className="flex items-center space-x-3">
-              <div className="relative">
+
+            {/* Search and Filter Controls */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="relative flex-1 sm:flex-initial">
                 <input
                   type="text"
                   placeholder="Search users..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full sm:w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 />
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="text-gray-400">🔍</span>
+                  <Search className="w-4 h-4 text-gray-400" />
                 </div>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                className={`${showAdvancedFilters ? "bg-blue-50 text-blue-700" : ""}`}
-              >
-                🔧 Filters{" "}
-                {getActiveFiltersCount() > 0 && `(${getActiveFiltersCount()})`}
-              </Button>
-              {getActiveFiltersCount() > 0 && (
+
+              <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={clearAllFilters}
-                  className="text-red-600 hover:text-red-700"
+                  onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                  className={`flex items-center space-x-2 ${showAdvancedFilters ? "bg-blue-50 text-blue-700" : ""}`}
                 >
-                  Clear All
+                  <Settings className="w-4 h-4" />
+                  <span className="hidden sm:inline">Filters</span>
+                  <span className="sm:hidden">Filter</span>
+                  {getActiveFiltersCount() > 0 && (
+                    <span>({getActiveFiltersCount()})</span>
+                  )}
                 </Button>
-              )}
+                {getActiveFiltersCount() > 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={clearAllFilters}
+                    className="text-red-600 hover:text-red-700 whitespace-nowrap"
+                  >
+                    <span className="hidden sm:inline">Clear All</span>
+                    <span className="sm:hidden">Clear</span>
+                  </Button>
+                )}
+              </div>
             </div>
-          </div>
-
+          </div>{" "}
           {/* Advanced Filters Panel */}
           {showAdvancedFilters && (
             <div className="border-t pt-4 mt-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Status
-                  </label>{" "}
+                  </label>
                   <select
                     value={advancedFilters.status}
                     onChange={(e) =>
                       updateAdvancedFilter("status", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                     aria-label="Filter by user status"
                   >
                     <option value="all">All Statuses</option>
@@ -753,13 +832,13 @@ const Users = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Join Date
-                  </label>{" "}
+                  </label>
                   <select
                     value={advancedFilters.dateRange}
                     onChange={(e) =>
                       updateAdvancedFilter("dateRange", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                     aria-label="Filter by join date range"
                   >
                     <option value="all">All Time</option>
@@ -773,13 +852,13 @@ const Users = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Verification
-                  </label>{" "}
+                  </label>
                   <select
                     value={advancedFilters.verificationStatus}
                     onChange={(e) =>
                       updateAdvancedFilter("verificationStatus", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                     aria-label="Filter by verification status"
                   >
                     <option value="all">All Users</option>
@@ -791,13 +870,13 @@ const Users = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Activity Level
-                  </label>{" "}
+                  </label>
                   <select
                     value={advancedFilters.activityLevel}
                     onChange={(e) =>
                       updateAdvancedFilter("activityLevel", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                     aria-label="Filter by activity level"
                   >
                     <option value="all">All Levels</option>
@@ -808,18 +887,17 @@ const Users = () => {
                 </div>
               </div>
 
-              <div className="mt-4 text-sm text-gray-500">
+              <div className="mt-4 text-xs sm:text-sm text-gray-500">
                 Showing {filteredUsers.length} of {users.length} users
                 {getActiveFiltersCount() > 0 &&
                   ` with ${getActiveFiltersCount()} filter${getActiveFiltersCount() !== 1 ? "s" : ""} applied`}
               </div>
             </div>
-          )}
-
+          )}{" "}
           {/* Bulk Actions Bar */}
           {selectedUsers.length > 0 && (
-            <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-center space-x-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 space-y-3 sm:space-y-0">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-2 sm:space-y-0">
                 <span className="text-sm font-medium text-blue-900">
                   {selectedUsers.length} user
                   {selectedUsers.length !== 1 ? "s" : ""} selected
@@ -828,7 +906,7 @@ const Users = () => {
                   size="sm"
                   variant="outline"
                   onClick={() => setSelectedUsers([])}
-                  className="text-blue-600 border-blue-300"
+                  className="text-blue-600 border-blue-300 w-full sm:w-auto"
                 >
                   Clear Selection
                 </Button>
@@ -836,7 +914,7 @@ const Users = () => {
               <Button
                 size="sm"
                 onClick={() => setShowBulkActionModal(true)}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
               >
                 Bulk Actions
               </Button>
@@ -846,7 +924,141 @@ const Users = () => {
       </Card>{" "}
       {/* Users Table */}
       <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile View - Card Layout */}
+        <div className="block sm:hidden">
+          <div className="p-4 space-y-4">
+            {paginatedUsers.map((user) => (
+              <div
+                key={user.id}
+                className="border border-gray-200 rounded-lg p-4 space-y-3"
+              >
+                {/* User Header */}
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center space-x-3 flex-1 min-w-0">
+                    {" "}
+                    <input
+                      type="checkbox"
+                      checked={selectedUsers.includes(user.id)}
+                      onChange={() => handleSelectUser(user.id)}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      aria-label={`Select user ${user.name || user.email}`}
+                    />
+                    <div className="flex-shrink-0 h-10 w-10">
+                      <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                        <span className="text-sm font-medium text-gray-700">
+                          {user.name
+                            ?.split(" ")
+                            .map((n) => n[0])
+                            .join("") || "?"}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center">
+                        <div className="text-sm font-medium text-gray-900 truncate">
+                          {user.name}
+                        </div>
+                        {user.verified && (
+                          <div className="ml-2 w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <CheckCircle className="w-3 h-3 text-blue-600" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-sm text-gray-500 truncate">
+                        {user.email}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* User Details */}
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <span className="text-gray-500">Role:</span>
+                    <span
+                      className={`ml-1 px-2 py-1 rounded-full text-xs font-medium ${roleColors[user.role]}`}
+                    >
+                      {user.role}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Status:</span>
+                    <span
+                      className={`ml-1 px-2 py-1 rounded-full text-xs font-medium ${statusColors[user.status]}`}
+                    >
+                      {user.status}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Activity:</span>
+                    <span className="ml-1 text-gray-900">
+                      {user.activityScore}%
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Joined:</span>
+                    <span className="ml-1 text-gray-900">{user.joinDate}</span>
+                  </div>
+                </div>
+
+                {/* Mobile Actions */}
+                <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-100">
+                  <Button
+                    size="sm"
+                    onClick={() => viewUserDetails(user)}
+                    className="flex items-center space-x-1"
+                  >
+                    <Eye className="w-3 h-3" />
+                    <span>View</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => editUser(user)}
+                    className="flex items-center space-x-1"
+                  >
+                    <Edit className="w-3 h-3" />
+                    <span>Edit</span>
+                  </Button>
+
+                  {/* Status-specific mobile actions */}
+                  {user.status === "pending" && (
+                    <Button
+                      size="sm"
+                      className="flex items-center space-x-1 bg-green-600 hover:bg-green-700 text-white"
+                      onClick={() => handleStatusAction(user, "activate")}
+                    >
+                      <CheckCircle className="w-3 h-3" />
+                      <span>Activate</span>
+                    </Button>
+                  )}
+                  {user.status === "active" && (
+                    <Button
+                      size="sm"
+                      className="flex items-center space-x-1 bg-red-600 hover:bg-red-700 text-white"
+                      onClick={() => handleStatusAction(user, "block")}
+                    >
+                      <Ban className="w-3 h-3" />
+                      <span>Block</span>
+                    </Button>
+                  )}
+                  {user.status === "blocked" && (
+                    <Button
+                      size="sm"
+                      className="flex items-center space-x-1 bg-green-600 hover:bg-green-700 text-white"
+                      onClick={() => handleStatusAction(user, "unblock")}
+                    >
+                      <Unlock className="w-3 h-3" />
+                      <span>Unblock</span>
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Desktop View - Table Layout */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -870,13 +1082,18 @@ const Users = () => {
                   onClick={() => handleSort("name")}
                 >
                   <div className="flex items-center space-x-1">
+                    {" "}
                     <span>User</span>
                     <span className="text-gray-400">
-                      {sortField === "name"
-                        ? sortDirection === "asc"
-                          ? "↑"
-                          : "↓"
-                        : "↕"}
+                      {sortField === "name" ? (
+                        sortDirection === "asc" ? (
+                          <ArrowUp className="w-3 h-3" />
+                        ) : (
+                          <ArrowDown className="w-3 h-3" />
+                        )
+                      ) : (
+                        <ArrowUpDown className="w-3 h-3" />
+                      )}
                     </span>
                   </div>
                 </th>
@@ -885,13 +1102,18 @@ const Users = () => {
                   onClick={() => handleSort("role")}
                 >
                   <div className="flex items-center space-x-1">
+                    {" "}
                     <span>Role</span>
                     <span className="text-gray-400">
-                      {sortField === "role"
-                        ? sortDirection === "asc"
-                          ? "↑"
-                          : "↓"
-                        : "↕"}
+                      {sortField === "role" ? (
+                        sortDirection === "asc" ? (
+                          <ArrowUp className="w-3 h-3" />
+                        ) : (
+                          <ArrowDown className="w-3 h-3" />
+                        )
+                      ) : (
+                        <ArrowUpDown className="w-3 h-3" />
+                      )}
                     </span>
                   </div>
                 </th>
@@ -900,13 +1122,18 @@ const Users = () => {
                   onClick={() => handleSort("status")}
                 >
                   <div className="flex items-center space-x-1">
+                    {" "}
                     <span>Status</span>
                     <span className="text-gray-400">
-                      {sortField === "status"
-                        ? sortDirection === "asc"
-                          ? "↑"
-                          : "↓"
-                        : "↕"}
+                      {sortField === "status" ? (
+                        sortDirection === "asc" ? (
+                          <ArrowUp className="w-3 h-3" />
+                        ) : (
+                          <ArrowDown className="w-3 h-3" />
+                        )
+                      ) : (
+                        <ArrowUpDown className="w-3 h-3" />
+                      )}
                     </span>
                   </div>
                 </th>
@@ -915,13 +1142,18 @@ const Users = () => {
                   onClick={() => handleSort("company")}
                 >
                   <div className="flex items-center space-x-1">
+                    {" "}
                     <span>Company</span>
                     <span className="text-gray-400">
-                      {sortField === "company"
-                        ? sortDirection === "asc"
-                          ? "↑"
-                          : "↓"
-                        : "↕"}
+                      {sortField === "company" ? (
+                        sortDirection === "asc" ? (
+                          <ArrowUp className="w-3 h-3" />
+                        ) : (
+                          <ArrowDown className="w-3 h-3" />
+                        )
+                      ) : (
+                        <ArrowUpDown className="w-3 h-3" />
+                      )}
                     </span>
                   </div>
                 </th>
@@ -930,13 +1162,18 @@ const Users = () => {
                   onClick={() => handleSort("joinDate")}
                 >
                   <div className="flex items-center space-x-1">
+                    {" "}
                     <span>Join Date</span>
                     <span className="text-gray-400">
-                      {sortField === "joinDate"
-                        ? sortDirection === "asc"
-                          ? "↑"
-                          : "↓"
-                        : "↕"}
+                      {sortField === "joinDate" ? (
+                        sortDirection === "asc" ? (
+                          <ArrowUp className="w-3 h-3" />
+                        ) : (
+                          <ArrowDown className="w-3 h-3" />
+                        )
+                      ) : (
+                        <ArrowUpDown className="w-3 h-3" />
+                      )}
                     </span>
                   </div>
                 </th>
@@ -974,12 +1211,15 @@ const Users = () => {
                         </div>
                       </div>
                       <div className="ml-4">
+                        {" "}
                         <div className="flex items-center">
                           <div className="text-sm font-medium text-gray-900">
                             {user.name}
                           </div>
                           {user.verified && (
-                            <span className="ml-2 text-blue-500">✓</span>
+                            <div className="ml-2 w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
+                              <CheckCircle className="w-3 h-3 text-blue-600" />
+                            </div>
                           )}
                         </div>
                         <div className="text-sm text-gray-500">
@@ -1029,44 +1269,55 @@ const Users = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    {" "}
                     <div className="flex items-center space-x-2">
                       {" "}
-                      <Button size="sm" onClick={() => viewUserDetails(user)}>
-                        👁️ View
+                      <Button
+                        size="sm"
+                        onClick={() => viewUserDetails(user)}
+                        className="flex items-center space-x-1"
+                      >
+                        <Eye className="w-3 h-3" />
+                        <span>View</span>
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => editUser(user)}
+                        className="flex items-center space-x-1"
                       >
-                        ✏️ Edit
+                        <Edit className="w-3 h-3" />
+                        <span>Edit</span>
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-red-600 border-red-300 hover:bg-red-50"
+                        className="flex items-center space-x-1 text-red-600 border-red-300 hover:bg-red-50"
                         onClick={() =>
                           handleDeleteUser(user.id, user.name || user.email)
                         }
                       >
-                        🗑️ Delete
+                        <Trash2 className="w-3 h-3" />
+                        <span>Delete</span>
                       </Button>
                       {/* Status-based Action Buttons */}
                       {user.status === "pending" && (
                         <>
                           <Button
                             size="sm"
-                            className="bg-green-600 hover:bg-green-700 text-white"
+                            className="flex items-center space-x-1 bg-green-600 hover:bg-green-700 text-white"
                             onClick={() => handleStatusAction(user, "activate")}
                           >
-                            ✅ Activate
+                            <CheckCircle className="w-3 h-3" />
+                            <span>Activate</span>
                           </Button>
                           <Button
                             size="sm"
-                            className="bg-red-600 hover:bg-red-700 text-white"
+                            className="flex items-center space-x-1 bg-red-600 hover:bg-red-700 text-white"
                             onClick={() => handleStatusAction(user, "reject")}
                           >
-                            ❌ Reject
+                            <X className="w-3 h-3" />
+                            <span>Reject</span>
                           </Button>
                         </>
                       )}
@@ -1074,39 +1325,43 @@ const Users = () => {
                         <>
                           <Button
                             size="sm"
-                            className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                            className="flex items-center space-x-1 bg-yellow-600 hover:bg-yellow-700 text-white"
                             onClick={() =>
                               handleStatusAction(user, "inactivate")
                             }
                           >
-                            ⏸️ Inactivate
+                            <Pause className="w-3 h-3" />
+                            <span>Inactivate</span>
                           </Button>
                           <Button
                             size="sm"
-                            className="bg-red-600 hover:bg-red-700 text-white"
+                            className="flex items-center space-x-1 bg-red-600 hover:bg-red-700 text-white"
                             onClick={() => handleStatusAction(user, "block")}
                           >
-                            🚫 Block
+                            <Ban className="w-3 h-3" />
+                            <span>Block</span>
                           </Button>
                         </>
                       )}
                       {user.status === "blocked" && (
                         <Button
                           size="sm"
-                          className="bg-green-600 hover:bg-green-700 text-white"
+                          className="flex items-center space-x-1 bg-green-600 hover:bg-green-700 text-white"
                           onClick={() => handleStatusAction(user, "unblock")}
                         >
-                          🔓 Unblock
+                          <Unlock className="w-3 h-3" />
+                          <span>Unblock</span>
                         </Button>
                       )}
                       {(user.status === "inactive" ||
                         user.status === "pending") && (
                         <Button
                           size="sm"
-                          className="bg-green-600 hover:bg-green-700 text-white"
+                          className="flex items-center space-x-1 bg-green-600 hover:bg-green-700 text-white"
                           onClick={() => handleStatusAction(user, "activate")}
                         >
-                          ✅ Activate
+                          <CheckCircle className="w-3 h-3" />
+                          <span>Activate</span>
                         </Button>
                       )}
                     </div>
@@ -1115,18 +1370,19 @@ const Users = () => {
               ))}
             </tbody>
           </table>
-        </div>
-
-        {/* Pagination */}
+        </div>{" "}
+        {/* Pagination - Mobile Responsive */}
         {totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-700">
+          <div className="px-4 sm:px-6 py-4 border-t border-gray-200">
+            <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+              <div className="text-xs sm:text-sm text-gray-700 text-center sm:text-left">
                 Showing {startIndex + 1} to{" "}
                 {Math.min(endIndex, sortedUsers.length)} of {sortedUsers.length}{" "}
                 users
               </div>
-              <div className="flex space-x-2">
+
+              {/* Responsive Pagination Controls */}
+              <div className="flex items-center justify-center space-x-1 sm:space-x-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -1134,22 +1390,95 @@ const Users = () => {
                     setCurrentPage((prev) => Math.max(prev - 1, 1))
                   }
                   disabled={currentPage === 1}
+                  className="flex items-center space-x-1"
                 >
-                  Previous
+                  <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Previous</span>
+                  <span className="sm:hidden">Prev</span>
                 </Button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
-                    <Button
-                      key={page}
-                      variant={currentPage === page ? "primary" : "outline"}
-                      size="sm"
-                      onClick={() => setCurrentPage(page)}
-                      className="min-w-[40px]"
-                    >
-                      {page}
-                    </Button>
-                  )
-                )}
+
+                {/* Show fewer page numbers on mobile */}
+                <div className="flex space-x-1">
+                  {totalPages <= 5 ? (
+                    // Show all pages if 5 or fewer
+                    Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (page) => (
+                        <Button
+                          key={page}
+                          variant={currentPage === page ? "primary" : "outline"}
+                          size="sm"
+                          onClick={() => setCurrentPage(page)}
+                          className="min-w-[32px] sm:min-w-[40px] px-2 sm:px-3"
+                        >
+                          {page}
+                        </Button>
+                      )
+                    )
+                  ) : (
+                    // Show condensed pagination for many pages
+                    <>
+                      {currentPage > 3 && (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(1)}
+                            className="min-w-[32px] sm:min-w-[40px] px-2 sm:px-3"
+                          >
+                            1
+                          </Button>
+                          {currentPage > 4 && (
+                            <span className="flex items-center px-2 text-gray-500">
+                              ...
+                            </span>
+                          )}
+                        </>
+                      )}
+
+                      {/* Show current page and adjacent pages */}
+                      {Array.from(
+                        { length: Math.min(3, totalPages) },
+                        (_, i) => {
+                          const page =
+                            Math.max(
+                              1,
+                              Math.min(totalPages - 2, currentPage - 1)
+                            ) + i;
+                          return page;
+                        }
+                      ).map((page) => (
+                        <Button
+                          key={page}
+                          variant={currentPage === page ? "primary" : "outline"}
+                          size="sm"
+                          onClick={() => setCurrentPage(page)}
+                          className="min-w-[32px] sm:min-w-[40px] px-2 sm:px-3"
+                        >
+                          {page}
+                        </Button>
+                      ))}
+
+                      {currentPage < totalPages - 2 && (
+                        <>
+                          {currentPage < totalPages - 3 && (
+                            <span className="flex items-center px-2 text-gray-500">
+                              ...
+                            </span>
+                          )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(totalPages)}
+                            className="min-w-[32px] sm:min-w-[40px] px-2 sm:px-3"
+                          >
+                            {totalPages}
+                          </Button>
+                        </>
+                      )}
+                    </>
+                  )}
+                </div>
+
                 <Button
                   variant="outline"
                   size="sm"
@@ -1157,8 +1486,11 @@ const Users = () => {
                     setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                   }
                   disabled={currentPage === totalPages}
+                  className="flex items-center space-x-1"
                 >
-                  Next
+                  <span className="hidden sm:inline">Next</span>
+                  <span className="sm:hidden">Next</span>
+                  <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
                 </Button>
               </div>
             </div>

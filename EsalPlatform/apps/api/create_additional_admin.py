@@ -1,25 +1,7 @@
 #!/usr/bin/env python3
 """
-ESAL Platform Admin User Creation Script
-
-This comprehensive script creates admin users for the ESAL Platform with full system authentication.
-The script supports both interactive mode (for single custom admin creation) and batch mode 
-(for creating multiple predefined admin users).
-
-Features:
-- Interactive user input with validation
-- Email, username, full name, and password validation
-- Automatic profile creation in Supabase
-- Full system authentication testing
-- Role-based permissions setup
-- Existing user detection and updates
-- Comprehensive error handling and logging
-
-
-Usage:
-    python create_admin_user.py
-
-The script will guide you through creating admin users with proper validation and testing.
+Additional Admin User Creation Script
+This script creates additional admin users for the ESAL Platform admin portal.
 """
 import asyncio
 import sys
@@ -663,42 +645,33 @@ async def create_single_admin():
 
 async def main():
     """Main function with improved user interface"""
-    print("🔧 ESAL Platform Admin User Creation System")
+    print("🔧 ESAL Platform Admin User Management System")
     print("=" * 60)
     print("This tool creates admin users with full system authentication.")
-    print("📖 For detailed documentation, see: ADMIN_USER_CREATION_GUIDE.md")
-    print()
     print("Admin users will have complete access to:")
     print("   • Admin Portal Dashboard")
-    print("   • User Management") 
+    print("   • User Management")
     print("   • System Configuration")
     print("   • Analytics & Reports")
     print("   • Platform Settings")
-    print("   • Content Moderation")
     print()
-    print("🎯 Choose an option:")
-    print("1. 🆕 Create a single admin user (recommended)")
-    print("2. 🔄 Create multiple predefined admin users (development)")
-    print("3. 📖 View documentation")
-    print("4. ❌ Exit")
+    print("Choose an option:")
+    print("1. 🆕 Create a new admin user (recommended)")
+    print("2. 🔄 Create multiple predefined admin users")
+    print("3. ❌ Exit")
     print()
     
     while True:
-        choice = input("Enter your choice (1, 2, 3, or 4): ").strip()
+        choice = input("Enter your choice (1, 2, or 3): ").strip()
         
         if choice == "1":
             print("\n" + "🆕" * 20)
-            print("📝 Creating a single admin user with custom details...")
             success = await create_single_admin()
             break
         elif choice == "2":
             print("\n" + "🔄" * 20)
-            print("⚠️  This will create multiple predefined admin accounts for development.")
-            print("   • admin@esal.platform (System Administrator)")
-            print("   • manager@esal.platform (Platform Manager)")
-            print("   • super@esal.platform (Super Administrator)")
-            print()
-            confirm = input("🤔 Are you sure you want to continue? (y/n): ").strip().lower()
+            print("⚠️  This will create multiple predefined admin accounts.")
+            confirm = input("Are you sure you want to continue? (y/n): ").strip().lower()
             if confirm in ['y', 'yes']:
                 success = await create_multiple_admins()
             else:
@@ -706,129 +679,62 @@ async def main():
                 success = False
             break
         elif choice == "3":
-            print("\n📖 Admin User Creation Documentation")
-            print("=" * 50)
-            print("📍 Location: ADMIN_USER_CREATION_GUIDE.md")
-            print("📖 This comprehensive guide covers:")
-            print("   • Step-by-step creation process")
-            print("   • Validation rules and requirements")
-            print("   • Security best practices")
-            print("   • Troubleshooting common issues")
-            print("   • Admin portal access instructions")
-            print()
-            view_doc = input("📂 Open documentation file? (y/n): ").strip().lower()
-            if view_doc in ['y', 'yes']:
-                try:
-                    import webbrowser
-                    import os
-                    doc_path = os.path.join(os.path.dirname(__file__), "ADMIN_USER_CREATION_GUIDE.md")
-                    if os.path.exists(doc_path):
-                        webbrowser.open(f"file://{doc_path}")
-                        print("✅ Documentation opened in your default browser/editor")
-                    else:
-                        print("❌ Documentation file not found")
-                except Exception as e:
-                    print(f"❌ Could not open documentation: {e}")
-                    print("📂 Please manually open: ADMIN_USER_CREATION_GUIDE.md")
-            print()
-            continue  # Go back to main menu
-        elif choice == "4":
-            print("👋 Thank you for using ESAL Platform Admin User Creation System!")
-            print("📖 Remember to check the documentation for best practices.")
+            print("👋 Goodbye!")
             return True
         else:
-            print("❌ Invalid choice! Please enter 1, 2, 3, or 4.")
+            print("❌ Invalid choice! Please enter 1, 2, or 3.")
             continue
     
     return success
 
 if __name__ == "__main__":
     try:
-        print("🚀 ESAL Platform Admin User Creation System")
-        print("=" * 60)
-        print("⚡ Initializing system and checking requirements...")
+        print("🚀 Starting ESAL Platform Admin User Management System...")
+        print("⚡ Checking system requirements...")
         
         # Quick environment check
         if not os.path.exists('.env'):
             print("⚠️  Warning: .env file not found in current directory")
             print("   Make sure you're running this from the API directory")
             print("   and that your .env file contains SUPABASE configuration")
-            print()
-            print("📋 Required .env variables:")
-            print("   • SUPABASE_URL")
-            print("   • SUPABASE_SERVICE_ROLE_KEY")
-            print("   • SUPABASE_ANON_KEY")
-            print()
-        
-        # Check if documentation exists
-        doc_path = os.path.join(os.path.dirname(__file__), "ADMIN_USER_CREATION_GUIDE.md")
-        if os.path.exists(doc_path):
-            print("📖 Documentation available: ADMIN_USER_CREATION_GUIDE.md")
-        else:
-            print("⚠️  Documentation file not found")
-        
-        print("✅ System ready for admin user creation")
-        print()
         
         success = asyncio.run(main())
         
         if success:
             print("\n" + "🎉" * 20)
-            print("✅ ADMIN USER CREATION COMPLETED SUCCESSFULLY!")
+            print("✅ ADMIN USER MANAGEMENT COMPLETED SUCCESSFULLY!")
             print("🔐 Your admin user is ready with full system authentication")
-            print()
             print("🚀 Next steps:")
-            print("   1. Start the admin portal server")
-            print("   2. Navigate to: http://localhost:3004/login")
-            print("   3. Log in with your admin credentials")
-            print("   4. Explore the admin dashboard and features")
+            print("   1. Start the admin portal: http://localhost:3004")
+            print("   2. Log in with your admin credentials")
+            print("   3. Explore the admin dashboard")
+            print("   4. Manage users and platform settings")
             print()
-            print("📚 Additional resources:")
-            print("   • Admin User Guide: ADMIN_USER_CREATION_GUIDE.md")
-            print("   • Platform Startup: PLATFORM_STARTUP.md")
-            print("   • Admin Portal Docs: ../admin-portal/README.md")
-            print()
-            print("🔒 Security reminders:")
-            print("   • Keep admin credentials secure")
-            print("   • Change default passwords after first login")
-            print("   • Review admin access regularly")
+            print("📚 For help with the admin portal, see:")
+            print("   • Admin documentation in /docs/admin/")
+            print("   • Platform startup guide: PLATFORM_STARTUP.md")
             print("=" * 60)
             sys.exit(0)
         else:
             print("\n" + "❌" * 20)
-            print("❌ ADMIN USER CREATION FAILED!")
+            print("❌ ADMIN USER MANAGEMENT FAILED!")
             print("🔧 Troubleshooting steps:")
             print("   1. Check your .env file for correct SUPABASE configuration")
-            print("   2. Ensure all Python dependencies are installed:")
-            print("      pip install -r requirements.txt")
+            print("   2. Ensure the API server dependencies are installed")
             print("   3. Verify Supabase connection and service key permissions")
-            print("   4. Check the error messages above for specific details")
-            print("   5. Review the documentation: ADMIN_USER_CREATION_GUIDE.md")
+            print("   4. Check the logs above for specific error details")
             print()
-            print("🆘 Common solutions:")
-            print("   • Restart Supabase if using local instance")
-            print("   • Check internet connection for cloud Supabase")
-            print("   • Verify service role key has admin permissions")
-            print("   • Ensure database schema is properly set up")
-            print()
-            print("📞 Need help? Check the troubleshooting section in the documentation.")
+            print("📞 Need help? Check the documentation or contact support.")
             print("=" * 60)
             sys.exit(1)
             
     except KeyboardInterrupt:
-        print("\n\n⏹️  Operation cancelled by user (Ctrl+C)")
-        print("👋 Thank you for using ESAL Platform Admin User Creation System!")
-        print("📖 Remember to check the documentation for future reference.")
+        print("\n\n⏹️  Operation cancelled by user.")
+        print("👋 Goodbye!")
         sys.exit(0)
     except Exception as e:
-        print(f"\n❌ Unexpected system error: {e}")
-        print("\n🔧 Debug information:")
+        print(f"\n❌ Unexpected error: {e}")
         import traceback
         traceback.print_exc()
-        print("\n💡 Suggestions:")
-        print("   • Check your Python environment and dependencies")
-        print("   • Verify you're running from the correct directory")
-        print("   • Review the full error trace above")
-        print("   • Consult the documentation: ADMIN_USER_CREATION_GUIDE.md")
-        print("\n📞 If the issue persists, please report this error.")
+        print("\n🔧 Please check your setup and try again.")
         sys.exit(1)

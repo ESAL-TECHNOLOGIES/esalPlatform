@@ -172,9 +172,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4 px-3">
             Navigation
           </div>
-        )}
-
-        {items.map((item, index) => {
+        )}{" "}
+        {items.map((item) => {
           const isActive = currentPath === item.href;
           return (
             <div key={item.href} className="relative">
