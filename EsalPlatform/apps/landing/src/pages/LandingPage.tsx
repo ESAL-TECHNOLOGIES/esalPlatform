@@ -25,31 +25,27 @@ const LandingPage: React.FC = () => {
     type: "success" | "error";
     text: string;
   } | null>(null);
-  const [formErrors, setFormErrors] = useState<Partial<ContactFormData>>({});
-  const handleJoinAs = (role: string) => {
+  const [formErrors, setFormErrors] = useState<Partial<ContactFormData>>({});  const handleJoinAs = (role: string) => {
     // Get portal URLs from environment variables, fallback to localhost for development
     const isDevelopment = import.meta.env.VITE_ENVIRONMENT !== "production";
 
     const portals = {
       innovator: isDevelopment
         ? "http://localhost:3001/login"
-        : import.meta.env.VITE_INNOVATOR_PORTAL_URL
-          ? `${import.meta.env.VITE_INNOVATOR_PORTAL_URL}/login`
-          : "https://innovator-portal.onrender.com/login",
+        : import.meta.env.VITE_INNOVATOR_PORTAL_URL ||
+          "https://innovator-portal.onrender.com",
       investor: isDevelopment
         ? "http://localhost:3002/login"
-        : import.meta.env.VITE_INVESTOR_PORTAL_URL
-          ? `${import.meta.env.VITE_INVESTOR_PORTAL_URL}/login`
-          : "https://investor-portal-vz2e.onrender.com/login",
+        : import.meta.env.VITE_INVESTOR_PORTAL_URL ||
+          "https://investor-portal-vz2e.onrender.com",
       hub: isDevelopment
         ? "http://localhost:3003"
         : import.meta.env.VITE_HUB_PORTAL_URL ||
           "https://esal-hub-portal.onrender.com",
       admin: isDevelopment
         ? "http://localhost:3004/login"
-        : import.meta.env.VITE_ADMIN_PORTAL_URL
-          ? `${import.meta.env.VITE_ADMIN_PORTAL_URL}/login`
-          : "https://esal-admin-portal.onrender.com/login",
+        : import.meta.env.VITE_ADMIN_PORTAL_URL ||
+          "https://esal-admin-portal.onrender.com",
     };
 
     const url = portals[role as keyof typeof portals];
