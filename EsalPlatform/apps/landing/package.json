@@ -12,9 +12,8 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "type-check": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@esal/ui": "workspace:*",
+  },  "dependencies": {
+    "@esal/ui": "file:../../packages/ui",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0"
