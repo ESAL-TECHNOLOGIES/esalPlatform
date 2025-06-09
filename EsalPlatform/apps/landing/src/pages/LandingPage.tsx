@@ -26,13 +26,20 @@ const LandingPage: React.FC = () => {
     text: string;
   } | null>(null);
   const [formErrors, setFormErrors] = useState<Partial<ContactFormData>>({});
-
   const handleJoinAs = (role: string) => {
-    // Redirect to appropriate portal's auth/signup flow
+    // Get portal URLs from environment variables, fallback to localhost for development
+    const isDevelopment = import.meta.env.VITE_ENVIRONMENT !== 'production';
+    
     const portals = {
-      innovator: "http://localhost:3001/login",
-      investor: "http://localhost:3002/login",
-      hub: "http://localhost:3003/login",
+      innovator: isDevelopment 
+        ? "http://localhost:3001/login" 
+        : (import.meta.env.VITE_INNOVATOR_PORTAL_URL + "/login" || "https://innovator-portal.onrender.com/login"),
+      investor: isDevelopment 
+        ? "http://localhost:3002/login" 
+        : (import.meta.env.VITE_INVESTOR_PORTAL_URL + "/login" || "https://investor-portal-vz2e.onrender.com/login"),
+      hub: isDevelopment 
+        ? "http://localhost:3003/login" 
+        : (import.meta.env.VITE_HUB_PORTAL_URL + "/login" || "https://esal-hub-portal.onrender.com/login"),
     };
 
     const url = portals[role as keyof typeof portals];
