@@ -6,13 +6,23 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from contextlib import asynccontextmanager
 import logging
+import sys
 
 from app.database import create_tables
 from app.routers import auth, innovator, hub, investor, admin, ideas, users, contact
 from app.config import settings
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
+# Configure logging based on environment
+if settings.DEBUG:
+    logging.basicConfig(level=logging.INFO)
+else:
+    logging.basicConfig(
+        level=logging.WARNING,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.StreamHandler(sys.stdout)
+        ]
+    )
 logger = logging.getLogger(__name__)
 
 
@@ -46,22 +56,24 @@ if settings.DEBUG:
         TrustedHostMiddleware, 
         allowed_hosts=["*"]
     )
+else:
+    # Production trusted hosts
+    app.add_middleware(
+        TrustedHostMiddleware,
+        allowed_hosts=[
+            "*.onrender.com",  # All Render domains
+            "localhost",  # Keep for health checks
+            "127.0.0.1",  # Local IP
+        ]
+    )
 
 # CORS middleware - Configure before other middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",  # Main web app
-        "http://localhost:3001",  # Admin portal
-        "http://localhost:3002",  # Innovator portal
-        "http://localhost:3003",  # Investor portal
-        "http://localhost:3004",  # Admin portal (alternate port)
-        "http://localhost:5173",  # Vite dev server
-        "*"  # Allow all for development
-    ],
+    allow_origins=settings.ALLOWED_ORIGINS,  # Use from settings instead of hardcoded
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"],
-    allow_headers=["*"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"],
     expose_headers=["*"],
     max_age=3600,  # Cache preflight requests for 1 hour
 )
@@ -96,7 +108,9 @@ async def root():
         "message": "ESAL Innovation Platform API",
         "status": "running",
         "version": "1.0.0",
-        "cors_origins": settings.ALLOWED_ORIGINS
+        "environment": settings.ENVIRONMENT,
+        "debug": settings.DEBUG,
+        "cors_origins": settings.ALLOWED_ORIGINS if settings.DEBUG else ["*** HIDDEN IN PRODUCTION ***"]
     }
 
 
@@ -114,15 +128,19 @@ async def health_check():
 
 @app.middleware("http")
 async def cors_debug_middleware(request: Request, call_next):
-    """Debug CORS requests"""
-    origin = request.headers.get("origin")
-    method = request.method
-    path = request.url.path
-    
-    logger.info(f"Request: {method} {path} from origin: {origin}")
-    
-    response = await call_next(request)
-    
-    logger.info(f"Response status: {response.status_code}")
-    
-    return response
+    """Debug CORS requests - Only in debug mode"""
+    if settings.DEBUG:
+        origin = request.headers.get("origin")
+        method = request.method
+        path = request.url.path
+        
+        logger.info(f"Request: {method} {path} from origin: {origin}")
+        
+        response = await call_next(request)
+        
+        logger.info(f"Response status: {response.status_code}")
+        
+        return response
+    else:
+        # In production, just pass through without logging
+        return await call_next(request)

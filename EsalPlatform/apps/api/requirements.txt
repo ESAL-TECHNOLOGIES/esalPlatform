@@ -33,6 +33,9 @@ python-dotenv==1.0.0
 # Rate Limiting
 slowapi==0.1.9
 
-# Development
+# Production WSGI Server (alternative to uvicorn)
+gunicorn==21.2.0
+
+# Development & Testing (optional in production)
 pytest==7.4.3
 pytest-asyncio==0.21.1
