@@ -49,13 +49,14 @@ class Settings(BaseSettings):
             "http://127.0.0.1:3002",  # Investor portal (127.0.0.1)
             "http://127.0.0.1:3003",  # Hub portal (127.0.0.1)
             "http://127.0.0.1:3004",  # Admin portal (127.0.0.1)
-            "http://127.0.0.1:5173",  # Vite default (127.0.0.1)
-            # Production Render deployments
+            "http://127.0.0.1:5173",  # Vite default (127.0.0.1)            # Production Render deployments
             "https://esalplatform.onrender.com",  # Landing page
             "https://innovator-portal.onrender.com",  # Innovator portal
             "https://investor-portal-vz2e.onrender.com",  # Investor portal
             "https://esal-hub-portal.onrender.com",  # Hub portal
             "https://esal-admin-portal.onrender.com",  # Admin portal
+            # Allow all Render domains (wildcard support)
+            "https://*.onrender.com",  # All Render subdomains
             # Production Vercel deployments (backup)
             "https://esal-platform.vercel.app",  # Landing page
             "https://esal-innovator-portal.vercel.app",  # Innovator portal

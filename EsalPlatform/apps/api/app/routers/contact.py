@@ -1,8 +1,8 @@
 """
 Contact form router for handling contact form submissions
 """
-from fastapi import APIRouter, HTTPException, BackgroundTasks
-from pydantic import BaseModel, EmailStr
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Request
+from pydantic import BaseModel, EmailStr, ValidationError
 import logging
 
 from app.services.email_service import email_service
@@ -10,6 +10,12 @@ from app.services.email_service import email_service
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+
+@router.get("/test")
+async def test_contact_endpoint():
+    """Simple test endpoint to verify CORS is working"""
+    return {"message": "Contact endpoint is working", "success": True}
 
 
 class ContactFormData(BaseModel):
@@ -36,6 +42,10 @@ async def submit_contact_form(
     Submit contact form data and send email to ESAL
     """
     try:
+        logger.info(f"Received contact form submission from: {contact_data.email}")
+        logger.info(f"Role: {contact_data.role}")
+        logger.info(f"Message length: {len(contact_data.message)}")
+        
         # Validate role
         valid_roles = [
             "Innovator/Entrepreneur",
@@ -45,9 +55,10 @@ async def submit_contact_form(
         ]
         
         if contact_data.role not in valid_roles:
+            logger.error(f"Invalid role: '{contact_data.role}', valid roles: {valid_roles}")
             raise HTTPException(
                 status_code=400,
-                detail="Invalid role selected"
+                detail=f"Invalid role selected. Valid roles are: {', '.join(valid_roles)}"
             )
         
         # Check if email service is configured
@@ -68,9 +79,14 @@ async def submit_contact_form(
             success=True,
             message="Thank you for your message! We'll get back to you soon."
         )
-        
-    except HTTPException:
+          except HTTPException:
         raise
+    except ValidationError as e:
+        logger.error(f"Validation error in contact form: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid data provided: {str(e)}"
+        )
     except Exception as e:
         logger.error(f"Error processing contact form: {e}")
         raise HTTPException(
