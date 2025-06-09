@@ -1,4 +1,4 @@
-/// <reference types="vite/client" />
+// Environment variable type definitions for the Landing Page
 
 interface ImportMetaEnv {
   readonly VITE_API_URL?: string;
