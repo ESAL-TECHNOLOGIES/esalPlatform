@@ -32,8 +32,5 @@
   "packageManager": "pnpm@10.11.0",
   "engines": {
     "node": ">=18"
-  },
-  "dependencies": {
-    "esal-platform": "file:"
   }
 }
