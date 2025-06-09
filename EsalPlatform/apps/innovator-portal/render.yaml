@@ -1,0 +1,35 @@
+services:
+  - type: static_site
+    name: esal-innovator-portal
+    rootDir: apps/innovator-portal
+    buildCommand: cd ../.. && pnpm install && pnpm --filter @esal/ui run build && cd apps/innovator-portal && pnpm run build:local
+    publishPath: ./dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    buildFilter:
+      paths:
+        - apps/innovator-portal/**
+        - packages/ui/**
+        - pnpm-lock.yaml
+        - package.json
+      ignoredPaths:
+        - "**/*.md"
+        - "**/*.test.js"
+        - "**/*.test.ts"
+        - "**/*.spec.js"
+        - "**/*.spec.ts"
+    envVars:
+      - key: NODE_VERSION
+        value: "18"
+      - key: VITE_API_URL
+        value: https://esalplatform-1.onrender.com
+      - key: VITE_SUPABASE_URL
+        value: https://ppvkucdspgoeqsxxydxg.supabase.co
+      - key: VITE_SUPABASE_ANON_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBwdmt1Y2RzcGdvZXFzeHh5ZHhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxNTkzMzAsImV4cCI6MjA2MzczNTMzMH0.6VVpA6qEcjNPJvPvn0dMh7CUNkNTCYGWsMwb6WS0XGE
+      - key: VITE_APP_TITLE
+        value: ESAL Innovator Portal
+      - key: VITE_ENVIRONMENT
+        value: production

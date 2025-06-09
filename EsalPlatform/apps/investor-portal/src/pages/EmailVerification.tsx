@@ -112,10 +112,8 @@ const EmailVerification: React.FC<EmailVerificationProps> = () => {
             email: email,
           }),
         }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
+      );      if (response.ok) {
+        await response.json();
         setSuccess("Verification code sent! Please check your email.");
         setTimeLeft(60); // 60 second cooldown
       } else {

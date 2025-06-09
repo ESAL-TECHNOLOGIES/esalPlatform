@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "cd ../.. && pnpm turbo build --filter=landing",
+  "buildCommand": "cd ../.. && pnpm install --frozen-lockfile && pnpm --filter @esal/ui run build && cd apps/landing && pnpm run build:local",
   "outputDirectory": "dist",
-  "installCommand": "cd ../.. && pnpm install",
+  "installCommand": "echo 'Skip default install'",
   "routes": [
     {
       "src": "/(.*)",
