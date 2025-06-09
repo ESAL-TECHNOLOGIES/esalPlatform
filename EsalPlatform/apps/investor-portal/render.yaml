@@ -2,15 +2,26 @@ services:
   - type: static_site
     name: esal-investor-portal
     rootDir: .
-    buildCommand: npm install && npm run build:ui && cd apps/investor-portal && npm run build
-    publishPath: ./apps/investor-portal/dist
+    buildCommand: npm run build:render
+    publishPath: ./dist
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
+    buildFilter:
+      paths:
+        - apps/investor-portal/**
+        - packages/ui/**
+        - package.json
+      ignoredPaths:
+        - "**/*.md"
+        - "**/*.test.js"
+        - "**/*.test.ts"
+        - "**/*.spec.js"
+        - "**/*.spec.ts"
     envVars:
       - key: NODE_VERSION
-        value: "18"
+        value: "22"
       - key: VITE_API_URL
         value: https://esalplatform-1.onrender.com
       - key: VITE_SUPABASE_URL
