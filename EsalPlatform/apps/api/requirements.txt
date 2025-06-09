@@ -20,9 +20,9 @@ PyJWT==2.8.0
 
 # Supabase Integration - Updated for compatibility
 supabase==2.9.1
-postgrest==0.16.11
-storage3==0.7.7
-gotrue==2.8.2
+postgrest==0.17.0
+storage3==0.8.0
+gotrue==2.12.0
 realtime==2.0.5
 
 # HTTP Client with proxy support
