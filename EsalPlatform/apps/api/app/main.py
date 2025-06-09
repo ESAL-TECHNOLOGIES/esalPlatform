@@ -135,9 +135,7 @@ app.include_router(contact.router, prefix="/api/v1/contact", tags=["Contact"])
 async def options_handler(path: str, request: Request):
     """Handle CORS preflight requests manually"""
     origin = request.headers.get("origin")
-    response = Response()
-    
-    # Always allow the specific origins we know about
+    response = Response()    # Always allow the specific origins we know about
     allowed_origins = [
         "https://esalplatform.onrender.com",
         "https://innovator-portal.onrender.com", 
