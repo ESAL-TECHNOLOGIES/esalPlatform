@@ -31,7 +31,11 @@ async def lifespan(app: FastAPI):
     """Application lifespan events"""
     # Startup
     logger.info("Starting ESAL Platform API...")
+    logger.info(f"Environment: {settings.ENVIRONMENT}")
+    logger.info(f"Is Production: {settings.is_production}")
+    logger.info(f"Debug Mode: {settings.DEBUG}")
     logger.info(f"CORS Origins: {settings.ALLOWED_ORIGINS}")
+    logger.info(f"CORS Origins Type: {type(settings.ALLOWED_ORIGINS)}")
     create_tables()
     yield
     # Shutdown
@@ -135,28 +139,31 @@ app.include_router(contact.router, prefix="/api/v1/contact", tags=["Contact"])
 async def options_handler(path: str, request: Request):
     """Handle CORS preflight requests manually"""
     origin = request.headers.get("origin")
-    response = Response()    # Always allow the specific origins we know about
-    allowed_origins = [
-        "https://esalplatform.onrender.com",
-        "https://innovator-portal.onrender.com", 
-        "https://investor-portal-vz2e.onrender.com",
-        "https://esal-hub-portal.onrender.com",
-        "https://esal-admin-portal.onrender.com"
-    ]
+    response = Response()
     
-    # In production, check if origin is allowed
-    if settings.is_production:
-        if origin and (
-            origin in allowed_origins or
-            origin.endswith(".onrender.com") or 
-            origin.endswith(".vercel.app")
-        ):
-            response.headers["Access-Control-Allow-Origin"] = origin
-        else:
-            response.headers["Access-Control-Allow-Origin"] = "https://esalplatform.onrender.com"
-    else:
+    # Log CORS preflight request for debugging
+    logger.info(f"CORS preflight request - Origin: {origin}, Path: {path}")
+    
+    # Use settings for allowed origins
+    allowed_origins = settings.ALLOWED_ORIGINS
+    logger.info(f"Configured allowed origins: {allowed_origins}")
+    
+    # Always allow requests from configured origins
+    if origin and origin in allowed_origins:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        logger.info(f"CORS: Allowed origin {origin}")
+    elif not settings.is_production:
         # In development, allow all
         response.headers["Access-Control-Allow-Origin"] = origin or "*"
+        logger.info(f"CORS: Development mode - allowing origin {origin}")
+    else:
+        # Production: Be more permissive for Render domains
+        if origin and (origin.endswith(".onrender.com") or origin.endswith(".vercel.app")):
+            response.headers["Access-Control-Allow-Origin"] = origin
+            logger.info(f"CORS: Allowed Render/Vercel origin {origin}")
+        else:
+            logger.warning(f"CORS: Origin {origin} not allowed")
+            # Don't set Access-Control-Allow-Origin if not allowed
     
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD"
     response.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type, Accept, Origin, X-Requested-With, X-CSRF-Token"
@@ -208,3 +215,15 @@ async def cors_debug_middleware(request: Request, call_next):
     else:
         # In production, just pass through without logging
         return await call_next(request)
+
+
+@app.get("/api/debug/cors")
+async def debug_cors():
+    """Debug endpoint to check CORS configuration"""
+    return {
+        "environment": settings.ENVIRONMENT,
+        "is_production": settings.is_production,
+        "debug": settings.DEBUG,
+        "allowed_origins": settings.ALLOWED_ORIGINS,
+        "cors_configured": True
+    }
