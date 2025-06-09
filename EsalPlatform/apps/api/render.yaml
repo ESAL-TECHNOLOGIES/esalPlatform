@@ -1,0 +1,82 @@
+services:
+  - type: web
+    name: esal-platform-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    plan: free  # or starter/standard based on your needs
+    region: oregon  # Change to your preferred region
+    branch: main
+    rootDir: apps/api
+    envVars:
+      # Application Configuration
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "False"
+      - key: PROJECT_NAME
+        value: "ESAL Platform"
+      - key: API_VERSION
+        value: "v1"
+      
+      # Python Runtime
+      - key: PYTHON_VERSION
+        value: "3.11"
+      
+      # Supabase Configuration (Set manually in dashboard)
+      - key: SUPABASE_URL
+        sync: false  # Set manually - your Supabase project URL
+      - key: SUPABASE_ANON_KEY
+        sync: false  # Set manually - your Supabase anon key
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false  # Set manually - your Supabase service role key
+      
+      # JWT Configuration (Generate secure keys)
+      - key: JWT_SECRET_KEY
+        sync: false  # Set manually - generate with: python -c "import secrets; print(secrets.token_urlsafe(32))"
+      - key: JWT_ALGORITHM
+        value: "HS256"
+      - key: JWT_EXPIRATION_TIME
+        value: "3600"
+      
+      # AI Configuration (Set manually in dashboard)
+      - key: GEMINI_API_KEY
+        sync: false  # Set manually - your Gemini API key
+      - key: OPENAI_API_KEY
+        sync: false  # Set manually - your OpenAI API key (optional)
+      
+      # CORS Configuration (Will be updated after frontend deployments)
+      - key: ALLOWED_ORIGINS
+        value: "https://esal-landing.onrender.com,https://esal-hub-portal.onrender.com,https://esal-innovator-portal.onrender.com,https://esal-investor-portal.onrender.com,https://esal-admin-portal.onrender.com"
+      
+      # Site Configuration
+      - key: SITE_URL
+        value: "https://esal-landing.onrender.com"  # Update with your main frontend URL
+      - key: CONFIRM_EMAIL_REDIRECT_URL
+        value: "https://esal-landing.onrender.com/email-confirmed"
+      
+      # Email Configuration (Optional - set if using SMTP)
+      - key: SMTP_HOST
+        value: "smtp.gmail.com"
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false  # Set manually - your email
+      - key: SMTP_PASSWORD
+        sync: false  # Set manually - your app password
+      - key: SMTP_FROM_EMAIL
+        sync: false  # Set manually - your from email
+      - key: SMTP_FROM_NAME
+        value: "ESAL Platform"
+    
+    healthCheckPath: /health
+    
+    buildFilter:
+      paths:
+        - apps/api/**
+        - requirements.txt
+      ignoredPaths:
+        - "*.md"
+        - "*.txt"
+        - "__pycache__/**"
+        - "*.pyc"
