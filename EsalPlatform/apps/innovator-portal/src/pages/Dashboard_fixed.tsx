@@ -1,6 +1,7 @@
 // filepath: d:\esalPlatform\EsalPlatform\apps\innovator-portal\src\pages\Dashboard_fixed.tsx
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, Button } from "@esal/ui";
+import { API_BASE_URL } from "../config/api";
 import {
   Lightbulb,
   Eye,

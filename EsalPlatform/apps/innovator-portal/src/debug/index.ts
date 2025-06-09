@@ -73,19 +73,18 @@ const patchReactHooks = () => {
   
   const originalUseState = React.useState;
   const originalUseEffect = React.useEffect;
-  
-  // Patch useState
+    // Patch useState
   if (originalUseState) {
-    React.useState = function<S>(initialState: S | (() => S)): [S, React.Dispatch<React.SetStateAction<S>>] {
+    React.useState = function<S>(initialState?: S | (() => S)): [S, React.Dispatch<React.SetStateAction<S>>] {
       console.log('🎣 useState called with:', initialState);
       try {
-        return originalUseState(initialState);
+        return originalUseState(initialState as any);
       } catch (error) {
         console.error('🚨 useState failed:', error);
         GlobalErrorTracker.getInstance().addError(error as Error, 'useState patch', 'hook');
         throw error;
       }
-    };
+    } as any;
   }
   
   // Patch useEffect
