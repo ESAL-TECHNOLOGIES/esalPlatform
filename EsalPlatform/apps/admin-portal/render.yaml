@@ -1,7 +1,7 @@
 services:
   - type: static_site
     name: esal-admin-portal
-    buildCommand: npm install -g pnpm@latest && cd ../.. && rm -rf node_modules && rm -rf apps/*/node_modules && pnpm install --frozen-lockfile && pnpm --filter @esal/ui run build && cd apps/admin-portal && pnpm run build:local
+    buildCommand: curl -fsSL https://get.pnpm.io/install.sh | sh - && export PNPM_HOME="/opt/render/.local/share/pnpm" && export PATH="$PNPM_HOME:$PATH" && cd ../.. && rm -rf node_modules && rm -rf apps/*/node_modules && pnpm install --frozen-lockfile && pnpm --filter @esal/ui run build && cd apps/admin-portal && pnpm run build:local
     publishPath: ./dist
     routes:
       - type: rewrite
