@@ -79,7 +79,7 @@ async def submit_contact_form(
             success=True,
             message="Thank you for your message! We'll get back to you soon."
         )
-          except HTTPException:
+    except HTTPException:
         raise
     except ValidationError as e:
         logger.error(f"Validation error in contact form: {e}")
