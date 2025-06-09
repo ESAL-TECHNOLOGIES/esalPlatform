@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Layout, Navbar, Sidebar } from "@esal/ui";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import {
   BarChart3,
   Lightbulb,
@@ -9,6 +9,15 @@ import {
   User,
   Settings as SettingsIcon,
 } from "lucide-react";
+// Debug imports
+import { 
+  ReactErrorBoundary, 
+  ReactDebugProvider, 
+  DebugPanel,
+  useStateDebug,
+  useEffectDebug,
+  setupDebugging
+} from "./debug";
 import DashboardModern from "./pages/Dashboard_fixed";
 import AIGenerator from "./pages/AIGenerator";
 import Metrics from "./pages/Metrics";
@@ -65,12 +74,18 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
 };
 
 function App() {
-  const [user, setUser] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {    // Check for existing token and get user info
+  // Initialize debugging
+  useEffect(() => {
+    setupDebugging();
+  }, []);
+
+  const [user, setUser] = useStateDebug<any>(null, 'App');
+  const [isLoading, setIsLoading] = useStateDebug(true, 'App');
+  
+  useEffectDebug(() => {    // Check for existing token and get user info
     const token = localStorage.getItem("access_token");
     if (token) {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const apiUrl = (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
       // Fetch user data from backend with token
       fetch(`${apiUrl}/api/v1/auth/me`, {
         method: "GET",
@@ -92,8 +107,7 @@ function App() {
             role: userData.role,
             email: userData.email,
           });
-        })
-        .catch((error) => {
+        })        .catch((error) => {
           console.error("Error fetching user data:", error);
           // Clear invalid token
           localStorage.removeItem("access_token");
@@ -102,7 +116,7 @@ function App() {
         });
     }
     setIsLoading(false);
-  }, []);
+  }, [], 'App');
 
   const handleLogout = () => {
     localStorage.removeItem("access_token");
@@ -116,35 +130,36 @@ function App() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">Loading...</div>
       </div>
-    );
-  }
+    );  }
   return (
-    <Routes>
-      {/* Public routes */}
-      <Route path="/email-confirmed" element={<EmailConfirmed />} />
-      <Route path="/email-verification" element={<EmailVerification />} />
+    <ReactErrorBoundary>
+      <ReactDebugProvider>
+        <Routes>
+          {/* Public routes */}
+          <Route path="/email-confirmed" element={<EmailConfirmed />} />
+          <Route path="/email-verification" element={<EmailVerification />} />
 
-      {/* Auth routes */}
-      <Route
-        path="/login"
-        element={
-          <AuthRedirect>
-            <AuthLayout>
-              <Login />
-            </AuthLayout>
-          </AuthRedirect>
-        }
-      />
-      <Route
-        path="/signup"
-        element={
-          <AuthRedirect>
-            <AuthLayout>
-              <Signup />
-            </AuthLayout>
-          </AuthRedirect>
-        }
-      />
+          {/* Auth routes */}
+          <Route
+            path="/login"
+            element={
+              <AuthRedirect>
+                <AuthLayout>
+                  <Login />
+                </AuthLayout>
+              </AuthRedirect>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <AuthRedirect>
+                <AuthLayout>
+                  <Signup />
+                </AuthLayout>
+              </AuthRedirect>
+            }
+          />
 
       {/* Protected routes */}
       <Route
@@ -172,15 +187,17 @@ function App() {
                 <Route path="/ai-generator" element={<AIGenerator />} />
                 <Route path="/metrics" element={<Metrics />} />{" "}
                 <Route path="/ideas/:ideaId" element={<IdeaDetails />} />{" "}
-                <Route path="/my-ideas" element={<MyIdeas />} />
-                <Route path="/profile" element={<Profile />} />
+                <Route path="/my-ideas" element={<MyIdeas />} />                <Route path="/profile" element={<Profile />} />
                 <Route path="/settings" element={<Settings />} />
               </Routes>
             </Layout>
           </ProtectedRoute>
         }
       />
-    </Routes>
+        </Routes>
+        <DebugPanel />
+      </ReactDebugProvider>
+    </ReactErrorBoundary>
   );
 }
 

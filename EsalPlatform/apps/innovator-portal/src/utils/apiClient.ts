@@ -2,15 +2,14 @@
  * Enhanced API Client with unified error handling and automatic token refresh
  */
 
-interface ApiResponse<T = any> {
+export interface ApiResponse<T = any> {
   data?: T;
   error?: string;
   success: boolean;
 }
 
-class ApiClient {
-  private baseURL =
-    import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1";
+class ApiClient {  private baseURL =
+    (import.meta as any).env?.VITE_API_URL || "http://localhost:8000/api/v1";
 
   private async getAuthHeaders(): Promise<Record<string, string>> {
     const token = localStorage.getItem("access_token");

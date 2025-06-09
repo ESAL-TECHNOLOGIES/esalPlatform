@@ -49,7 +49,7 @@ const Signup: React.FC = () => {
         password: formData.password,
         role: "innovator",      };
       // Log request details for debugging
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const apiUrl = (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
       const fullApiUrl = `${apiUrl}/api/v1/auth/register`;
       console.log("Request URL:", fullApiUrl);
       console.log("Request body:", requestBody); // API call to backend

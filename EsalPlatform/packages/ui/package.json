@@ -12,8 +12,10 @@
   },
   "files": [
     "dist/**"
-  ],  "scripts": {    "build": "tsup && postcss src/styles.css -o dist/index.css",
-    "dev": "tsup --watch",
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --external react && postcss src/styles.css -o dist/index.css",
+    "dev": "tsup src/index.ts --format esm --watch --dts --external react",
     "lint": "eslint src --ext .ts,.tsx",
     "type-check": "tsc --noEmit"
   },
@@ -33,8 +35,9 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
+    "@esal/ui": "file:",
     "clsx": "^2.1.1",
     "tailwind-merge": "^2.5.4",
-    "lucide-react": "^0.511.0"
+    "lucide-react": "^0.263.1"
   }
 }

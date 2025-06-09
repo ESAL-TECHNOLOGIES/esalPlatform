@@ -4,10 +4,54 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="build-time" content="%BUILD_TIME%" />
     <title>Innovator Portal - ESAL Platform</title>
   </head>
   <body>
     <div id="root"></div>
+    <!-- Production Debug Script for Render Deployment -->
+    <script>
+      // Only load debug script in production or when debug is enabled
+      if (window.location.hostname.includes('onrender.com') || 
+          window.location.search.includes('debug=true') ||
+          localStorage.getItem('enableDebug') === 'true') {
+        console.log('🔧 Loading production debug script...');
+        
+        // Inline debug script for immediate error catching
+        (function() {
+          'use strict';
+          
+          console.log('🚀 Early Production React Debug Loading...');
+          
+          // Catch very early errors
+          window.addEventListener('error', function(event) {
+            if (event.message && event.message.includes('useState')) {
+              console.group('🚨 VERY EARLY USESTATE ERROR');
+              console.error('Message:', event.message);
+              console.error('File:', event.filename);
+              console.error('Line:', event.lineno);
+              console.error('Stack:', event.error ? event.error.stack : 'No stack');
+              console.error('Timestamp:', new Date().toISOString());
+              console.groupEnd();
+            }
+          });
+          
+          // Check React availability immediately
+          const checkReact = () => {
+            console.log('React check:', {
+              windowReact: typeof window.React,
+              timestamp: new Date().toISOString()
+            });
+          };
+          
+          checkReact();
+          setTimeout(checkReact, 100);
+          setTimeout(checkReact, 500);
+          setTimeout(checkReact, 1000);
+          
+        })();
+      }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

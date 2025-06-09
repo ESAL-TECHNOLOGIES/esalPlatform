@@ -1,6 +1,6 @@
 // API configuration for the innovator portal
 export const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:8000";
+  (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
 export const API_V1_URL = `${API_BASE_URL}/api/v1`;
 
 // Helper function to build API URLs

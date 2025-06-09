@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent, Button } from "@esal/ui";
 
 // API configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || "${API_BASE_URL}";
+const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || "${API_BASE_URL}";
 
 interface NotificationSettings {
   email_notifications: boolean;

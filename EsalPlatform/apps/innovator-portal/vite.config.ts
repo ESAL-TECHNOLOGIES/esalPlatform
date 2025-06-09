@@ -22,13 +22,5 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
-    dedupe: ["react", "react-dom"],
-  },
-  optimizeDeps: {
-    include: ["react", "react-dom", "react-router-dom", "@esal/ui"],
-    force: true,
-  },
-  define: {
-    'process.env': {}
   },
 });
