@@ -2,8 +2,8 @@ services:
   - type: static_site
     name: esal-platform-landing
     rootDir: .
-    buildCommand: npm install && npm run build:ui && cd apps/landing && npm run build
-    publishPath: ./apps/landing/dist
+    buildCommand: npm run build:render
+    publishPath: ./dist
     routes:
       - type: rewrite
         source: /*
@@ -12,7 +12,6 @@ services:
       paths:
         - apps/landing/**
         - packages/ui/**
-        - pnpm-lock.yaml
         - package.json
       ignoredPaths:
         - "**/*.md"
@@ -22,13 +21,17 @@ services:
         - "**/*.spec.ts"
     envVars:
       - key: NODE_VERSION
-        value: "18"
+        value: "22"
       - key: VITE_API_URL
         value: https://esalplatform-1.onrender.com
       - key: VITE_SUPABASE_URL
         value: https://ppvkucdspgoeqsxxydxg.supabase.co
       - key: VITE_SUPABASE_ANON_KEY
         value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBwdmt1Y2RzcGdvZXFzeHh5ZHhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxNTkzMzAsImV4cCI6MjA2MzczNTMzMH0.6VVpA6qEcjNPJvPvn0dMh7CUNkNTCYGWsMwb6WS0XGE
+      - key: VITE_APP_TITLE
+        value: ESAL Platform
+      - key: VITE_ENVIRONMENT
+        value: production
       - key: VITE_APP_TITLE
         value: ESAL Platform
       - key: VITE_ENVIRONMENT
