@@ -32,10 +32,10 @@ const LandingPage: React.FC = () => {
     const portals = {
       innovator: isDevelopment 
         ? "http://localhost:3001/login" 
-        : (import.meta.env.VITE_INNOVATOR_PORTAL_URL + "/login" || "https://innovator-portal.onrender.com/login"),
+        : (import.meta.env.VITE_INNOVATOR_PORTAL_URL + "/login" || "https://esal-innovator-portal.onrender.com/login"),
       investor: isDevelopment 
         ? "http://localhost:3002/login" 
-        : (import.meta.env.VITE_INVESTOR_PORTAL_URL + "/login" || "https://investor-portal-vz2e.onrender.com/login"),
+        : (import.meta.env.VITE_INVESTOR_PORTAL_URL + "/login" || "https://esal-investor-portal.onrender.com/login"),
       hub: isDevelopment 
         ? "http://localhost:3003" 
         : (import.meta.env.VITE_HUB_PORTAL_URL || "https://esal-hub-portal.onrender.com"),

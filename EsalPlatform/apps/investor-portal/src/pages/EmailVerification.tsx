@@ -46,23 +46,21 @@ const EmailVerification: React.FC<EmailVerificationProps> = () => {
       setError("Please enter a valid 6-digit code");
       setIsLoading(false);
       return;
-    }    try {
+    }
+    try {
       const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
-      const response = await fetch(
-        `${apiUrl}/api/v1/auth/verify-email`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            user_id: userId,
-            code: verificationCode,
-            email: email, // Send email if userId not available
-          }),
-        }
-      );
+      const response = await fetch(`${apiUrl}/api/v1/auth/verify-email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          code: verificationCode,
+          email: email, // Send email if userId not available
+        }),
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -96,7 +94,8 @@ const EmailVerification: React.FC<EmailVerificationProps> = () => {
   const handleResendCode = async () => {
     setIsResending(true);
     setError("");
-    setSuccess("");    try {
+    setSuccess("");
+    try {
       const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
       const response = await fetch(
         `${apiUrl}/api/v1/auth/resend-verification`,

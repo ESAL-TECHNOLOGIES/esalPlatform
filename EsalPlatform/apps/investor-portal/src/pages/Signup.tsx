@@ -50,7 +50,7 @@ const Signup: React.FC = () => {
         full_name: formData.name, // Backend expects 'full_name' not 'name'
         password: formData.password,
         role: "investor", // Set role to investor
-      };      // Log request details for debugging
+      }; // Log request details for debugging
       const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
       const fullApiUrl = `${apiUrl}/api/v1/auth/register`;
       console.log("Request URL:", fullApiUrl);
