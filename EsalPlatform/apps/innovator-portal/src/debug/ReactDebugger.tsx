@@ -18,6 +18,12 @@ const DebugContext = createContext<DebugContextType | null>(null);
 export const useStateDebug = function<T>(initialState: T, componentName?: string) {
   const debugContext = useContext(DebugContext);
   
+  // Safety check: if called outside provider, fall back to regular useState
+  if (!debugContext) {
+    console.warn('⚠️ useStateDebug called outside ReactDebugProvider, falling back to regular useState');
+    return useState(initialState);
+  }
+  
   try {
     // Check if React is properly loaded
     if (typeof React === 'undefined') {
@@ -69,6 +75,12 @@ export const useStateDebug = function<T>(initialState: T, componentName?: string
 // Enhanced useEffect hook with debugging
 export const useEffectDebug = function(effect: React.EffectCallback, deps?: React.DependencyList, componentName?: string) {
   const debugContext = useContext(DebugContext);
+  
+  // Safety check: if called outside provider, fall back to regular useEffect
+  if (!debugContext) {
+    console.warn('⚠️ useEffectDebug called outside ReactDebugProvider, falling back to regular useEffect');
+    return useEffect(effect, deps);
+  }
   
   try {
     console.log('✅ React Debug: useEffect called', {

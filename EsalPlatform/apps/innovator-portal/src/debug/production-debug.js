@@ -113,8 +113,7 @@
       console.log('⚠️ React DevTools not detected');
     }
   }
-  
-  // Check React environment
+    // Check React environment
   function checkReactEnvironment() {
     console.group('🔍 React Environment Check');
     
@@ -137,11 +136,11 @@
     
     console.log('React instances found:', reactInstances);
     
-    // Check build environment
+    // Check build environment safely
     console.log('Environment variables:', {
-      NODE_ENV: process?.env?.NODE_ENV || 'unknown',
-      MODE: import.meta?.env?.MODE || 'unknown',
-      VITE_ENVIRONMENT: import.meta?.env?.VITE_ENVIRONMENT || 'unknown'
+      NODE_ENV: (typeof process !== 'undefined' && process.env && process.env.NODE_ENV) || 'unknown',
+      MODE: (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE) || 'unknown',
+      VITE_ENVIRONMENT: (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_ENVIRONMENT) || 'unknown'
     });
     
     console.groupEnd();

@@ -29,7 +29,7 @@ export const ProductionDebugger: React.FC = () => {
         reactExists: typeof React !== 'undefined',
         useStateExists: typeof React.useState === 'function',
         useEffectExists: typeof React.useEffect === 'function',
-        nodeEnv: process?.env?.NODE_ENV || 'unknown',
+        nodeEnv: (typeof process !== 'undefined' ? process?.env?.NODE_ENV : undefined) || 'unknown',
         viteEnv: (import.meta as any)?.env || {},
         buildTime: document.querySelector('meta[name="build-time"]')?.getAttribute('content'),        scripts: Array.from(document.querySelectorAll('script[src]')).map(s => (s as HTMLScriptElement).src),
         devTools: !!(window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__

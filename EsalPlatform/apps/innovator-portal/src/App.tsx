@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Layout, Navbar, Sidebar } from "@esal/ui";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   BarChart3,
   Lightbulb,
@@ -14,8 +14,6 @@ import {
   ReactErrorBoundary, 
   ReactDebugProvider, 
   DebugPanel,
-  useStateDebug,
-  useEffectDebug,
   setupDebugging
 } from "./debug";
 import DashboardModern from "./pages/Dashboard_fixed";
@@ -79,10 +77,11 @@ function App() {
     setupDebugging();
   }, []);
 
-  const [user, setUser] = useStateDebug<any>(null, 'App');
-  const [isLoading, setIsLoading] = useStateDebug(true, 'App');
+  const [user, setUser] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   
-  useEffectDebug(() => {    // Check for existing token and get user info
+  useEffect(() => {
+    // Check for existing token and get user info
     const token = localStorage.getItem("access_token");
     if (token) {
       const apiUrl = (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
@@ -112,11 +111,10 @@ function App() {
           // Clear invalid token
           localStorage.removeItem("access_token");
           localStorage.removeItem("refresh_token");
-          setUser(null);
-        });
+          setUser(null);        });
     }
     setIsLoading(false);
-  }, [], 'App');
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("access_token");
