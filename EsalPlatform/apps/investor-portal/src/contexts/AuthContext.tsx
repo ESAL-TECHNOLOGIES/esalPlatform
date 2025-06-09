@@ -38,11 +38,11 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const fetchUserInfo = async (token: string): Promise<User | null> => {
+  const [isLoading, setIsLoading] = useState(true);  const fetchUserInfo = async (token: string): Promise<User | null> => {
     try {
       // First get basic user info
-      const authResponse = await fetch("http://localhost:8000/api/v1/auth/me", {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const authResponse = await fetch(`${apiUrl}/api/v1/auth/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -56,12 +56,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return null;
       }
 
-      const authData = await authResponse.json();
-
-      // Then get full profile data including avatar
+      const authData = await authResponse.json();      // Then get full profile data including avatar
       try {
         const profileResponse = await fetch(
-          "http://localhost:8000/api/v1/investor/profile",
+          `${apiUrl}/api/v1/investor/profile`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

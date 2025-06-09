@@ -362,11 +362,11 @@ const Profile: React.FC = () => {
   }, []);
   const fetchProfile = async () => {
     try {
-      const token = localStorage.getItem("access_token");
-      if (!token) return;
+      const token = localStorage.getItem("access_token");      if (!token) return;
 
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
       const response = await fetch(
-        "http://localhost:8000/api/v1/investor/profile",
+        `${apiUrl}/api/v1/investor/profile`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -392,12 +392,12 @@ const Profile: React.FC = () => {
 
     try {
       const token = localStorage.getItem("access_token");
-      if (!token) {
-        throw new Error("Authentication required");
+      if (!token) {        throw new Error("Authentication required");
       }
 
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
       const response = await fetch(
-        "http://localhost:8000/api/v1/investor/profile",
+        `${apiUrl}/api/v1/investor/profile`,
         {
           method: "PUT",
           headers: {

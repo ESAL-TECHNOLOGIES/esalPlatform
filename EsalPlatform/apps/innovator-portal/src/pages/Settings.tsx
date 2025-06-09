@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent, Button } from "@esal/ui";
 
+// API configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || "${API_BASE_URL}";
+
 interface NotificationSettings {
   email_notifications: boolean;
   idea_comments: boolean;
@@ -103,11 +106,9 @@ const Settings: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }
-
-      // Fetch general settings
+      }      // Fetch general settings
       const settingsResponse = await fetch(
-        "http://localhost:8000/api/v1/users/settings",
+        `${API_BASE_URL}/api/v1/users/settings`,
         {
           method: "GET",
           headers: {
@@ -115,11 +116,9 @@ const Settings: React.FC = () => {
             "Content-Type": "application/json",
           },
         }
-      );
-
-      // Fetch notification settings
+      );      // Fetch notification settings
       const notificationsResponse = await fetch(
-        "http://localhost:8000/api/v1/users/notifications",
+        `${API_BASE_URL}/api/v1/users/notifications`,
         {
           method: "GET",
           headers: {
@@ -164,7 +163,7 @@ const Settings: React.FC = () => {
       if (!token) return;
 
       const response = await fetch(
-        "http://localhost:8000/api/v1/users/security-info",
+        "${API_BASE_URL}/api/v1/users/security-info",
         {
           method: "GET",
           headers: {
@@ -189,7 +188,7 @@ const Settings: React.FC = () => {
       if (!token) return;
 
       const response = await fetch(
-        "http://localhost:8000/api/v1/users/sessions",
+        "${API_BASE_URL}/api/v1/users/sessions",
         {
           method: "GET",
           headers: {
@@ -271,7 +270,7 @@ const Settings: React.FC = () => {
       console.log("Notification settings being sent:", settings.notifications);
 
       const response = await fetch(
-        "http://localhost:8000/api/v1/users/notifications",
+        "${API_BASE_URL}/api/v1/users/notifications",
         {
           method: "PUT",
           headers: {
@@ -331,7 +330,7 @@ const Settings: React.FC = () => {
       };
 
       const response = await fetch(
-        "http://localhost:8000/api/v1/users/settings",
+        "${API_BASE_URL}/api/v1/users/settings",
         {
           method: "PUT",
           headers: {
@@ -376,7 +375,7 @@ const Settings: React.FC = () => {
       }
 
       const response = await fetch(
-        "http://localhost:8000/api/v1/users/settings",
+        "${API_BASE_URL}/api/v1/users/settings",
         {
           method: "PUT",
           headers: {
@@ -441,7 +440,7 @@ const Settings: React.FC = () => {
       }
 
       const response = await fetch(
-        "http://localhost:8000/api/v1/users/change-password",
+        "${API_BASE_URL}/api/v1/users/change-password",
         {
           method: "POST",
           headers: {
@@ -494,7 +493,7 @@ const Settings: React.FC = () => {
       }
 
       const response = await fetch(
-        "http://localhost:8000/api/v1/users/enable-2fa",
+        "${API_BASE_URL}/api/v1/users/enable-2fa",
         {
           method: "POST",
           headers: {
@@ -545,7 +544,7 @@ const Settings: React.FC = () => {
       }
 
       const response = await fetch(
-        "http://localhost:8000/api/v1/users/disable-2fa",
+        "${API_BASE_URL}/api/v1/users/disable-2fa",
         {
           method: "POST",
           headers: {
@@ -582,7 +581,7 @@ const Settings: React.FC = () => {
       }
 
       const response = await fetch(
-        `http://localhost:8000/api/v1/users/sessions/${sessionId}`,
+        `${API_BASE_URL}/api/v1/users/sessions/${sessionId}`,
         {
           method: "DELETE",
           headers: {
@@ -621,7 +620,7 @@ const Settings: React.FC = () => {
       }
 
       const response = await fetch(
-        "http://localhost:8000/api/v1/users/export",
+        "${API_BASE_URL}/api/v1/users/export",
         {
           method: "GET",
           headers: {
@@ -671,7 +670,7 @@ const Settings: React.FC = () => {
         }
 
         const response = await fetch(
-          "http://localhost:8000/api/v1/users/delete-account",
+          "${API_BASE_URL}/api/v1/users/delete-account",
           {
             method: "DELETE",
             headers: {

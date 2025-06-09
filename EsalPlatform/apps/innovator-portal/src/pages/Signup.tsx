@@ -47,13 +47,13 @@ const Signup: React.FC = () => {
         email: formData.email,
         full_name: formData.name, // Backend expects 'full_name' not 'name'
         password: formData.password,
-        role: "innovator",
-      };
+        role: "innovator",      };
       // Log request details for debugging
-      const apiUrl = "http://localhost:8000/api/v1/auth/register";
-      console.log("Request URL:", apiUrl);
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const fullApiUrl = `${apiUrl}/api/v1/auth/register`;
+      console.log("Request URL:", fullApiUrl);
       console.log("Request body:", requestBody); // API call to backend
-      const response = await fetch(apiUrl, {
+      const response = await fetch(fullApiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

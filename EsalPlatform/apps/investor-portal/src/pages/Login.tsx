@@ -25,12 +25,11 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
-
-    try {
+    setError("");    try {
       // API call to backend using JSON endpoint
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
       const response = await fetch(
-        "http://localhost:8000/api/v1/auth/login-json",
+        `${apiUrl}/api/v1/auth/login-json`,
         {
           method: "POST",
           headers: {

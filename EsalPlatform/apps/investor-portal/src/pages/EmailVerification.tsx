@@ -46,11 +46,10 @@ const EmailVerification: React.FC<EmailVerificationProps> = () => {
       setError("Please enter a valid 6-digit code");
       setIsLoading(false);
       return;
-    }
-
-    try {
+    }    try {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
       const response = await fetch(
-        "http://localhost:8000/api/v1/auth/verify-email",
+        `${apiUrl}/api/v1/auth/verify-email`,
         {
           method: "POST",
           headers: {
@@ -97,11 +96,10 @@ const EmailVerification: React.FC<EmailVerificationProps> = () => {
   const handleResendCode = async () => {
     setIsResending(true);
     setError("");
-    setSuccess("");
-
-    try {
+    setSuccess("");    try {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
       const response = await fetch(
-        "http://localhost:8000/api/v1/auth/resend-verification",
+        `${apiUrl}/api/v1/auth/resend-verification`,
         {
           method: "POST",
           headers: {
