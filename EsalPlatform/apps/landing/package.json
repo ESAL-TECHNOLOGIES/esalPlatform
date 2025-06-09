@@ -7,7 +7,7 @@
     "build": "cd ../.. && npm install && npm run build:ui && cd apps/landing && npm run build:local",
     "build:local": "tsc && vite build",
     "build:npm": "npm install && npm run build:local",
-    "build:render": "cd ../.. && npm install --include=dev && cd packages/ui && npm install --include=dev && npm run build && cd ../../apps/landing && npm install --include=dev && npm install react@^18.3.1 react-dom@^18.3.1 @vitejs/plugin-react@^4.3.4 && npx --yes vite@6.0.5 build --config vite.config.simple.js",
+    "build:render": "cd ../.. && npm install --include=dev react@^18.3.1 react-dom@^18.3.1 react-router-dom@^6.28.0 @vitejs/plugin-react@^4.3.4 vite@^6.0.5 lucide-react@^0.511.0 && cd packages/ui && npm install --include=dev && npm run build && cd ../../apps/landing && npm install --include=dev react@^18.3.1 react-dom@^18.3.1 react-router-dom@^6.28.0 @vitejs/plugin-react@^4.3.4 vite@^6.0.5 lucide-react@^0.511.0 && npx --yes vite@6.0.5 build --config vite.config.simple.js",
     "build:simple": "npx --yes vite@6.0.5 build --config vite.config.simple.js",
     "build:no-config": "npx --yes vite@6.0.5 build --outDir dist",
     "build:esbuild": "npx --yes esbuild src/main.tsx --bundle --outdir=dist --format=esm --jsx=automatic --loader:.css=css --external:react --external:react-dom",
