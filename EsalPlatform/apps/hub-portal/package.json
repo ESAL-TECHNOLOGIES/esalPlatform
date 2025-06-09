@@ -2,12 +2,12 @@
   "name": "@esal/hub-portal",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
-  "scripts": {
+  "type": "module",  "scripts": {
     "dev": "vite --port 3003",
     "build": "tsc && vite build",
     "build:npm": "npm install && npm run build",
-    "build:render": "cd ../.. && npm install && cd packages/ui && npm install && npm run build && cd ../../apps/hub-portal && npm install && npm run build",
+    "build:render": "cd ../.. && npm install --include=dev && cd packages/ui && npm install --include=dev && npm run build && cd ../../apps/hub-portal && npm install --include=dev && npm run build:vite-only",
+    "build:vite-only": "vite build",
     "vercel-build": "cd ../.. && pnpm install && pnpm --filter @esal/ui run build && cd apps/hub-portal && pnpm run build",
     "preview": "vite preview",
     "lint": "eslint src --ext .ts,.tsx",
