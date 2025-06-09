@@ -1,34 +1,22 @@
 services:
   - type: static_site
-    name: esal-landing
-    staticSiteGenerator: vite
-    buildCommand: cd ../.. && pnpm install && pnpm turbo build --filter=landing
+    name: esal-platform-landing
+    buildCommand: npm install -g pnpm && cd ../.. && pnpm install && pnpm --filter @esal/ui run build && cd apps/landing && pnpm run build
     publishPath: ./dist
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
     envVars:
+      - key: NODE_VERSION
+        value: "18"
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: esal-platform-api
-          property: host
-        # Will resolve to https://your-api-name.onrender.com
+        value: https://esalplatform-1.onrender.com
       - key: VITE_SUPABASE_URL
-        sync: false  # Set manually in Render dashboard
+        value: https://ppvkucdspgoeqsxxydxg.supabase.co
       - key: VITE_SUPABASE_ANON_KEY
-        sync: false  # Set manually in Render dashboard
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBwdmt1Y2RzcGdvZXFzeHh5ZHhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxNTkzMzAsImV4cCI6MjA2MzczNTMzMH0.6VVpA6qEcjNPJvPvn0dMh7CUNkNTCYGWsMwb6WS0XGE
       - key: VITE_APP_TITLE
-        value: "ESAL Platform"
+        value: ESAL Platform
       - key: VITE_ENVIRONMENT
-        value: "production"
-    buildFilter:
-      paths:
-        - apps/landing/**
-        - packages/**
-        - pnpm-lock.yaml
-        - turbo.json
-      ignoredPaths:
-        - "*.md"
-        - "*.txt"
+        value: production
