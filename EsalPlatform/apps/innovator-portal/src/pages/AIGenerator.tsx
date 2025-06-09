@@ -114,7 +114,8 @@ const AIGenerator: React.FC = () => {
   const fetchUserIdeas = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      if (!token) return;      const response = await fetch(
+      if (!token) return;
+      const response = await fetch(
         `${API_BASE_URL}/api/v1/innovator/view-ideas`,
         {
           headers: {
@@ -207,7 +208,8 @@ const AIGenerator: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }      const response = await fetch(
+      }
+      const response = await fetch(
         `${API_BASE_URL}/api/v1/innovator/ai/generate-idea`,
         {
           method: "POST",
@@ -259,7 +261,8 @@ const AIGenerator: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }      const response = await fetch(
+      }
+      const response = await fetch(
         `${API_BASE_URL}/api/v1/innovator/ai/fine-tune`,
         {
           method: "POST",
@@ -300,7 +303,8 @@ const AIGenerator: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }      const response = await fetch(
+      }
+      const response = await fetch(
         `${API_BASE_URL}/api/v1/innovator/ai/judge-idea`,
         {
           method: "POST",
@@ -351,7 +355,8 @@ const AIGenerator: React.FC = () => {
           .map((idea) => `${idea.title}: ${idea.description || ""}`)
           .filter((ideaText) => ideaText.length > 10),
         focus_area: recommendationsForm.focus_area,
-      };      const response = await fetch(
+      };
+      const response = await fetch(
         `${API_BASE_URL}/api/v1/innovator/ai/recommendations`,
         {
           method: "POST",
@@ -423,7 +428,8 @@ const AIGenerator: React.FC = () => {
         target_market: generateForm.target_market || "To be determined",
         category: generateForm.industry || "Technology",
         tags: [generateForm.industry, "AI-Generated"].filter(Boolean),
-      };      const response = await fetch(
+      };
+      const response = await fetch(
         `${API_BASE_URL}/api/v1/innovator/submit-idea`,
         {
           method: "POST",

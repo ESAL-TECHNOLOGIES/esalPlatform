@@ -85,16 +85,14 @@ const IdeaDetails: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }      const response = await fetch(
-        `${API_BASE_URL}/api/v1/ideas/${ideaId}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      }
+      const response = await fetch(`${API_BASE_URL}/api/v1/ideas/${ideaId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -124,7 +122,8 @@ const IdeaDetails: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }      const response = await fetch(
+      }
+      const response = await fetch(
         `${API_BASE_URL}/api/v1/ideas/${ideaId}/comment`,
         {
           method: "POST",
@@ -211,7 +210,8 @@ const IdeaDetails: React.FC = () => {
       }
 
       const formData = new FormData();
-      formData.append("file", selectedFile);      const response = await fetch(
+      formData.append("file", selectedFile);
+      const response = await fetch(
         `${API_BASE_URL}/api/v1/ideas/${ideaId}/upload-file`,
         {
           method: "POST",
@@ -270,16 +270,14 @@ const IdeaDetails: React.FC = () => {
         const token = localStorage.getItem("access_token");
         if (!token) {
           throw new Error("Authentication required");
-        }        const response = await fetch(
-          `${API_BASE_URL}/api/v1/ideas/${ideaId}`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        }
+        const response = await fetch(`${API_BASE_URL}/api/v1/ideas/${ideaId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
 
         if (!response.ok) {
           const errorData = await response.json();
@@ -563,7 +561,9 @@ const IdeaDetails: React.FC = () => {
                       key={file.id}
                       className="flex items-center justify-between py-2 px-4 border rounded-lg"
                     >
-                      <div className="flex items-center">                        <div className="mr-3 text-lg">
+                      <div className="flex items-center">
+                        {" "}
+                        <div className="mr-3 text-lg">
                           {file.file_type.includes("pdf") ? (
                             <FileText className="w-5 h-5 text-red-500" />
                           ) : file.file_type.includes("image") ? (

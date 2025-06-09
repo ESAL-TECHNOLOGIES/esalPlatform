@@ -26,19 +26,16 @@ const Login: React.FC = () => {
 
     try {
       // API call to backend using JSON endpoint
-      const response = await fetch(
-        `${API_BASE_URL}/api/v1/auth/login-json`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-          }),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login-json`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
 
       if (response.ok) {
         const data = await response.json();

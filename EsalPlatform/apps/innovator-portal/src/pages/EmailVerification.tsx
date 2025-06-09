@@ -48,21 +48,19 @@ const EmailVerification: React.FC<EmailVerificationProps> = () => {
       return;
     }
 
-    try {      const response = await fetch(
-        `${API_BASE_URL}/api/v1/auth/verify-email`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            user_id: userId,
-            code: verificationCode,
-            email: email, // Send email if userId not available
-          }),
-        }
-      );
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/verify-email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          code: verificationCode,
+          email: email, // Send email if userId not available
+        }),
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -98,7 +96,8 @@ const EmailVerification: React.FC<EmailVerificationProps> = () => {
     setError("");
     setSuccess("");
 
-    try {      const response = await fetch(
+    try {
+      const response = await fetch(
         `${API_BASE_URL}/api/v1/auth/resend-verification`,
         {
           method: "POST",
