@@ -7,8 +7,9 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "build:npm": "npm install && npm run build",
-    "build:render": "cd ../.. && npm install --include=dev && cd packages/ui && npm install --include=dev && npm run build && cd ../../apps/innovator-portal && npm install --include=dev && npm run build:vite-only",
-    "build:vite-only": "vite build",
+    "build:render": "cd ../.. && npm install --include=dev react@^18.3.1 react-dom@^18.3.1 react-router-dom@^6.28.0 @vitejs/plugin-react@^4.3.4 vite@^6.0.5 lucide-react@^0.511.0 tailwindcss@^3.4.17 postcss@^8.5.0 autoprefixer@^10.4.20 axios@^1.9.0 recharts@^2.15.3 && cd packages/ui && npm install --include=dev && npm run build && cd ../../apps/innovator-portal && npm install --include=dev react@^18.3.1 react-dom@^18.3.1 react-router-dom@^6.28.0 @vitejs/plugin-react@^4.3.4 vite@^6.0.5 lucide-react@^0.511.0 tailwindcss@^3.4.17 postcss@^8.5.0 autoprefixer@^10.4.20 axios@^1.9.0 recharts@^2.15.3 && npx --yes vite@6.0.5 build --config vite.config.simple.js",
+    "build:simple": "npx --yes vite@6.0.5 build --config vite.config.simple.js",
+    "build:no-config": "npx --yes vite@6.0.5 build --outDir dist",
     "vercel-build": "cd ../.. && pnpm install && pnpm --filter @esal/ui run build && cd apps/innovator-portal && pnpm run build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
@@ -16,26 +17,26 @@
   },
   "dependencies": {
     "@esal/ui": "file:../../packages/ui",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
     "axios": "^1.9.0",
     "lucide-react": "^0.511.0",
+    "postcss": "^8.5.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",
-    "recharts": "^2.15.3"
+    "recharts": "^2.15.3",
+    "tailwindcss": "^3.4.17",
+    "vite": "^6.0.5"
   },
   "devDependencies": {
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@typescript-eslint/eslint-plugin": "^8.15.0",
     "@typescript-eslint/parser": "^8.15.0",
-    "@vitejs/plugin-react": "^4.3.4",
-    "autoprefixer": "^10.4.20",
     "eslint": "^9.17.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",
-    "postcss": "^8.5.0",
-    "tailwindcss": "^3.4.17",
-    "typescript": "^5.7.2",
-    "vite": "^6.0.5"
+    "typescript": "^5.7.2"
   }
 }
