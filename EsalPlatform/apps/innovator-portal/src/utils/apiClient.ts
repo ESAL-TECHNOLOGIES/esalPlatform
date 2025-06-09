@@ -9,7 +9,7 @@ interface ApiResponse<T = any> {
 }
 
 class ApiClient {
-  private baseURL = "http://localhost:8000/api/v1";
+  private baseURL = import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1";
 
   private async getAuthHeaders(): Promise<Record<string, string>> {
     const token = localStorage.getItem("access_token");

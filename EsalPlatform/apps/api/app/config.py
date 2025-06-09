@@ -37,8 +37,7 @@ class Settings(BaseSettings):
     JWT_EXPIRATION_TIME: int = Field(default=3600, description="JWT expiration time in seconds")
     # CORS - Handle as string and convert to list
     ALLOWED_ORIGINS: Union[str, List[str]] = Field(
-        default=[
-            "http://localhost:3000",  # Landing page
+        default=[            "http://localhost:3000",  # Landing page
             "http://localhost:3001",  # Innovator portal
             "http://localhost:3002",  # Investor portal
             "http://localhost:3003",  # Hub portal
@@ -52,7 +51,14 @@ class Settings(BaseSettings):
             "http://127.0.0.1:3003",  # Hub portal (127.0.0.1)
             "http://127.0.0.1:3004",  # Admin portal (127.0.0.1)
             "http://127.0.0.1:5173",  # Vite default (127.0.0.1)
-            "https://esal-platform.vercel.app"  # Production deployment      
+            # Production Vercel deployments
+            "https://esal-platform.vercel.app",  # Landing page
+            "https://esal-innovator-portal.vercel.app",  # Innovator portal
+            "https://esal-investor-portal.vercel.app",  # Investor portal
+            "https://esal-hub-portal.vercel.app",  # Hub portal
+            "https://esal-admin-portal.vercel.app",  # Admin portal
+            # Alternative Vercel URLs (user might use different names)
+            "https://*.vercel.app"  # Allow all Vercel subdomains
               ],
         description="Allowed CORS origins"
     )

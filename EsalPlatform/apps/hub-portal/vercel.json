@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "name": "esal-hub-portal",
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "env": {
+    "VITE_API_URL": "https://esalplatform-1.onrender.com",
+    "VITE_SUPABASE_URL": "https://ppvkucdspgoeqsxxydxg.supabase.co",
+    "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBwdmt1Y2RzcGdvZXFzeHh5ZHhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxNTkzMzAsImV4cCI6MjA2MzczNTMzMH0.6VVpA6qEcjNPJvPvn0dMh7CUNkNTCYGWsMwb6WS0XGE",
+    "VITE_APP_TITLE": "ESAL Hub Portal",
+    "VITE_ENVIRONMENT": "production"
+  },
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm run build",
+  "outputDirectory": "dist"
+}

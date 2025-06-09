@@ -108,11 +108,10 @@ const LandingPage: React.FC = () => {
     }
 
     setIsSubmitting(true);
-    setSubmitMessage(null);
-
-    try {
+    setSubmitMessage(null);    try {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
       const response = await fetch(
-        "http://localhost:8000/api/v1/contact/submit",
+        `${apiUrl}/api/v1/contact/submit`,
         {
           method: "POST",
           headers: {
