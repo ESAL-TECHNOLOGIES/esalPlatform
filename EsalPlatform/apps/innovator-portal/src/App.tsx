@@ -67,12 +67,12 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
 function App() {
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    // Check for existing token and get user info
+  useEffect(() => {    // Check for existing token and get user info
     const token = localStorage.getItem("access_token");
     if (token) {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
       // Fetch user data from backend with token
-      fetch("http://localhost:8000/api/v1/auth/me", {
+      fetch(`${apiUrl}/api/v1/auth/me`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
