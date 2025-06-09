@@ -1,12 +1,25 @@
 services:
   - type: static_site
     name: esal-platform-landing
-    buildCommand: curl -fsSL https://get.pnpm.io/install.sh | sh - && export PNPM_HOME="/opt/render/.local/share/pnpm" && export PATH="$PNPM_HOME:$PATH" && cd ../.. && rm -rf node_modules && rm -rf apps/*/node_modules && pnpm install --frozen-lockfile && pnpm --filter @esal/ui run build && cd apps/landing && pnpm run build:local
+    rootDir: apps/landing
+    buildCommand: cd ../.. && pnpm install && pnpm --filter @esal/ui run build && cd apps/landing && pnpm run build:local
     publishPath: ./dist
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
+    buildFilter:
+      paths:
+        - apps/landing/**
+        - packages/ui/**
+        - pnpm-lock.yaml
+        - package.json
+      ignoredPaths:
+        - "**/*.md"
+        - "**/*.test.js"
+        - "**/*.test.ts"
+        - "**/*.spec.js"
+        - "**/*.spec.ts"
     envVars:
       - key: NODE_VERSION
         value: "18"
