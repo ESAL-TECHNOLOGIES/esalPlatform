@@ -9,13 +9,6 @@ import {
   User,
   Settings as SettingsIcon,
 } from "lucide-react";
-// Debug imports
-import { 
-  ReactErrorBoundary, 
-  ReactDebugProvider, 
-  DebugPanel,
-  setupDebugging
-} from "./debug";
 import DashboardModern from "./pages/Dashboard_fixed";
 import AIGenerator from "./pages/AIGenerator";
 import Metrics from "./pages/Metrics";
@@ -72,11 +65,6 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
 };
 
 function App() {
-  // Initialize debugging
-  useEffect(() => {
-    setupDebugging();
-  }, []);
-
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   
@@ -128,74 +116,68 @@ function App() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">Loading...</div>
       </div>
-    );  }
-  return (
-    <ReactErrorBoundary>
-      <ReactDebugProvider>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/email-confirmed" element={<EmailConfirmed />} />
-          <Route path="/email-verification" element={<EmailVerification />} />
+    );  }  return (
+    <Routes>
+      {/* Public routes */}
+      <Route path="/email-confirmed" element={<EmailConfirmed />} />
+      <Route path="/email-verification" element={<EmailVerification />} />
 
-          {/* Auth routes */}
-          <Route
-            path="/login"
-            element={
-              <AuthRedirect>
-                <AuthLayout>
-                  <Login />
-                </AuthLayout>
-              </AuthRedirect>
-            }
-          />
-          <Route
-            path="/signup"
-            element={
-              <AuthRedirect>
-                <AuthLayout>
-                  <Signup />
-                </AuthLayout>
-              </AuthRedirect>
-            }
-          />
-
-      {/* Protected routes */}
+      {/* Auth routes */}
       <Route
-        path="/*"
+        path="/login"
         element={
-          <ProtectedRoute>
-            <Layout
-              navbar={
-                <Navbar
-                  title="Innovator Portal"
-                  user={user}
-                  onLogout={handleLogout}
-                />
-              }
-              sidebar={
-                <Sidebar
-                  items={sidebarItems}
-                  currentPath={window.location.pathname}
-                />
-              }
-            >
-              {" "}
-              <Routes>
-                <Route path="/" element={<DashboardModern />} />
-                <Route path="/ai-generator" element={<AIGenerator />} />
-                <Route path="/metrics" element={<Metrics />} />{" "}
-                <Route path="/ideas/:ideaId" element={<IdeaDetails />} />{" "}
-                <Route path="/my-ideas" element={<MyIdeas />} />                <Route path="/profile" element={<Profile />} />
-                <Route path="/settings" element={<Settings />} />
-              </Routes>
-            </Layout>
-          </ProtectedRoute>
+          <AuthRedirect>
+            <AuthLayout>
+              <Login />
+            </AuthLayout>
+          </AuthRedirect>
         }
       />
-        </Routes>
-        <DebugPanel />
-      </ReactDebugProvider>
-    </ReactErrorBoundary>
+      <Route
+        path="/signup"
+        element={
+          <AuthRedirect>
+            <AuthLayout>
+              <Signup />
+            </AuthLayout>
+          </AuthRedirect>
+        }
+      />
+
+  {/* Protected routes */}
+  <Route
+    path="/*"
+    element={
+      <ProtectedRoute>
+        <Layout
+          navbar={
+            <Navbar
+              title="Innovator Portal"
+              user={user}
+              onLogout={handleLogout}
+            />
+          }
+          sidebar={
+            <Sidebar
+              items={sidebarItems}
+              currentPath={window.location.pathname}
+            />
+          }
+        >
+          {" "}
+          <Routes>
+            <Route path="/" element={<DashboardModern />} />
+            <Route path="/ai-generator" element={<AIGenerator />} />
+            <Route path="/metrics" element={<Metrics />} />{" "}
+            <Route path="/ideas/:ideaId" element={<IdeaDetails />} />{" "}
+            <Route path="/my-ideas" element={<MyIdeas />} />                <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Settings />} />
+          </Routes>
+        </Layout>
+      </ProtectedRoute>
+    }
+  />
+    </Routes>
   );
 }
 
