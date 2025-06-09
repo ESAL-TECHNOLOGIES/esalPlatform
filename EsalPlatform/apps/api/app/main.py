@@ -96,12 +96,12 @@ def is_allowed_origin(origin: str) -> bool:
     
     return False
 
-# CORS configuration with proper regex patterns
+# CORS configuration with proper origin list
 if settings.is_production:
-    # Use allow_origin_regex for wildcard support - fixed regex pattern
+    # Use specific allowed origins from settings
     app.add_middleware(
         CORSMiddleware,
-        allow_origin_regex=r"https://[a-zA-Z0-9\-]+\.onrender\.com|https://[a-zA-Z0-9\-]+\.vercel\.app",
+        allow_origins=settings.ALLOWED_ORIGINS,
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"],
         allow_headers=["Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With", "X-CSRF-Token"],
