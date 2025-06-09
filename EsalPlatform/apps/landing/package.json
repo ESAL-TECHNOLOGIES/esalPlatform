@@ -2,11 +2,11 @@
   "name": "landing",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
-  "scripts": {
+  "type": "module",  "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "vercel-build": "cd ../.. && pnpm install && pnpm --filter @esal/ui run build && cd apps/landing && pnpm run build",
+    "build": "cd ../.. && npm install && npm run build:ui && cd apps/landing && npm run build:local",
+    "build:local": "tsc && vite build",
+    "vercel-build": "cd ../.. && pnpm install && pnpm --filter @esal/ui run build && cd apps/landing && pnpm run build:local",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "type-check": "tsc --noEmit"
