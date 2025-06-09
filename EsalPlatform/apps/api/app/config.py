@@ -34,8 +34,7 @@ class Settings(BaseSettings):
       # JWT
     JWT_SECRET_KEY: str = Field(default="", description="JWT secret key - MUST be set in production")
     JWT_ALGORITHM: str = Field(default="HS256", description="JWT algorithm")
-    JWT_EXPIRATION_TIME: int = Field(default=3600, description="JWT expiration time in seconds")
-    # CORS - Handle as string and convert to list
+    JWT_EXPIRATION_TIME: int = Field(default=3600, description="JWT expiration time in seconds")    # CORS - Handle as string and convert to list
     ALLOWED_ORIGINS: Union[str, List[str]] = Field(
         default=[            "http://localhost:3000",  # Landing page
             "http://localhost:3001",  # Innovator portal
@@ -51,7 +50,13 @@ class Settings(BaseSettings):
             "http://127.0.0.1:3003",  # Hub portal (127.0.0.1)
             "http://127.0.0.1:3004",  # Admin portal (127.0.0.1)
             "http://127.0.0.1:5173",  # Vite default (127.0.0.1)
-            # Production Vercel deployments
+            # Production Render deployments
+            "https://esalplatform.onrender.com",  # Landing page
+            "https://innovator-portal.onrender.com",  # Innovator portal
+            "https://investor-portal-vz2e.onrender.com",  # Investor portal
+            "https://esal-hub-portal.onrender.com",  # Hub portal
+            "https://esal-admin-portal.onrender.com",  # Admin portal
+            # Production Vercel deployments (backup)
             "https://esal-platform.vercel.app",  # Landing page
             "https://esal-innovator-portal.vercel.app",  # Innovator portal
             "https://esal-investor-portal.vercel.app",  # Investor portal

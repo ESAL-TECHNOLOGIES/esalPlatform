@@ -44,16 +44,15 @@ services:
         sync: false  # Set manually - your Gemini API key
       - key: OPENAI_API_KEY
         sync: false  # Set manually - your OpenAI API key (optional)
-      
-      # CORS Configuration (Will be updated after frontend deployments)
+        # CORS Configuration (Updated with actual frontend URLs)
       - key: ALLOWED_ORIGINS
-        value: "https://esal-landing.onrender.com,https://esal-hub-portal.onrender.com,https://esal-innovator-portal.onrender.com,https://esal-investor-portal.onrender.com,https://esal-admin-portal.onrender.com"
+        value: "https://esalplatform.onrender.com,https://innovator-portal.onrender.com,https://esal-hub-portal.onrender.com,https://esal-admin-portal.onrender.com"
       
       # Site Configuration
       - key: SITE_URL
-        value: "https://esal-landing.onrender.com"  # Update with your main frontend URL
+        value: "https://esalplatform.onrender.com"  # Main frontend URL
       - key: CONFIRM_EMAIL_REDIRECT_URL
-        value: "https://esal-landing.onrender.com/email-confirmed"
+        value: "https://esalplatform.onrender.com/email-confirmed"
       
       # Email Configuration (Optional - set if using SMTP)
       - key: SMTP_HOST
