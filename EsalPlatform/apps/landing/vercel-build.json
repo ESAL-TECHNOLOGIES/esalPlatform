@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "build": "cd ../.. && pnpm install && pnpm --filter @esal/ui run build && pnpm --filter landing run build",
+    "vercel-build": "cd ../.. && pnpm install && pnpm --filter @esal/ui run build && pnpm --filter landing run build"
+  }
+}
