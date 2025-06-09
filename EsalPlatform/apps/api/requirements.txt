@@ -20,7 +20,7 @@ PyJWT>=2.8.0,<3.0.0
 
 # Supabase Integration - Updated for compatible versions
 supabase==2.8.1
-postgrest==0.16.8
+postgrest>=0.17.0,<0.18.0
 storage3==0.7.7
 gotrue==2.8.1
 realtime==2.0.5

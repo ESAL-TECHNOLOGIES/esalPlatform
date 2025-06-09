@@ -25,7 +25,8 @@ const LandingPage: React.FC = () => {
     type: "success" | "error";
     text: string;
   } | null>(null);
-  const [formErrors, setFormErrors] = useState<Partial<ContactFormData>>({});  const handleJoinAs = (role: string) => {
+  const [formErrors, setFormErrors] = useState<Partial<ContactFormData>>({});
+  const handleJoinAs = (role: string) => {
     // Get portal URLs from environment variables, fallback to localhost for development
     const isDevelopment = import.meta.env.VITE_ENVIRONMENT !== "production";
 

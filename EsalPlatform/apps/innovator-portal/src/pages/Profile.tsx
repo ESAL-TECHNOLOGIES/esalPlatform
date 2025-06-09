@@ -1,6 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent, Button } from "@esal/ui";
-import { Lightbulb, Eye, Heart, AlertTriangle, RefreshCw, HelpCircle, User, Edit2, Link, Save, BarChart3, CheckCircle, XCircle, Zap, Lock, Mail, Camera, Package } from "lucide-react";
+import {
+  Lightbulb,
+  Eye,
+  Heart,
+  AlertTriangle,
+  RefreshCw,
+  HelpCircle,
+  User,
+  Edit2,
+  Link,
+  Save,
+  BarChart3,
+  CheckCircle,
+  XCircle,
+  Zap,
+  Lock,
+  Mail,
+  Camera,
+  Package,
+} from "lucide-react";
 import ProfileCard from "../components/ProfileCard";
 import { API_BASE_URL } from "../config/api";
 
@@ -186,7 +205,7 @@ const Profile: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }      // Fetch profile data
+      } // Fetch profile data
       const profileResponse = await fetch(
         `${API_BASE_URL}/api/v1/innovator/profile`,
         {
@@ -202,7 +221,7 @@ const Profile: React.FC = () => {
         throw new Error("Failed to fetch profile");
       }
 
-      const profileData = await profileResponse.json();      // Also fetch dashboard stats
+      const profileData = await profileResponse.json(); // Also fetch dashboard stats
       const dashboardResponse = await fetch(
         `${API_BASE_URL}/api/v1/innovator/dashboard`,
         {
@@ -298,17 +317,15 @@ const Profile: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }      const response = await fetch(
-        `${API_BASE_URL}/api/v1/innovator/profile`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      }
+      const response = await fetch(`${API_BASE_URL}/api/v1/innovator/profile`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -352,7 +369,8 @@ const Profile: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }      const response = await fetch(
+      }
+      const response = await fetch(
         `${API_BASE_URL}/api/v1/users/change-password`,
         {
           method: "POST",
@@ -406,7 +424,8 @@ const Profile: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }      const response = await fetch(
+      }
+      const response = await fetch(
         `${API_BASE_URL}/api/v1/users/notifications`,
         {
           method: "PUT",
@@ -445,15 +464,13 @@ const Profile: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }      const response = await fetch(
-        `${API_BASE_URL}/api/v1/users/export`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      }
+      const response = await fetch(`${API_BASE_URL}/api/v1/users/export`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -546,7 +563,8 @@ const Profile: React.FC = () => {
       }
 
       const formData = new FormData();
-      formData.append("file", avatarFile);      const response = await fetch(
+      formData.append("file", avatarFile);
+      const response = await fetch(
         `${API_BASE_URL}/api/v1/innovator/profile/avatar`,
         {
           method: "POST",
@@ -626,13 +644,16 @@ const Profile: React.FC = () => {
           </p>
         </div>
         <Card className="border-red-200 bg-red-50">
-          <CardContent className="text-center py-12">            <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+          <CardContent className="text-center py-12">
+            {" "}
+            <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
               <AlertTriangle className="text-red-600 w-8 h-8" />
             </div>
             <h3 className="text-lg font-semibold text-red-900 mb-2">
               Profile Load Error
             </h3>
-            <p className="text-red-700 mb-6">{error}</p>            <Button
+            <p className="text-red-700 mb-6">{error}</p>{" "}
+            <Button
               onClick={fetchProfile}
               className="bg-red-600 hover:bg-red-700"
             >
@@ -652,7 +673,9 @@ const Profile: React.FC = () => {
           <p className="text-gray-600">Profile not found.</p>
         </div>
         <Card className="border-yellow-200 bg-yellow-50">
-          <CardContent className="text-center py-12">            <div className="mx-auto w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
+          <CardContent className="text-center py-12">
+            {" "}
+            <div className="mx-auto w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
               <HelpCircle className="text-yellow-600 w-8 h-8" />
             </div>
             <h3 className="text-lg font-semibold text-yellow-900 mb-2">
@@ -664,7 +687,8 @@ const Profile: React.FC = () => {
             </p>
             <Button
               onClick={fetchProfile}
-              className="bg-yellow-600 hover:bg-yellow-700"            >
+              className="bg-yellow-600 hover:bg-yellow-700"
+            >
               <RefreshCw className="w-4 h-4 mr-2" />
               Try Again
             </Button>
@@ -672,7 +696,8 @@ const Profile: React.FC = () => {
         </Card>
       </div>
     );
-  }  return (
+  }
+  return (
     <div className="space-y-6">
       {/* Enhanced Header with Gradient Background and Tabs */}
       <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 border border-blue-200 rounded-2xl p-6 sm:p-8 shadow-lg">
@@ -694,12 +719,13 @@ const Profile: React.FC = () => {
                   month: "short",
                 })}
               </p>
-            </div>            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
+            </div>{" "}
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
               <User className="text-white w-6 h-6" />
             </div>
           </div>
         </div>
-        
+
         {/* Profile Tabs */}
         <div className="mt-8 flex flex-wrap gap-2 justify-center sm:justify-start">
           <div className="flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium border border-blue-200">
@@ -715,7 +741,8 @@ const Profile: React.FC = () => {
             Privacy
           </div>
         </div>
-      </div>      {/* Enhanced Success Message */}
+      </div>{" "}
+      {/* Enhanced Success Message */}
       {successMessage && (
         <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 shadow-sm">
           <div className="flex items-center">
@@ -741,7 +768,6 @@ const Profile: React.FC = () => {
           </div>
         </div>
       )}
-
       {/* Enhanced Profile Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 hover:shadow-lg transition-all duration-200 cursor-pointer group">
@@ -757,7 +783,8 @@ const Profile: React.FC = () => {
                 <p className="text-xs text-blue-600 mt-1">
                   Your innovative concepts
                 </p>
-              </div>              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+              </div>{" "}
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
                 <Lightbulb className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
               </div>
             </div>
@@ -777,7 +804,8 @@ const Profile: React.FC = () => {
                 <p className="text-xs text-green-600 mt-1">
                   Community engagement
                 </p>
-              </div>              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
+              </div>{" "}
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
                 <Eye className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
               </div>
             </div>
@@ -797,13 +825,15 @@ const Profile: React.FC = () => {
                 <p className="text-xs text-purple-600 mt-1">
                   Investor attention
                 </p>
-              </div>              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+              </div>{" "}
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors">
                 <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
               </div>
             </div>
           </CardContent>
         </Card>
-      </div>      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      </div>{" "}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Profile Card - Takes up 2 columns on xl screens */}
         <div className="xl:col-span-2">
           <ProfileCard
@@ -822,7 +852,9 @@ const Profile: React.FC = () => {
           {isEditing && (
             <Card className="shadow-lg border-blue-200">
               <CardHeader>
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200 -mx-6 -mt-6 px-6 pt-6 pb-4 rounded-t-lg">                  <CardTitle>
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200 -mx-6 -mt-6 px-6 pt-6 pb-4 rounded-t-lg">
+                  {" "}
+                  <CardTitle>
                     <div className="text-blue-900 flex items-center">
                       <Edit2 className="w-4 h-4 mr-2" />
                       Edit Profile
@@ -831,7 +863,10 @@ const Profile: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent className="p-4 sm:p-6">
-                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                <form
+                  onSubmit={handleSubmit}
+                  className="space-y-4 sm:space-y-6"
+                >
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -990,7 +1025,9 @@ const Profile: React.FC = () => {
                   {/* Collapsible Social Links Section */}
                   <div className="border-t pt-4">
                     <details className="group">
-                      <summary className="flex items-center justify-between cursor-pointer text-sm font-medium text-gray-900 mb-4 p-2 rounded-lg hover:bg-gray-50 transition-colors">                        <span className="flex items-center">
+                      <summary className="flex items-center justify-between cursor-pointer text-sm font-medium text-gray-900 mb-4 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                        {" "}
+                        <span className="flex items-center">
                           <Link className="w-4 h-4 mr-2" />
                           Social Links
                         </span>
@@ -1073,7 +1110,9 @@ const Profile: React.FC = () => {
                   </div>
 
                   {formError && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">                      <div className="flex items-center">
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                      {" "}
+                      <div className="flex items-center">
                         <AlertTriangle className="text-red-600 w-4 h-4 mr-2" />
                         <span className="text-red-700 text-sm font-medium">
                           Error: {formError}
@@ -1093,7 +1132,8 @@ const Profile: React.FC = () => {
                           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                           Saving Changes...
                         </>
-                      ) : (                        <>
+                      ) : (
+                        <>
                           <Save className="w-4 h-4 mr-2" />
                           Save Changes
                         </>
@@ -1132,11 +1172,14 @@ const Profile: React.FC = () => {
                 </form>
               </CardContent>
             </Card>
-          )}          {/* Enhanced Account Status */}
+          )}{" "}
+          {/* Enhanced Account Status */}
           <Card className="shadow-lg">
             <CardHeader>
               <div className="bg-gradient-to-r from-gray-50 to-slate-50 border-b border-gray-200 -mx-6 -mt-6 px-6 pt-6 pb-4 rounded-t-lg">
-                <CardTitle>                  <div className="text-gray-900 flex items-center">
+                <CardTitle>
+                  {" "}
+                  <div className="text-gray-900 flex items-center">
                     <BarChart3 className="w-4 h-4 mr-2" />
                     Account Status
                   </div>
@@ -1155,9 +1198,17 @@ const Profile: React.FC = () => {
                         ? "bg-green-100 text-green-800 border border-green-200"
                         : "bg-red-100 text-red-800 border border-red-200"
                     }`}
-                  >                    {profile.is_active && !profile.is_blocked
-                      ? (<><CheckCircle className="w-4 h-4 inline mr-1" /> Active</>)
-                      : (<><XCircle className="w-4 h-4 inline mr-1" /> Inactive</>)}
+                  >
+                    {" "}
+                    {profile.is_active && !profile.is_blocked ? (
+                      <>
+                        <CheckCircle className="w-4 h-4 inline mr-1" /> Active
+                      </>
+                    ) : (
+                      <>
+                        <XCircle className="w-4 h-4 inline mr-1" /> Inactive
+                      </>
+                    )}
                   </span>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded-lg space-y-2 sm:space-y-0">
@@ -1180,7 +1231,9 @@ const Profile: React.FC = () => {
 
               {/* Enhanced Status Messages */}
               {profile.is_blocked && (
-                <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">                  <div className="flex items-start">
+                <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  {" "}
+                  <div className="flex items-start">
                     <AlertTriangle className="text-red-600 w-5 h-5 mr-3 flex-shrink-0" />
                     <div>
                       <h4 className="text-red-800 font-medium mb-1">
@@ -1195,7 +1248,9 @@ const Profile: React.FC = () => {
                 </div>
               )}
               {!profile.is_active && !profile.is_blocked && (
-                <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">                  <div className="flex items-start">
+                <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  {" "}
+                  <div className="flex items-start">
                     <AlertTriangle className="text-yellow-600 w-5 h-5 mr-3 flex-shrink-0" />
                     <div>
                       <h4 className="text-yellow-800 font-medium mb-1">
@@ -1210,7 +1265,9 @@ const Profile: React.FC = () => {
                 </div>
               )}
               {profile.is_active && !profile.is_blocked && (
-                <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">                  <div className="flex items-start">
+                <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  {" "}
+                  <div className="flex items-start">
                     <CheckCircle className="text-green-600 w-5 h-5 mr-3 flex-shrink-0" />
                     <div>
                       <h4 className="text-green-800 font-medium mb-1">
@@ -1225,11 +1282,14 @@ const Profile: React.FC = () => {
                 </div>
               )}
             </CardContent>
-          </Card>{/* Enhanced Quick Actions */}
+          </Card>
+          {/* Enhanced Quick Actions */}
           <Card className="shadow-lg">
             <CardHeader>
               <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-indigo-200 -mx-6 -mt-6 px-6 pt-6 pb-4 rounded-t-lg">
-                <CardTitle>                  <div className="text-indigo-900 flex items-center">
+                <CardTitle>
+                  {" "}
+                  <div className="text-indigo-900 flex items-center">
                     <Zap className="w-4 h-4 mr-2" />
                     Quick Actions
                   </div>
@@ -1243,62 +1303,78 @@ const Profile: React.FC = () => {
                   variant="outline"
                   onClick={() => setShowChangePasswordModal(true)}
                 >
-                  <div className="flex items-center">                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 group-hover:bg-red-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0 transition-colors">
+                  <div className="flex items-center">
+                    {" "}
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 group-hover:bg-red-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0 transition-colors">
                       <Lock className="text-red-600 w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <div className="text-left">
-                      <div className="font-medium text-sm sm:text-base">Change Password</div>
+                      <div className="font-medium text-sm sm:text-base">
+                        Change Password
+                      </div>
                       <div className="text-xs text-red-600 mt-0.5">
                         Update your account security
                       </div>
                     </div>
                   </div>
                 </Button>
-                
+
                 <Button
                   className="w-full text-left justify-start h-auto sm:h-14 bg-white hover:bg-blue-50 border-blue-200 hover:border-blue-300 text-blue-700 hover:text-blue-800 transition-all duration-200 group p-3 sm:p-4"
                   variant="outline"
                   onClick={() => setShowNotificationsModal(true)}
                 >
-                  <div className="flex items-center">                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 group-hover:bg-blue-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0 transition-colors">
+                  <div className="flex items-center">
+                    {" "}
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 group-hover:bg-blue-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0 transition-colors">
                       <Mail className="text-blue-600 w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <div className="text-left">
-                      <div className="font-medium text-sm sm:text-base">Manage Notifications</div>
+                      <div className="font-medium text-sm sm:text-base">
+                        Manage Notifications
+                      </div>
                       <div className="text-xs text-blue-600 mt-0.5">
                         Configure your preferences
                       </div>
                     </div>
                   </div>
                 </Button>
-                
+
                 <Button
                   className="w-full text-left justify-start h-auto sm:h-14 bg-white hover:bg-purple-50 border-purple-200 hover:border-purple-300 text-purple-700 hover:text-purple-800 transition-all duration-200 group p-3 sm:p-4"
                   variant="outline"
                   onClick={() => setShowAvatarModal(true)}
                 >
-                  <div className="flex items-center">                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 group-hover:bg-purple-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0 transition-colors">
+                  <div className="flex items-center">
+                    {" "}
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 group-hover:bg-purple-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0 transition-colors">
                       <Camera className="text-purple-600 w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <div className="text-left">
-                      <div className="font-medium text-sm sm:text-base">Update Avatar</div>
+                      <div className="font-medium text-sm sm:text-base">
+                        Update Avatar
+                      </div>
                       <div className="text-xs text-purple-600 mt-0.5">
                         Change your profile picture
                       </div>
                     </div>
                   </div>
                 </Button>
-                
+
                 <Button
                   className="w-full text-left justify-start h-auto sm:h-14 bg-white hover:bg-green-50 border-green-200 hover:border-green-300 text-green-700 hover:text-green-800 transition-all duration-200 group p-3 sm:p-4"
                   variant="outline"
                   onClick={() => setShowExportModal(true)}
                 >
-                  <div className="flex items-center">                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 group-hover:bg-green-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0 transition-colors">
+                  <div className="flex items-center">
+                    {" "}
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 group-hover:bg-green-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0 transition-colors">
                       <Package className="text-green-600 w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <div className="text-left">
-                      <div className="font-medium text-sm sm:text-base">Export My Data</div>
+                      <div className="font-medium text-sm sm:text-base">
+                        Export My Data
+                      </div>
                       <div className="text-xs text-green-600 mt-0.5">
                         Download your information
                       </div>
@@ -1312,8 +1388,14 @@ const Profile: React.FC = () => {
       </div>{" "}
       {/* Enhanced Change Password Modal */}
       <Modal
-        isOpen={showChangePasswordModal}        onClose={() => setShowChangePasswordModal(false)}
-        title={<><Lock className="w-4 h-4 mr-2" />Change Password</>}
+        isOpen={showChangePasswordModal}
+        onClose={() => setShowChangePasswordModal(false)}
+        title={
+          <>
+            <Lock className="w-4 h-4 mr-2" />
+            Change Password
+          </>
+        }
       >
         <div className="space-y-4">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
@@ -1389,7 +1471,8 @@ const Profile: React.FC = () => {
               />
             </div>
 
-            {passwordError && (              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            {passwordError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <div className="flex items-center">
                   <AlertTriangle className="text-red-600 w-4 h-4 mr-2" />
                   <span className="text-red-700 text-sm font-medium">
@@ -1409,7 +1492,8 @@ const Profile: React.FC = () => {
                   <>
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                     Changing Password...
-                  </>                ) : (
+                  </>
+                ) : (
                   <>
                     <Lock className="w-4 h-4 mr-2" />
                     Change Password
@@ -1432,7 +1516,12 @@ const Profile: React.FC = () => {
       <Modal
         isOpen={showNotificationsModal}
         onClose={() => setShowNotificationsModal(false)}
-        title={<><Mail className="w-4 h-4 mr-2" />Manage Notifications</>}
+        title={
+          <>
+            <Mail className="w-4 h-4 mr-2" />
+            Manage Notifications
+          </>
+        }
       >
         <div className="space-y-6">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
@@ -1537,12 +1626,13 @@ const Profile: React.FC = () => {
                 <>
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                   Saving Preferences...
-                </>                ) : (
-                  <>
-                    <Save className="w-4 h-4 mr-2" />
-                    Save Preferences
-                  </>
-                )}
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Preferences
+                </>
+              )}
             </Button>
             <Button
               type="button"
@@ -1559,7 +1649,12 @@ const Profile: React.FC = () => {
       <Modal
         isOpen={showExportModal}
         onClose={() => setShowExportModal(false)}
-        title={<><Package className="w-4 h-4 mr-2" />Export My Data</>}
+        title={
+          <>
+            <Package className="w-4 h-4 mr-2" />
+            Export My Data
+          </>
+        }
       >
         <div className="space-y-6">
           <div className="bg-green-50 border border-green-200 rounded-lg p-4">
@@ -1573,7 +1668,8 @@ const Profile: React.FC = () => {
               <li>• Uploaded files and documents</li>
               <li>• Account activity history</li>
             </ul>
-          </div>          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          </div>{" "}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div className="flex items-start">
               <AlertTriangle className="text-blue-600 w-5 h-5 mr-3" />
               <div>
@@ -1588,8 +1684,9 @@ const Profile: React.FC = () => {
               </div>
             </div>
           </div>
-
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">            <div className="flex items-start">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            {" "}
+            <div className="flex items-start">
               <AlertTriangle className="text-yellow-600 w-5 h-5 mr-3" />
               <div>
                 <h4 className="text-yellow-800 font-medium mb-1">
@@ -1604,7 +1701,6 @@ const Profile: React.FC = () => {
               </div>
             </div>
           </div>
-
           <div className="flex flex-col space-y-3 pt-4">
             <Button
               onClick={handleExportData}
@@ -1615,12 +1711,13 @@ const Profile: React.FC = () => {
                 <>
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                   Preparing Export...
-                </>                ) : (
-                  <>
-                    <Package className="w-4 h-4 mr-2" />
-                    Export My Data
-                  </>
-                )}
+                </>
+              ) : (
+                <>
+                  <Package className="w-4 h-4 mr-2" />
+                  Export My Data
+                </>
+              )}
             </Button>
             <Button
               type="button"
@@ -1637,7 +1734,12 @@ const Profile: React.FC = () => {
       <Modal
         isOpen={showAvatarModal}
         onClose={() => setShowAvatarModal(false)}
-        title={<><Camera className="w-4 h-4 mr-2" />Update Avatar</>}
+        title={
+          <>
+            <Camera className="w-4 h-4 mr-2" />
+            Update Avatar
+          </>
+        }
       >
         <div className="space-y-4">
           <div className="flex flex-col items-center">

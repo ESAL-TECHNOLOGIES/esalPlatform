@@ -260,7 +260,8 @@ const DashboardModern: React.FC = () => {
       const headers = {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
-      };      const dashboardResponse = await fetch(
+      };
+      const dashboardResponse = await fetch(
         `${API_BASE_URL}/api/v1/innovator/dashboard`,
         {
           method: "GET",

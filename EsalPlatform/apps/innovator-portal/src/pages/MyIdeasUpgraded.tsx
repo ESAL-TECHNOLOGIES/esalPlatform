@@ -2,16 +2,16 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, Button } from "@esal/ui";
 import { API_BASE_URL } from "../config/api";
-import { 
-  Lightbulb, 
-  Eye, 
-  Calendar, 
-  CheckCircle, 
-  Sparkles, 
-  Wrench, 
-  Clock, 
-  Rocket, 
-  FileText, 
+import {
+  Lightbulb,
+  Eye,
+  Calendar,
+  CheckCircle,
+  Sparkles,
+  Wrench,
+  Clock,
+  Rocket,
+  FileText,
   Edit,
   Trash2,
   Handshake,
@@ -27,7 +27,7 @@ import {
   PenTool,
   AlignLeft,
   XCircle,
-  Save
+  Save,
 } from "lucide-react";
 import Modal from "../components/Modal";
 
@@ -140,7 +140,8 @@ const MyIdeasUpgraded: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }      const response = await fetch(
+      }
+      const response = await fetch(
         `${API_BASE_URL}/api/v1/innovator/view-ideas`,
         {
           method: "GET",
@@ -178,7 +179,8 @@ const MyIdeasUpgraded: React.FC = () => {
         const token = localStorage.getItem("access_token");
         if (!token) {
           throw new Error("Authentication required");
-        }        const response = await fetch(
+        }
+        const response = await fetch(
           `${API_BASE_URL}/api/v1/innovator/delete-idea/${ideaId}`,
           {
             method: "DELETE",
@@ -332,7 +334,8 @@ const MyIdeasUpgraded: React.FC = () => {
           .filter((tag) => tag.length > 0),
         status: isDraft ? "draft" : createFormData.status,
         visibility: createFormData.visibility,
-      };      const response = await fetch(
+      };
+      const response = await fetch(
         `${API_BASE_URL}/api/v1/innovator/submit-idea`,
         {
           method: "POST",
@@ -360,7 +363,8 @@ const MyIdeasUpgraded: React.FC = () => {
           fileFormData.append(
             "description",
             `Document for ${createFormData.title}`
-          );          const fileResponse = await fetch(
+          );
+          const fileResponse = await fetch(
             `${API_BASE_URL}/api/v1/innovator/upload-file`,
             {
               method: "POST",
@@ -436,7 +440,8 @@ const MyIdeasUpgraded: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }      const response = await fetch(
+      }
+      const response = await fetch(
         `${API_BASE_URL}/api/v1/innovator/update-idea/${ideaId}`,
         {
           method: "PUT",
@@ -473,7 +478,10 @@ const MyIdeasUpgraded: React.FC = () => {
     }
   };
   // Enhanced notification system
-  const showNotification = (message: string, notificationType: "success" | "error") => {
+  const showNotification = (
+    message: string,
+    notificationType: "success" | "error"
+  ) => {
     // This would ideally use a toast notification library
     // For now, we'll use a simple alert
     alert(message);
@@ -600,7 +608,9 @@ const MyIdeasUpgraded: React.FC = () => {
 
   if (error) {
     return (
-      <div className="space-y-6">        <div className="text-center py-12">
+      <div className="space-y-6">
+        {" "}
+        <div className="text-center py-12">
           <div className="flex justify-center mb-4">
             <XCircle className="w-16 h-16 text-red-500" />
           </div>
@@ -624,7 +634,9 @@ const MyIdeasUpgraded: React.FC = () => {
       {/* Enhanced Header */}
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>            <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
+          <div>
+            {" "}
+            <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
               <Lightbulb className="w-8 h-8 mr-3 text-blue-600" />
               My Ideas Dashboard
             </h1>
@@ -635,16 +647,20 @@ const MyIdeasUpgraded: React.FC = () => {
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
             <Button
-              onClick={() => setIsCreateModalOpen(true)}              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-6 py-3 font-medium"
+              onClick={() => setIsCreateModalOpen(true)}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-6 py-3 font-medium"
             >
               <Sparkles className="w-4 h-4 mr-2" />
               Create New Idea
             </Button>
             <Button
               variant="outline"
-              onClick={() => setIsBulkMode(!isBulkMode)}              className="px-6 py-3"
+              onClick={() => setIsBulkMode(!isBulkMode)}
+              className="px-6 py-3"
             >
-              {isBulkMode ? "Exit Bulk Mode" : (
+              {isBulkMode ? (
+                "Exit Bulk Mode"
+              ) : (
                 <>
                   <Wrench className="w-4 h-4 mr-2" />
                   Bulk Actions
@@ -655,7 +671,9 @@ const MyIdeasUpgraded: React.FC = () => {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mt-6">          {[
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mt-6">
+          {" "}
+          {[
             {
               label: "Total Ideas",
               value: statusCounts.all,
@@ -690,7 +708,9 @@ const MyIdeasUpgraded: React.FC = () => {
             <div
               key={stat.label}
               className="bg-white rounded-lg p-4 text-center shadow-sm"
-            >              <div
+            >
+              {" "}
+              <div
                 className={`inline-flex items-center justify-center w-8 h-8 ${stat.color} text-white rounded-full text-sm mb-2`}
               >
                 {stat.icon}
@@ -703,7 +723,6 @@ const MyIdeasUpgraded: React.FC = () => {
           ))}
         </div>
       </div>
-
       {/* Enhanced Search and Filters */}
       <Card className="shadow-lg">
         <CardContent className="p-6">
@@ -724,7 +743,8 @@ const MyIdeasUpgraded: React.FC = () => {
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                   />
                 </svg>
-              </div>              <input
+              </div>{" "}
+              <input
                 type="text"
                 placeholder="Search ideas by title, description, industry, category, or tags..."
                 value={searchTerm}
@@ -732,7 +752,8 @@ const MyIdeasUpgraded: React.FC = () => {
                 className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 title="Search ideas"
                 aria-label="Search ideas by title, description, industry, category, or tags"
-              />{searchTerm && (
+              />
+              {searchTerm && (
                 <button
                   onClick={() => setSearchTerm("")}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
@@ -815,7 +836,8 @@ const MyIdeasUpgraded: React.FC = () => {
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={handleBulkDelete}                    >
+                      onClick={handleBulkDelete}
+                    >
                       <Trash2 className="w-4 h-4 mr-2" />
                       Delete Selected
                     </Button>
@@ -825,7 +847,8 @@ const MyIdeasUpgraded: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-gray-700">
                     Sort by:
-                  </span>                  <select
+                  </span>{" "}
+                  <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
                     className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
@@ -859,11 +882,12 @@ const MyIdeasUpgraded: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-
       {/* Ideas List */}
       {filteredAndSortedIdeas.length === 0 ? (
         <Card className="border-gray-200 shadow-sm">
-          <CardContent className="text-center py-20">            <div className="max-w-md mx-auto">
+          <CardContent className="text-center py-20">
+            {" "}
+            <div className="max-w-md mx-auto">
               <div className="text-center mb-6">
                 {searchTerm ? (
                   <Search className="w-20 h-20 mx-auto text-gray-400" />
@@ -900,7 +924,8 @@ const MyIdeasUpgraded: React.FC = () => {
                   >
                     Clear Search
                   </Button>
-                ) : (                  <Button
+                ) : (
+                  <Button
                     onClick={() => setIsCreateModalOpen(true)}
                     className="bg-blue-600 hover:bg-blue-700 px-6 py-3 text-base font-medium transition-colors"
                   >
@@ -1019,7 +1044,8 @@ const MyIdeasUpgraded: React.FC = () => {
                               />
                             </svg>
                             Updated {formatDate(idea.updated_at)}
-                          </div>                          <div className="flex items-center gap-1">
+                          </div>{" "}
+                          <div className="flex items-center gap-1">
                             <Eye className="w-4 h-4" />
                             <span>{idea.views_count} views</span>
                           </div>
@@ -1035,7 +1061,9 @@ const MyIdeasUpgraded: React.FC = () => {
                         </p>
 
                         {/* Enhanced Tags and Categories */}
-                        <div className="flex flex-wrap items-center gap-3 text-sm">                          {idea.industry && (
+                        <div className="flex flex-wrap items-center gap-3 text-sm">
+                          {" "}
+                          {idea.industry && (
                             <div className="flex items-center text-gray-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
                               <Factory className="w-4 h-4 mr-2" />
                               {idea.industry}
@@ -1079,7 +1107,8 @@ const MyIdeasUpgraded: React.FC = () => {
                           variant="outline"
                           size="sm"
                           onClick={() => navigate(`/ideas/${idea.id}`)}
-                          className="w-full"                        >
+                          className="w-full"
+                        >
                           <Eye className="w-4 h-4 mr-2" />
                           View Details
                         </Button>
@@ -1087,10 +1116,12 @@ const MyIdeasUpgraded: React.FC = () => {
                           variant="outline"
                           size="sm"
                           onClick={() => handleEditIdea(idea)}
-                          className="w-full"                        >
+                          className="w-full"
+                        >
                           <Edit className="w-4 h-4 mr-2" />
                           Edit
-                        </Button>                        <Button
+                        </Button>{" "}
+                        <Button
                           variant="destructive"
                           size="sm"
                           onClick={() => handleDeleteIdea(idea.id)}
@@ -1108,9 +1139,9 @@ const MyIdeasUpgraded: React.FC = () => {
           })}
         </div>
       )}
-
       {/* Enhanced Edit Modal */}
-      {editingIdea && (        <Modal
+      {editingIdea && (
+        <Modal
           isOpen={true}
           onClose={() => setEditingIdea(null)}
           title={
@@ -1290,8 +1321,8 @@ const MyIdeasUpgraded: React.FC = () => {
           </div>
         </Modal>
       )}
-
-      {/* Enhanced Create Modal */}      <Modal
+      {/* Enhanced Create Modal */}{" "}
+      <Modal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         title={
@@ -1465,7 +1496,8 @@ const MyIdeasUpgraded: React.FC = () => {
                   name="visibility"
                   required
                   value={createFormData.visibility}
-                  onChange={handleCreateInputChange}                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={handleCreateInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="private">
                     <Lock className="w-4 h-4 inline mr-2" />
@@ -1515,7 +1547,8 @@ const MyIdeasUpgraded: React.FC = () => {
                 id="create-status"
                 name="status"
                 value={createFormData.status}
-                onChange={handleCreateInputChange}                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={handleCreateInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="draft">
                   <PenTool className="w-4 h-4 inline mr-2" />
@@ -1586,24 +1619,30 @@ const MyIdeasUpgraded: React.FC = () => {
                 disabled={isCreating}
               >
                 Cancel
-              </Button>              <Button
+              </Button>{" "}
+              <Button
                 type="button"
                 variant="outline"
                 onClick={() => handleCreateSubmit(true)}
                 disabled={isCreating}
               >
-                {isCreating ? "Saving..." : (
+                {isCreating ? (
+                  "Saving..."
+                ) : (
                   <>
                     <Save className="w-4 h-4 mr-2" />
                     Save as Draft
                   </>
                 )}
-              </Button>              <Button
+              </Button>{" "}
+              <Button
                 type="submit"
                 disabled={isCreating}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
-                {isCreating ? "Creating..." : (
+                {isCreating ? (
+                  "Creating..."
+                ) : (
                   <>
                     <Sparkles className="w-4 h-4 mr-2" />
                     Create Idea

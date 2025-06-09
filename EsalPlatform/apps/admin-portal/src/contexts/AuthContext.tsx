@@ -72,16 +72,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const login = async (email: string, password: string) => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
-      const response = await fetch(
-        `${apiUrl}/api/v1/auth/login-json`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        }
-      );
+      const response = await fetch(`${apiUrl}/api/v1/auth/login-json`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();

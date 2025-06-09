@@ -407,7 +407,8 @@ const MyIdeas: React.FC = () => {
           .filter((tag) => tag.length > 0),
         status: "draft",
         visibility: "private",
-      };      const response = await fetch(
+      };
+      const response = await fetch(
         `${API_BASE_URL}/api/v1/innovator/submit-idea`,
         {
           method: "POST",
@@ -432,7 +433,8 @@ const MyIdeas: React.FC = () => {
       let uploadedCount = 0;
       for (const file of createFormData.documents) {
         const fileFormData = new FormData();
-        fileFormData.append("file", file);        fileFormData.append("idea_id", ideaResult.id.toString());
+        fileFormData.append("file", file);
+        fileFormData.append("idea_id", ideaResult.id.toString());
         fileFormData.append(
           "description",
           `Document for ${draftIdeaData.title}`
@@ -517,7 +519,8 @@ const MyIdeas: React.FC = () => {
         tags: createFormData.tags
           .split(",")
           .map((tag) => tag.trim())
-          .filter((tag) => tag.length > 0),      status: "draft",
+          .filter((tag) => tag.length > 0),
+        status: "draft",
         visibility: createFormData.visibility,
       };
 
@@ -577,7 +580,8 @@ const MyIdeas: React.FC = () => {
         description: createFormData.description,
         category: createFormData.category,
         tags: createFormData.tags
-          .split(",")        .map((tag) => tag.trim())
+          .split(",")
+          .map((tag) => tag.trim())
           .filter((tag) => tag.length > 0),
         status: isDraft ? "draft" : createFormData.status,
         visibility: createFormData.visibility,
@@ -607,7 +611,8 @@ const MyIdeas: React.FC = () => {
         for (const file of createFormData.documents) {
           const fileFormData = new FormData();
           fileFormData.append("file", file);
-          fileFormData.append("idea_id", ideaResult.id.toString());          fileFormData.append(
+          fileFormData.append("idea_id", ideaResult.id.toString());
+          fileFormData.append(
             "description",
             `Document for ${createFormData.title}`
           );
@@ -687,7 +692,8 @@ const MyIdeas: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }      const response = await fetch(
+      }
+      const response = await fetch(
         `${API_BASE_URL}/api/v1/innovator/update-idea/${ideaId}`,
         {
           method: "PUT",

@@ -36,7 +36,8 @@ const MyIdeas: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }      const response = await fetch(
+      }
+      const response = await fetch(
         `${API_BASE_URL}/api/v1/innovator/view-ideas`,
         {
           method: "GET",
@@ -74,7 +75,8 @@ const MyIdeas: React.FC = () => {
         const token = localStorage.getItem("access_token");
         if (!token) {
           throw new Error("Authentication required");
-        }        const response = await fetch(
+        }
+        const response = await fetch(
           `${API_BASE_URL}/api/v1/innovator/delete-idea/${ideaId}`,
           {
             method: "DELETE",
