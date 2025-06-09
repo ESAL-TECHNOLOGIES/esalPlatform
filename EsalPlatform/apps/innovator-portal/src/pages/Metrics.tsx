@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@esal/ui";
+import { API_BASE_URL } from "../config/api";
 import {
   LineChart,
   Line,
@@ -160,10 +161,8 @@ const Metrics: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }
-
-      const response = await fetch(
-        "http://localhost:8000/api/v1/ideas/analytics",
+      }      const response = await fetch(
+        `${API_BASE_URL}/api/v1/ideas/analytics`,
         {
           method: "GET",
           headers: {
@@ -229,10 +228,8 @@ const Metrics: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }
-
-      const response = await fetch(
-        "http://localhost:8000/api/v1/ideas/metrics",
+      }      const response = await fetch(
+        `${API_BASE_URL}/api/v1/ideas/metrics`,
         {
           method: "GET",
           headers: {

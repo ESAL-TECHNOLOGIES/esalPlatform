@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardContent, Button } from "@esal/ui";
+import { API_BASE_URL } from "../config/api";
 import {
   FileText,
   Image,
@@ -84,10 +85,8 @@ const IdeaDetails: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }
-
-      const response = await fetch(
-        `http://localhost:8000/api/v1/ideas/${ideaId}`,
+      }      const response = await fetch(
+        `${API_BASE_URL}/api/v1/ideas/${ideaId}`,
         {
           method: "GET",
           headers: {
@@ -125,10 +124,8 @@ const IdeaDetails: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }
-
-      const response = await fetch(
-        `http://localhost:8000/api/v1/ideas/${ideaId}/comment`,
+      }      const response = await fetch(
+        `${API_BASE_URL}/api/v1/ideas/${ideaId}/comment`,
         {
           method: "POST",
           headers: {
@@ -214,10 +211,8 @@ const IdeaDetails: React.FC = () => {
       }
 
       const formData = new FormData();
-      formData.append("file", selectedFile);
-
-      const response = await fetch(
-        `http://localhost:8000/api/v1/ideas/${ideaId}/upload-file`,
+      formData.append("file", selectedFile);      const response = await fetch(
+        `${API_BASE_URL}/api/v1/ideas/${ideaId}/upload-file`,
         {
           method: "POST",
           headers: {
@@ -275,10 +270,8 @@ const IdeaDetails: React.FC = () => {
         const token = localStorage.getItem("access_token");
         if (!token) {
           throw new Error("Authentication required");
-        }
-
-        const response = await fetch(
-          `http://localhost:8000/api/v1/ideas/${ideaId}`,
+        }        const response = await fetch(
+          `${API_BASE_URL}/api/v1/ideas/${ideaId}`,
           {
             method: "DELETE",
             headers: {

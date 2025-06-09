@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent, Button } from "@esal/ui";
 import { checkAndConsumeUsage, requireFeature } from "../utils/subscription";
+import { API_BASE_URL } from "../config/api";
 import {
   Zap,
   Target,
@@ -113,10 +114,8 @@ const AIGenerator: React.FC = () => {
   const fetchUserIdeas = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      if (!token) return;
-
-      const response = await fetch(
-        "http://localhost:8000/api/v1/innovator/view-ideas",
+      if (!token) return;      const response = await fetch(
+        `${API_BASE_URL}/api/v1/innovator/view-ideas`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -208,10 +207,8 @@ const AIGenerator: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }
-
-      const response = await fetch(
-        "http://localhost:8000/api/v1/innovator/ai/generate-idea",
+      }      const response = await fetch(
+        `${API_BASE_URL}/api/v1/innovator/ai/generate-idea`,
         {
           method: "POST",
           headers: {
@@ -262,10 +259,8 @@ const AIGenerator: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }
-
-      const response = await fetch(
-        "http://localhost:8000/api/v1/innovator/ai/fine-tune",
+      }      const response = await fetch(
+        `${API_BASE_URL}/api/v1/innovator/ai/fine-tune`,
         {
           method: "POST",
           headers: {
@@ -305,10 +300,8 @@ const AIGenerator: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }
-
-      const response = await fetch(
-        "http://localhost:8000/api/v1/innovator/ai/judge-idea",
+      }      const response = await fetch(
+        `${API_BASE_URL}/api/v1/innovator/ai/judge-idea`,
         {
           method: "POST",
           headers: {
@@ -358,10 +351,8 @@ const AIGenerator: React.FC = () => {
           .map((idea) => `${idea.title}: ${idea.description || ""}`)
           .filter((ideaText) => ideaText.length > 10),
         focus_area: recommendationsForm.focus_area,
-      };
-
-      const response = await fetch(
-        "http://localhost:8000/api/v1/innovator/ai/recommendations",
+      };      const response = await fetch(
+        `${API_BASE_URL}/api/v1/innovator/ai/recommendations`,
         {
           method: "POST",
           headers: {
@@ -432,10 +423,8 @@ const AIGenerator: React.FC = () => {
         target_market: generateForm.target_market || "To be determined",
         category: generateForm.industry || "Technology",
         tags: [generateForm.industry, "AI-Generated"].filter(Boolean),
-      };
-
-      const response = await fetch(
-        "http://localhost:8000/api/v1/innovator/submit-idea",
+      };      const response = await fetch(
+        `${API_BASE_URL}/api/v1/innovator/submit-idea`,
         {
           method: "POST",
           headers: {

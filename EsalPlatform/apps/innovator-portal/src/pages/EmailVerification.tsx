@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button, Card, CardHeader, CardTitle, CardContent } from "@esal/ui";
+import { API_BASE_URL } from "../config/api";
 
 interface EmailVerificationProps {
   email?: string;
@@ -47,9 +48,8 @@ const EmailVerification: React.FC<EmailVerificationProps> = () => {
       return;
     }
 
-    try {
-      const response = await fetch(
-        "http://localhost:8000/api/v1/auth/verify-email",
+    try {      const response = await fetch(
+        `${API_BASE_URL}/api/v1/auth/verify-email`,
         {
           method: "POST",
           headers: {
@@ -98,9 +98,8 @@ const EmailVerification: React.FC<EmailVerificationProps> = () => {
     setError("");
     setSuccess("");
 
-    try {
-      const response = await fetch(
-        "http://localhost:8000/api/v1/auth/resend-verification",
+    try {      const response = await fetch(
+        `${API_BASE_URL}/api/v1/auth/resend-verification`,
         {
           method: "POST",
           headers: {
