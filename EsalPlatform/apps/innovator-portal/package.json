@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:npm": "npm install && npm run build",
+    "build:render": "cd ../.. && npm install && npm run build:ui && cd apps/innovator-portal && npm run build",
     "vercel-build": "cd ../.. && pnpm install && pnpm --filter @esal/ui run build && cd apps/innovator-portal && pnpm run build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",

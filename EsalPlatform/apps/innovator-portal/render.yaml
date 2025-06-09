@@ -1,9 +1,9 @@
 services:
   - type: static_site
     name: esal-innovator-portal
-    rootDir: apps/innovator-portal
-    buildCommand: cd ../.. && pnpm install && pnpm --filter @esal/ui run build && cd apps/innovator-portal && pnpm run build:local
-    publishPath: ./dist
+    rootDir: .
+    buildCommand: npm install && npm run build:ui && cd apps/innovator-portal && npm run build
+    publishPath: ./apps/innovator-portal/dist
     routes:
       - type: rewrite
         source: /*

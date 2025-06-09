@@ -1,8 +1,9 @@
 services:
   - type: static_site
     name: esal-hub-portal
-    buildCommand: curl -fsSL https://get.pnpm.io/install.sh | sh - && export PNPM_HOME="/opt/render/.local/share/pnpm" && export PATH="$PNPM_HOME:$PATH" && cd ../.. && rm -rf node_modules && rm -rf apps/*/node_modules && pnpm install --frozen-lockfile && pnpm --filter @esal/ui run build && cd apps/hub-portal && pnpm run build:local
-    publishPath: ./dist
+    rootDir: .
+    buildCommand: npm install && npm run build:ui && cd apps/hub-portal && npm run build
+    publishPath: ./apps/hub-portal/dist
     routes:
       - type: rewrite
         source: /*
@@ -20,6 +21,3 @@ services:
         value: ESAL Hub Portal
       - key: VITE_ENVIRONMENT
         value: production
-      ignoredPaths:
-        - "*.md"
-        - "*.txt"

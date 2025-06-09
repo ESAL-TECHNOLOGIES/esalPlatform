@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite --port 3004",
     "build": "tsc && vite build",
+    "build:npm": "npm install && npm run build",
+    "build:render": "cd ../.. && npm install && npm run build:ui && cd apps/admin-portal && npm run build",
     "vercel-build": "cd ../.. && pnpm install && pnpm --filter @esal/ui run build && cd apps/admin-portal && pnpm run build",
     "preview": "vite preview",
     "lint": "eslint src --ext .ts,.tsx",
