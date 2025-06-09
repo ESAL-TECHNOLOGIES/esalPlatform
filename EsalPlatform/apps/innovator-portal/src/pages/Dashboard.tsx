@@ -1,6 +1,7 @@
 // filepath: d:\esalPlatform\EsalPlatform\apps\innovator-portal\src\pages\Dashboard_fixed.tsx
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent, Button } from "@esal/ui";
+import { API_BASE_URL } from "../config/api";
 import {
   Lightbulb,
   Rocket,
@@ -248,7 +249,7 @@ const DashboardModern: React.FC = () => {
       };
 
       const dashboardResponse = await fetch(
-        "http://localhost:8000/api/v1/innovator/dashboard",
+        `${API_BASE_URL}/api/v1/innovator/dashboard`,
         {
           method: "GET",
           headers,

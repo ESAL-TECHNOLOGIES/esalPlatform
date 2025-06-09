@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, Button } from "@esal/ui";
+import { API_BASE_URL } from "../config/api";
 import { 
   Lightbulb, 
   Eye, 
@@ -139,10 +140,8 @@ const MyIdeasUpgraded: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }
-
-      const response = await fetch(
-        `http://localhost:8000/api/v1/innovator/view-ideas`,
+      }      const response = await fetch(
+        `${API_BASE_URL}/api/v1/innovator/view-ideas`,
         {
           method: "GET",
           headers: {
@@ -179,10 +178,8 @@ const MyIdeasUpgraded: React.FC = () => {
         const token = localStorage.getItem("access_token");
         if (!token) {
           throw new Error("Authentication required");
-        }
-
-        const response = await fetch(
-          `http://localhost:8000/api/v1/innovator/delete-idea/${ideaId}`,
+        }        const response = await fetch(
+          `${API_BASE_URL}/api/v1/innovator/delete-idea/${ideaId}`,
           {
             method: "DELETE",
             headers: {
@@ -335,10 +332,8 @@ const MyIdeasUpgraded: React.FC = () => {
           .filter((tag) => tag.length > 0),
         status: isDraft ? "draft" : createFormData.status,
         visibility: createFormData.visibility,
-      };
-
-      const response = await fetch(
-        "http://localhost:8000/api/v1/innovator/submit-idea",
+      };      const response = await fetch(
+        `${API_BASE_URL}/api/v1/innovator/submit-idea`,
         {
           method: "POST",
           headers: {
@@ -365,10 +360,8 @@ const MyIdeasUpgraded: React.FC = () => {
           fileFormData.append(
             "description",
             `Document for ${createFormData.title}`
-          );
-
-          const fileResponse = await fetch(
-            "http://localhost:8000/api/v1/innovator/upload-file",
+          );          const fileResponse = await fetch(
+            `${API_BASE_URL}/api/v1/innovator/upload-file`,
             {
               method: "POST",
               headers: {
@@ -443,10 +436,8 @@ const MyIdeasUpgraded: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }
-
-      const response = await fetch(
-        `http://localhost:8000/api/v1/innovator/update-idea/${ideaId}`,
+      }      const response = await fetch(
+        `${API_BASE_URL}/api/v1/innovator/update-idea/${ideaId}`,
         {
           method: "PUT",
           headers: {

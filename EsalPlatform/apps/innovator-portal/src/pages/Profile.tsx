@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent, Button } from "@esal/ui";
 import { Lightbulb, Eye, Heart, AlertTriangle, RefreshCw, HelpCircle, User, Edit2, Link, Save, BarChart3, CheckCircle, XCircle, Zap, Lock, Mail, Camera, Package } from "lucide-react";
 import ProfileCard from "../components/ProfileCard";
+import { API_BASE_URL } from "../config/api";
 
 interface UserProfile {
   id: string;
@@ -185,11 +186,9 @@ const Profile: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }
-
-      // Fetch profile data
+      }      // Fetch profile data
       const profileResponse = await fetch(
-        "http://localhost:8000/api/v1/innovator/profile",
+        `${API_BASE_URL}/api/v1/innovator/profile`,
         {
           method: "GET",
           headers: {
@@ -203,11 +202,9 @@ const Profile: React.FC = () => {
         throw new Error("Failed to fetch profile");
       }
 
-      const profileData = await profileResponse.json();
-
-      // Also fetch dashboard stats
+      const profileData = await profileResponse.json();      // Also fetch dashboard stats
       const dashboardResponse = await fetch(
-        "http://localhost:8000/api/v1/innovator/dashboard",
+        `${API_BASE_URL}/api/v1/innovator/dashboard`,
         {
           method: "GET",
           headers: {
@@ -301,10 +298,8 @@ const Profile: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }
-
-      const response = await fetch(
-        "http://localhost:8000/api/v1/innovator/profile",
+      }      const response = await fetch(
+        `${API_BASE_URL}/api/v1/innovator/profile`,
         {
           method: "PUT",
           headers: {
@@ -357,10 +352,8 @@ const Profile: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }
-
-      const response = await fetch(
-        "http://localhost:8000/api/v1/users/change-password",
+      }      const response = await fetch(
+        `${API_BASE_URL}/api/v1/users/change-password`,
         {
           method: "POST",
           headers: {
@@ -413,10 +406,8 @@ const Profile: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }
-
-      const response = await fetch(
-        "http://localhost:8000/api/v1/users/notifications",
+      }      const response = await fetch(
+        `${API_BASE_URL}/api/v1/users/notifications`,
         {
           method: "PUT",
           headers: {
@@ -454,10 +445,8 @@ const Profile: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }
-
-      const response = await fetch(
-        "http://localhost:8000/api/v1/users/export",
+      }      const response = await fetch(
+        `${API_BASE_URL}/api/v1/users/export`,
         {
           method: "GET",
           headers: {
@@ -557,10 +546,8 @@ const Profile: React.FC = () => {
       }
 
       const formData = new FormData();
-      formData.append("file", avatarFile);
-
-      const response = await fetch(
-        "http://localhost:8000/api/v1/innovator/profile/avatar",
+      formData.append("file", avatarFile);      const response = await fetch(
+        `${API_BASE_URL}/api/v1/innovator/profile/avatar`,
         {
           method: "POST",
           headers: {

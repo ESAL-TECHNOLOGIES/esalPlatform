@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Card, CardHeader, CardTitle, CardContent } from "@esal/ui";
+import { API_BASE_URL } from "../config/api";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const Login: React.FC = () => {
     try {
       // API call to backend using JSON endpoint
       const response = await fetch(
-        "http://localhost:8000/api/v1/auth/login-json",
+        `${API_BASE_URL}/api/v1/auth/login-json`,
         {
           method: "POST",
           headers: {

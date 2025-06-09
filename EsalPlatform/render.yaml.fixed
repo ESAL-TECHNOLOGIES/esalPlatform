@@ -1,0 +1,245 @@
+# ESAL Platform - Render.com Deployment Configuration
+# This file contains all services for the ESAL Platform monorepo
+# 
+# Usage:
+# 1. Deploy API first: render deploy --service-name esal-platform-api
+# 2. Deploy frontends: render deploy --service-name esal-landing (repeat for each portal)
+# 3. Update CORS configuration in API with actual frontend URLs
+
+services:
+  # API Service
+  - type: web
+    name: esal-platform-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    region: oregon
+    branch: main
+    rootDir: apps/api
+    envVars:
+      # Application Configuration
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "False"
+      - key: PROJECT_NAME
+        value: "ESAL Platform"
+      - key: API_VERSION
+        value: "v1"
+      - key: PYTHON_VERSION
+        value: "3.11"
+      
+      # Security Keys (MUST BE SET MANUALLY IN RENDER DASHBOARD)
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_FROM_EMAIL
+        sync: false
+      
+      # JWT Configuration
+      - key: JWT_ALGORITHM
+        value: "HS256"
+      - key: JWT_EXPIRATION_TIME
+        value: "3600"
+      
+      # Email Configuration
+      - key: SMTP_HOST
+        value: "smtp.gmail.com"
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_FROM_NAME
+        value: "ESAL Platform"
+      
+      # CORS Configuration (Updated with actual frontend URLs)
+      - key: ALLOWED_ORIGINS
+        value: "https://esalplatform.onrender.com,https://innovator-portal.onrender.com,https://investor-portal-vz2e.onrender.com,https://esal-hub-portal.onrender.com,https://esal-admin-portal.onrender.com"
+      
+      # Site Configuration
+      - key: SITE_URL
+        value: "https://esalplatform.onrender.com"
+      - key: CONFIRM_EMAIL_REDIRECT_URL
+        value: "https://esalplatform.onrender.com/email-confirmed"
+    
+    healthCheckPath: /health
+    
+    buildFilter:
+      paths:
+        - apps/api/**
+      ignoredPaths:
+        - "*.md"
+        - "__pycache__/**"
+        - "*.pyc"
+
+  # Landing Page
+  - type: static_site
+    name: esal-landing
+    staticSiteGenerator: vite
+    buildCommand: pnpm install && pnpm turbo build --filter=landing
+    publishPath: ./apps/landing/dist
+    plan: free
+    region: oregon
+    branch: main
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: "https://esalplatform-1.onrender.com"
+      - key: VITE_APP_TITLE
+        value: "ESAL Platform"
+      - key: VITE_ENVIRONMENT
+        value: "production"
+      # MUST BE SET MANUALLY IN RENDER DASHBOARD
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+    buildFilter:
+      paths:
+        - apps/landing/**
+        - packages/**
+        - pnpm-lock.yaml
+        - turbo.json
+
+  # Hub Portal
+  - type: static_site
+    name: esal-hub-portal
+    staticSiteGenerator: vite
+    buildCommand: pnpm install && pnpm turbo build --filter=hub-portal
+    publishPath: ./apps/hub-portal/dist
+    plan: free
+    region: oregon
+    branch: main
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: "https://esalplatform-1.onrender.com"
+      - key: VITE_APP_TITLE
+        value: "ESAL Hub Portal"
+      - key: VITE_ENVIRONMENT
+        value: "production"
+      # MUST BE SET MANUALLY IN RENDER DASHBOARD
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+    buildFilter:
+      paths:
+        - apps/hub-portal/**
+        - packages/**
+        - pnpm-lock.yaml
+        - turbo.json
+
+  # Innovator Portal
+  - type: static_site
+    name: esal-innovator-portal
+    staticSiteGenerator: vite
+    buildCommand: pnpm install && pnpm turbo build --filter=innovator-portal
+    publishPath: ./apps/innovator-portal/dist
+    plan: free
+    region: oregon
+    branch: main
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: "https://esalplatform-1.onrender.com"
+      - key: VITE_APP_TITLE
+        value: "ESAL Innovator Portal"
+      - key: VITE_ENVIRONMENT
+        value: "production"
+      # MUST BE SET MANUALLY IN RENDER DASHBOARD
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+    buildFilter:
+      paths:
+        - apps/innovator-portal/**
+        - packages/**
+        - pnpm-lock.yaml
+        - turbo.json
+
+  # Investor Portal
+  - type: static_site
+    name: esal-investor-portal
+    staticSiteGenerator: vite
+    buildCommand: pnpm install && pnpm turbo build --filter=investor-portal
+    publishPath: ./apps/investor-portal/dist
+    plan: free
+    region: oregon
+    branch: main
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: "https://esalplatform-1.onrender.com"
+      - key: VITE_APP_TITLE
+        value: "ESAL Investor Portal"
+      - key: VITE_ENVIRONMENT
+        value: "production"
+      # MUST BE SET MANUALLY IN RENDER DASHBOARD
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+    buildFilter:
+      paths:
+        - apps/investor-portal/**
+        - packages/**
+        - pnpm-lock.yaml
+        - turbo.json
+
+  # Admin Portal
+  - type: static_site
+    name: esal-admin-portal
+    staticSiteGenerator: vite
+    buildCommand: pnpm install && pnpm turbo build --filter=admin-portal
+    publishPath: ./apps/admin-portal/dist
+    plan: free
+    region: oregon
+    branch: main
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: "https://esalplatform-1.onrender.com"
+      - key: VITE_APP_TITLE
+        value: "ESAL Admin Portal"
+      - key: VITE_ENVIRONMENT
+        value: "production"
+      # MUST BE SET MANUALLY IN RENDER DASHBOARD
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+    buildFilter:
+      paths:
+        - apps/admin-portal/**
+        - packages/**
+        - pnpm-lock.yaml
+        - turbo.json

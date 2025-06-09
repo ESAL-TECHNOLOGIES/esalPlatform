@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, Button } from "@esal/ui";
+import { API_BASE_URL } from "../config/api";
 
 interface Idea {
   id: string;
@@ -35,10 +36,8 @@ const MyIdeas: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }
-
-      const response = await fetch(
-        `http://localhost:8000/api/v1/innovator/view-ideas`,
+      }      const response = await fetch(
+        `${API_BASE_URL}/api/v1/innovator/view-ideas`,
         {
           method: "GET",
           headers: {
@@ -75,10 +74,8 @@ const MyIdeas: React.FC = () => {
         const token = localStorage.getItem("access_token");
         if (!token) {
           throw new Error("Authentication required");
-        }
-
-        const response = await fetch(
-          `http://localhost:8000/api/v1/innovator/delete-idea/${ideaId}`,
+        }        const response = await fetch(
+          `${API_BASE_URL}/api/v1/innovator/delete-idea/${ideaId}`,
           {
             method: "DELETE",
             headers: {
