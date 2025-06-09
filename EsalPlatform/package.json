@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
-    "build:ui": "cd packages/ui && npm run build",
+    "build:ui": "cd packages/ui && npm install && npm run build",
     "build:npm": "npm run build:ui && npm run build:apps",
     "build:apps": "npm run build:landing && npm run build:admin && npm run build:innovator && npm run build:investor && npm run build:hub",
     "build:landing": "cd apps/landing && npm run build:npm",
