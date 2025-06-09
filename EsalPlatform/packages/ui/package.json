@@ -12,10 +12,8 @@
   },
   "files": [
     "dist/**"
-  ],
-  "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --external react && postcss src/styles.css -o dist/index.css",
-    "dev": "tsup src/index.ts --format esm --watch --dts --external react",
+  ],  "scripts": {    "build": "tsup && postcss src/styles.css -o dist/index.css",
+    "dev": "tsup --watch",
     "lint": "eslint src --ext .ts,.tsx",
     "type-check": "tsc --noEmit"
   },

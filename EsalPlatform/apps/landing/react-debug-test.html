@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Debug Test</title>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="module">
+        console.log('Script starting...');
+        
+        // Test if React can be imported
+        import React from 'react';
+        import ReactDOM from 'react-dom/client';
+        
+        console.log('React imported:', React);
+        console.log('React.useState:', React.useState);
+        
+        // Simple test component
+        function TestComponent() {
+            console.log('TestComponent rendering...');
+            const [count, setCount] = React.useState(0);
+            console.log('useState worked, count:', count);
+            
+            return React.createElement('div', {}, [
+                React.createElement('h1', { key: 'title' }, 'React Test'),
+                React.createElement('p', { key: 'count' }, `Count: ${count}`),
+                React.createElement('button', { 
+                    key: 'button', 
+                    onClick: () => setCount(count + 1) 
+                }, 'Increment')
+            ]);
+        }
+        
+        // Try to render
+        try {
+            console.log('Attempting to render...');
+            const root = ReactDOM.createRoot(document.getElementById('root'));
+            root.render(React.createElement(TestComponent));
+            console.log('Render successful!');
+        } catch (error) {
+            console.error('Render failed:', error);
+        }
+    </script>
+</body>
+</html>
