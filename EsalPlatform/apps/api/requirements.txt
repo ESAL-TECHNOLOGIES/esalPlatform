@@ -16,13 +16,13 @@ email-validator==2.1.0
 # Authentication & Security
 python-jose[cryptography]==3.3.0
 python-multipart==0.0.6
-PyJWT==2.8.0
+PyJWT>=2.8.0,<3.0.0
 
-# Supabase Integration - Updated for compatibility
-supabase==2.9.1
-postgrest==0.17.0
-storage3==0.8.0
-gotrue==2.12.0
+# Supabase Integration - Updated for compatible versions
+supabase==2.8.1
+postgrest==0.16.8
+storage3==0.7.7
+gotrue==2.8.1
 realtime==2.0.5
 
 # HTTP Client with proxy support
