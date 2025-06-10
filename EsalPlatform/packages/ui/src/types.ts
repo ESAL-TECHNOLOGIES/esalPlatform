@@ -37,6 +37,7 @@ export interface SidebarProps {
   };
   isMobileOpen?: boolean;
   onMobileClose?: () => void;
+  onNavigate?: (href: string) => void;
 }
 
 export interface SidebarItem {

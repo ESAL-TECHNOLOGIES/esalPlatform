@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Lightbulb } from "lucide-react";
 import { cn } from "../utils";
 import type { SidebarProps } from "../types";
@@ -11,9 +10,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   stats,
   isMobileOpen,
   onMobileClose,
+  onNavigate, // Add navigation callback prop
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const navigate = useNavigate();
   // Use provided user data or fallback to localStorage/defaults
   const getUserData = () => {
     if (propUser) return propUser;
@@ -178,10 +177,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           const isActive = currentPath === item.href;
           return (
             <div key={item.href} className="relative">
-              {" "}
-              <button
+              {" "}              <button
                 onClick={() => {
-                  navigate(item.href);
+                  onNavigate?.(item.href);
                   // Close mobile menu when navigation link is clicked
                   if (onMobileClose && window.innerWidth < 1024) {
                     onMobileClose();
