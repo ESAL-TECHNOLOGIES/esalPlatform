@@ -1,5 +1,7 @@
+import react from "@vitejs/plugin-react";
+
 export default {
-  plugins: [],
+  plugins: [react()],
   server: {
     port: 3001,
     host: true,
@@ -24,13 +26,13 @@ export default {
   },
   define: {
     // Define process.env for browser compatibility
-    'process.env.NODE_ENV': JSON.stringify('production'),
-    'process': JSON.stringify({
+    "process.env.NODE_ENV": JSON.stringify("production"),
+    process: JSON.stringify({
       env: {
-        NODE_ENV: 'production'
-      }
+        NODE_ENV: "production",
+      },
     }),
     // Ensure global is defined
-    'global': 'globalThis',
+    global: "globalThis",
   },
 };

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent, Button } from "@esal/ui";
 
 // API configuration
-const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || "${API_BASE_URL}";
+const API_BASE_URL =
+  (import.meta as any).env?.VITE_API_URL || "${API_BASE_URL}";
 
 interface NotificationSettings {
   email_notifications: boolean;
@@ -106,7 +107,7 @@ const Settings: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Authentication required");
-      }      // Fetch general settings
+      } // Fetch general settings
       const settingsResponse = await fetch(
         `${API_BASE_URL}/api/v1/users/settings`,
         {
@@ -116,7 +117,7 @@ const Settings: React.FC = () => {
             "Content-Type": "application/json",
           },
         }
-      );      // Fetch notification settings
+      ); // Fetch notification settings
       const notificationsResponse = await fetch(
         `${API_BASE_URL}/api/v1/users/notifications`,
         {
@@ -187,16 +188,13 @@ const Settings: React.FC = () => {
       const token = localStorage.getItem("access_token");
       if (!token) return;
 
-      const response = await fetch(
-        "${API_BASE_URL}/api/v1/users/sessions",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch("${API_BASE_URL}/api/v1/users/sessions", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -329,17 +327,14 @@ const Settings: React.FC = () => {
         privacy: settings.privacy,
       };
 
-      const response = await fetch(
-        "${API_BASE_URL}/api/v1/users/settings",
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedSettings),
-        }
-      );
+      const response = await fetch("${API_BASE_URL}/api/v1/users/settings", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedSettings),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -374,17 +369,14 @@ const Settings: React.FC = () => {
         throw new Error("Authentication required");
       }
 
-      const response = await fetch(
-        "${API_BASE_URL}/api/v1/users/settings",
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(settings),
-        }
-      );
+      const response = await fetch("${API_BASE_URL}/api/v1/users/settings", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(settings),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -492,17 +484,14 @@ const Settings: React.FC = () => {
         throw new Error("Authentication required");
       }
 
-      const response = await fetch(
-        "${API_BASE_URL}/api/v1/users/enable-2fa",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ password }),
-        }
-      );
+      const response = await fetch("${API_BASE_URL}/api/v1/users/enable-2fa", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password }),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -543,16 +532,13 @@ const Settings: React.FC = () => {
         throw new Error("Authentication required");
       }
 
-      const response = await fetch(
-        "${API_BASE_URL}/api/v1/users/disable-2fa",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch("${API_BASE_URL}/api/v1/users/disable-2fa", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -619,15 +605,12 @@ const Settings: React.FC = () => {
         throw new Error("Authentication required");
       }
 
-      const response = await fetch(
-        "${API_BASE_URL}/api/v1/users/export",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch("${API_BASE_URL}/api/v1/users/export", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (!response.ok) {
         const errorData = await response.json();

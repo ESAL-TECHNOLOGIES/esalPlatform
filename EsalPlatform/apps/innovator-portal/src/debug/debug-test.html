@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>React useState Error Debug Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .error-box {
+        background: #fee;
+        border: 1px solid #fcc;
+        border-radius: 4px;
+        padding: 15px;
+        margin: 10px 0;
+      }
+      .success-box {
+        background: #efe;
+        border: 1px solid #cfc;
+        border-radius: 4px;
+        padding: 15px;
+        margin: 10px 0;
+      }
+      button {
+        background: #007cba;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #005a8b;
+      }
+      .debug-panel {
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 15px;
+        margin: 15px 0;
+        font-family: monospace;
+      }
+      pre {
+        background: #f4f4f4;
+        padding: 10px;
+        border-radius: 4px;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🐛 React useState Error Debug Test</h1>
+
+      <div class="success-box">
+        <h3>✅ Debug Tools Loaded</h3>
+        <p>
+          The React useState error debugger is now active. This page will help
+          you test and understand the useState error detection.
+        </p>
+      </div>
+
+      <div class="debug-panel">
+        <h3>🔧 Debug Controls</h3>
+        <button onclick="checkReactState()">Check React State</button>
+        <button onclick="simulateError()">Simulate useState Error</button>
+        <button onclick="showErrors()">Show All Errors</button>
+        <button onclick="clearErrors()">Clear Errors</button>
+      </div>
+
+      <div id="output" class="debug-panel">
+        <h4>📊 Debug Output:</h4>
+        <div id="output-content">
+          Click a button above to see debug information...
+        </div>
+      </div>
+
+      <div class="error-box">
+        <h3>🎯 Instructions for Innovator Portal</h3>
+        <ol>
+          <li>Open the Innovator Portal in your browser</li>
+          <li>Open Developer Tools (F12)</li>
+          <li>
+            Copy and paste the debug script from
+            <code>console-debugger.js</code> into the console
+          </li>
+          <li>Navigate through the portal and watch for error alerts</li>
+          <li>
+            Use <code>debugReact.getUseStateErrors()</code> to see all useState
+            errors
+          </li>
+        </ol>
+      </div>
+
+      <div class="debug-panel">
+        <h4>🚨 Error Detection Features:</h4>
+        <ul>
+          <li>Automatic useState error interception</li>
+          <li>Component render monitoring</li>
+          <li>Stack trace analysis</li>
+          <li>Real-time error alerts</li>
+          <li>Error history tracking</li>
+        </ul>
+      </div>
+
+      <div class="debug-panel">
+        <h4>📋 Available Console Commands:</h4>
+        <pre>
+debugReact.checkReactState()    // Check React availability
+debugReact.getErrorCount()       // Get total error count
+debugReact.getUseStateErrors()   // Get useState specific errors
+debugReact.clearErrors()         // Clear error history
+debugReact.simulateError()       // Test error detection</pre
+        >
+      </div>
+    </div>
+
+    <script src="console-debugger.js"></script>
+    <script>
+      function updateOutput(content) {
+        document.getElementById("output-content").innerHTML = content;
+      }
+
+      function checkReactState() {
+        if (window.debugReact) {
+          window.debugReact.checkReactState();
+          updateOutput(`
+                    <strong>React State Check Complete!</strong><br>
+                    Check the browser console for detailed information.<br>
+                    <em>React Available:</em> ${typeof React !== "undefined"}<br>
+                    <em>useState Available:</em> ${typeof React?.useState === "function"}<br>
+                    <em>Total Errors:</em> ${window.debugReact.getErrorCount()}
+                `);
+        } else {
+          updateOutput(
+            '<span style="color: red;">❌ Debug tools not loaded properly</span>'
+          );
+        }
+      }
+
+      function simulateError() {
+        if (window.debugReact) {
+          window.debugReact.simulateError();
+          updateOutput(`
+                    <strong>🚨 Test Error Simulated!</strong><br>
+                    Check the console and look for an alert popup.<br>
+                    This tests the useState error detection system.
+                `);
+        } else {
+          updateOutput(
+            '<span style="color: red;">❌ Debug tools not available</span>'
+          );
+        }
+      }
+
+      function showErrors() {
+        if (window.debugReact) {
+          const errors = window.debugReact.getUseStateErrors();
+          updateOutput(`
+                    <strong>📊 Error Report:</strong><br>
+                    Total Errors: ${window.debugReact.getErrorCount()}<br>
+                    useState Errors: ${errors.length}<br>
+                    <pre>${JSON.stringify(errors, null, 2)}</pre>
+                `);
+        } else {
+          updateOutput(
+            '<span style="color: red;">❌ Debug tools not available</span>'
+          );
+        }
+      }
+
+      function clearErrors() {
+        if (window.debugReact) {
+          window.debugReact.clearErrors();
+          updateOutput(`
+                    <strong>🧹 Errors Cleared!</strong><br>
+                    Error history has been reset.
+                `);
+        } else {
+          updateOutput(
+            '<span style="color: red;">❌ Debug tools not available</span>'
+          );
+        }
+      }
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(() => {
+          if (window.debugReact) {
+            updateOutput(`
+                        <strong>✅ Debug System Ready!</strong><br>
+                        React useState error detection is active.<br>
+                        <em>Time:</em> ${new Date().toLocaleString()}
+                    `);
+          } else {
+            updateOutput(
+              '<span style="color: red;">❌ Failed to load debug system</span>'
+            );
+          }
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>

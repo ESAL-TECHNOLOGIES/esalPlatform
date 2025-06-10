@@ -8,7 +8,8 @@ export interface ApiResponse<T = any> {
   success: boolean;
 }
 
-class ApiClient {  private baseURL =
+class ApiClient {
+  private baseURL =
     (import.meta as any).env?.VITE_API_URL || "http://localhost:8000/api/v1";
 
   private async getAuthHeaders(): Promise<Record<string, string>> {

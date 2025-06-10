@@ -46,23 +46,8 @@ const Login: React.FC = () => {
         navigate("/");
       } else {
         const errorData = await response.json();
-        const errorMessage = errorData.detail || "Login failed";
-
-        // Check if the error is due to unverified email
-        if (
-          errorMessage.includes("verify your email") ||
-          errorMessage.includes("not verified")
-        ) {
-          // Redirect to email verification with the email
-          navigate("/email-verification", {
-            state: {
-              email: formData.email,
-              showResendOnly: true, // Flag to show only resend option
-            },
-          });
-        } else {
-          setError(errorMessage);
-        }
+        const errorMessage = errorData.detail || "Login failed"; // Email verification removed - show standard error message
+        setError(errorMessage);
       }
     } catch (err) {
       setError("Network error. Please try again.");

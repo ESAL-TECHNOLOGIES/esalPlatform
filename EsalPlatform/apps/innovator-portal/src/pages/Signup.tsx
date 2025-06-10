@@ -47,9 +47,11 @@ const Signup: React.FC = () => {
         email: formData.email,
         full_name: formData.name, // Backend expects 'full_name' not 'name'
         password: formData.password,
-        role: "innovator",      };
+        role: "innovator",
+      };
       // Log request details for debugging
-      const apiUrl = (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
+      const apiUrl =
+        (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
       const fullApiUrl = `${apiUrl}/api/v1/auth/register`;
       console.log("Request URL:", fullApiUrl);
       console.log("Request body:", requestBody); // API call to backend
@@ -64,38 +66,20 @@ const Signup: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
 
-        // Check if verification is required
-        if (data.requires_verification) {
-          setSuccess(
-            data.message ||
-              "Account created successfully! Please check your email for a verification code."
-          );
-
-          // Redirect to email verification page with user data
-          setTimeout(() => {
-            navigate("/email-verification", {
-              state: {
-                email: formData.email,
-                userId: data.user_id,
-              },
-            });
-          }, 1500);
-        } else {
-          // Fallback for immediate login (if verification is disabled)
-          localStorage.setItem("access_token", data.access_token);
-          if (data.refresh_token) {
-            localStorage.setItem("refresh_token", data.refresh_token);
-          }
-
-          setSuccess(
-            data.message ||
-              "Account created successfully! Redirecting to dashboard..."
-          );
-
-          setTimeout(() => {
-            navigate("/");
-          }, 1500);
+        // Email verification removed - immediate login after successful registration
+        localStorage.setItem("access_token", data.access_token);
+        if (data.refresh_token) {
+          localStorage.setItem("refresh_token", data.refresh_token);
         }
+
+        setSuccess(
+          data.message ||
+            "Account created successfully! Redirecting to dashboard..."
+        );
+
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
       } else if (response.status === 500) {
         // Most likely the backend error with the User.created_at attribute
         console.error("Server error - likely the 'created_at' attribute issue");

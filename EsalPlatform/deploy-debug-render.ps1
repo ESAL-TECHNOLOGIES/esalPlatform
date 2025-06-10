@@ -19,14 +19,15 @@ $env:BUILD_TIME = Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ"
 try {
     npm run build:render
     Write-Host "✅ Build completed successfully!" -ForegroundColor Green
-} catch {
+}
+catch {
     Write-Host "❌ Build failed. Attempting fallback build..." -ForegroundColor Red
     npm run build:simple
 }
 
 Write-Host "📊 Build analysis:" -ForegroundColor Cyan
 Write-Host "- Dist folder size:" -ForegroundColor White
-Get-ChildItem -Path "dist" -Recurse | Measure-Object -Property Length -Sum | Select-Object @{Name="Size(MB)";Expression={[math]::Round($_.Sum/1MB,2)}}
+Get-ChildItem -Path "dist" -Recurse | Measure-Object -Property Length -Sum | Select-Object @{Name = "Size(MB)"; Expression = { [math]::Round($_.Sum / 1MB, 2) } }
 
 Write-Host "- Main files in dist:" -ForegroundColor White
 Get-ChildItem -Path "dist" -Name

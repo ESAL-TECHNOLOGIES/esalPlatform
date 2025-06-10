@@ -65,14 +65,21 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
 };
 
 function App() {
+  // Add defensive check for React hooks availability
+  if (typeof useState === "undefined") {
+    console.error("React hooks not available - component mounted too early");
+    return <div>Loading...</div>;
+  }
+
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   useEffect(() => {
     // Check for existing token and get user info
     const token = localStorage.getItem("access_token");
     if (token) {
-      const apiUrl = (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
+      const apiUrl =
+        (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
       // Fetch user data from backend with token
       fetch(`${apiUrl}/api/v1/auth/me`, {
         method: "GET",
@@ -94,12 +101,14 @@ function App() {
             role: userData.role,
             email: userData.email,
           });
-        })        .catch((error) => {
+        })
+        .catch((error) => {
           console.error("Error fetching user data:", error);
           // Clear invalid token
           localStorage.removeItem("access_token");
           localStorage.removeItem("refresh_token");
-          setUser(null);        });
+          setUser(null);
+        });
     }
     setIsLoading(false);
   }, []);
@@ -116,7 +125,9 @@ function App() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">Loading...</div>
       </div>
-    );  }  return (
+    );
+  }
+  return (
     <Routes>
       {/* Public routes */}
       <Route path="/email-confirmed" element={<EmailConfirmed />} />
@@ -144,39 +155,39 @@ function App() {
         }
       />
 
-  {/* Protected routes */}
-  <Route
-    path="/*"
-    element={
-      <ProtectedRoute>
-        <Layout
-          navbar={
-            <Navbar
-              title="Innovator Portal"
-              user={user}
-              onLogout={handleLogout}
-            />
-          }
-          sidebar={
-            <Sidebar
-              items={sidebarItems}
-              currentPath={window.location.pathname}
-            />
-          }
-        >
-          {" "}
-          <Routes>
-            <Route path="/" element={<DashboardModern />} />
-            <Route path="/ai-generator" element={<AIGenerator />} />
-            <Route path="/metrics" element={<Metrics />} />{" "}
-            <Route path="/ideas/:ideaId" element={<IdeaDetails />} />{" "}
-            <Route path="/my-ideas" element={<MyIdeas />} />                <Route path="/profile" element={<Profile />} />
-            <Route path="/settings" element={<Settings />} />
-          </Routes>
-        </Layout>
-      </ProtectedRoute>
-    }
-  />
+      {/* Protected routes */}
+      <Route
+        path="/*"
+        element={
+          <ProtectedRoute>
+            <Layout
+              navbar={
+                <Navbar
+                  title="Innovator Portal"
+                  user={user}
+                  onLogout={handleLogout}
+                />
+              }
+              sidebar={
+                <Sidebar
+                  items={sidebarItems}
+                  currentPath={window.location.pathname}
+                />
+              }
+            >
+              <Routes>
+                <Route path="/" element={<DashboardModern />} />
+                <Route path="/ai-generator" element={<AIGenerator />} />
+                <Route path="/metrics" element={<Metrics />} />
+                <Route path="/ideas/:ideaId" element={<IdeaDetails />} />
+                <Route path="/my-ideas" element={<MyIdeas />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/settings" element={<Settings />} />
+              </Routes>
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }

@@ -15,7 +15,6 @@ const EmailVerification: React.FC<EmailVerificationProps> = () => {
   const email = location.state?.email || "";
   const userId = location.state?.userId || "";
   const showResendOnly = location.state?.showResendOnly || false;
-
   const [verificationCode, setVerificationCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
@@ -61,24 +60,22 @@ const EmailVerification: React.FC<EmailVerificationProps> = () => {
           email: email, // Send email if userId not available
         }),
       });
-
       if (response.ok) {
         const data = await response.json();
 
-        // Store token in localStorage
+        // Store token in localStorage first
         localStorage.setItem("access_token", data.access_token);
         if (data.refresh_token) {
           localStorage.setItem("refresh_token", data.refresh_token);
-        }
-
+        } // Set success message using response data
         setSuccess(
           data.message || "Email verified successfully! Redirecting..."
         );
 
-        // Redirect to dashboard after success
+        // Navigate after a brief delay to ensure state updates complete
         setTimeout(() => {
-          navigate("/");
-        }, 2000);
+          navigate("/", { replace: true });
+        }, 100);
       } else {
         const errorData = await response.json();
         setError(errorData.detail || "Verification failed");
@@ -110,9 +107,7 @@ const EmailVerification: React.FC<EmailVerificationProps> = () => {
           }),
         }
       );
-
       if (response.ok) {
-        const data = await response.json();
         setSuccess("Verification code sent! Please check your email.");
         setTimeLeft(60); // 60 second cooldown
       } else {
