@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { Layout, Navbar, Sidebar } from "@esal/ui";
 import { useEffect, useState } from "react";
 import {
@@ -71,6 +71,7 @@ function App() {
     return <div>Loading...</div>;
   }
 
+  const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -112,12 +113,15 @@ function App() {
     }
     setIsLoading(false);
   }, []);
-
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     setUser(null);
-    window.location.href = "/login";
+    navigate("/login");
+  };
+
+  const handleSidebarNavigation = (path: string) => {
+    navigate(path);
   };
 
   if (isLoading) {
@@ -167,11 +171,11 @@ function App() {
                   user={user}
                   onLogout={handleLogout}
                 />
-              }
-              sidebar={
+              }              sidebar={
                 <Sidebar
                   items={sidebarItems}
                   currentPath={window.location.pathname}
+                  onNavigate={handleSidebarNavigation}
                 />
               }
             >
