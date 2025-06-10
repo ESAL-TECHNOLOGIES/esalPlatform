@@ -62,23 +62,22 @@ const Signup: React.FC = () => {
           Accept: "application/json",
         },
         body: JSON.stringify(requestBody),
-      });
-      if (response.ok) {
+      });      if (response.ok) {
         const data = await response.json();
 
-        // Email verification removed - immediate login after successful registration
-        localStorage.setItem("access_token", data.access_token);
-        if (data.refresh_token) {
-          localStorage.setItem("refresh_token", data.refresh_token);
-        }
-
+        // Redirect to email verification page instead of direct login
         setSuccess(
           data.message ||
-            "Account created successfully! Redirecting to dashboard..."
+            "Account created successfully! Please check your email for verification."
         );
 
         setTimeout(() => {
-          navigate("/");
+          navigate("/email-verification", { 
+            state: { 
+              email: formData.email, 
+              userId: data.user_id || data.id 
+            } 
+          });
         }, 1500);
       } else if (response.status === 500) {
         // Most likely the backend error with the User.created_at attribute
