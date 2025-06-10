@@ -179,7 +179,7 @@ function App() {
                   user={{
                     name: user?.name || "Innovator",
                     email: user?.email || "",
-                    role: "Innovator",
+                    role: user?.role || "Innovator",
                     avatar_url: user?.avatar_url,
                   }}
                 />
