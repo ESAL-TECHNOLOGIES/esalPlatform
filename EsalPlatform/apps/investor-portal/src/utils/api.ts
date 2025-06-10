@@ -45,12 +45,15 @@ export const apiRequest = async (
   };
 
   const response = await fetch(url, defaultOptions);
-
   if (response.status === 401) {
     // Handle unauthorized - redirect to login
     localStorage.removeItem("access_token");
     localStorage.removeItem("user_data");
-    window.location.href = "/login";
+    // Use React Router navigation instead of window.location.href
+    const currentPath = window.location.pathname;
+    if (currentPath !== "/login") {
+      window.location.replace("/login");
+    }
     throw new Error("Unauthorized");
   }
 

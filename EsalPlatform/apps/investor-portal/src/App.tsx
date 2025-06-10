@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { Layout, Navbar, Sidebar } from "@esal/ui";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -43,9 +43,14 @@ const sidebarItems = [
 function AppContent() {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
+  };
+
+  const handleNavigate = (path: string) => {
+    navigate(path);
   };
   // Check if current route is login, signup, or email verification
   const isAuthRoute =
@@ -75,9 +80,12 @@ function AppContent() {
             }}
             onLogout={handleLogout}
           />
-        }
-        sidebar={
-          <Sidebar items={sidebarItems} currentPath={location.pathname} />
+        }        sidebar={
+          <Sidebar 
+            items={sidebarItems} 
+            currentPath={location.pathname}
+            onNavigate={handleNavigate}
+          />
         }
       >
         {" "}

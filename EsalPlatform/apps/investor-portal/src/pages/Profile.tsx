@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardContent, Button } from "@esal/ui";
 import {
   User,
@@ -349,6 +350,7 @@ const ProfileCard: React.FC<{
 };
 
 const Profile: React.FC = () => {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<InvestorProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -521,17 +523,15 @@ const Profile: React.FC = () => {
               <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <Button
+              <div className="space-y-3">                <Button
                   className="w-full"
-                  onClick={() => (window.location.href = "/matching")}
+                  onClick={() => navigate("/matching")}
                 >
                   Update Investment Preferences
-                </Button>
-                <Button
+                </Button>                <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => (window.location.href = "/startups")}
+                  onClick={() => navigate("/startups")}
                 >
                   Browse Startups
                 </Button>

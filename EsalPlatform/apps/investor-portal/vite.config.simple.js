@@ -13,7 +13,9 @@ export default {
   server: {
     port: 3002,
     host: true,
+    historyApiFallback: true, // ✅ Added for CSR support
   },
+  base: "/", // ✅ Added for proper base path
   build: {
     outDir: "dist",
     emptyOutDir: true,

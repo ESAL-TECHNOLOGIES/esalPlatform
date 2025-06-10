@@ -73,12 +73,10 @@ const EmailVerification: React.FC<EmailVerificationProps> = () => {
 
         setSuccess(
           data.message || "Email verified successfully! Redirecting..."
-        );
-
-        // Redirect to dashboard after success
+        );        // Redirect to dashboard after success
         setTimeout(() => {
-          navigate("/");
-        }, 2000);
+          navigate("/", { replace: true });
+        }, 100);
       } else {
         const errorData = await response.json();
         setError(errorData.detail || "Verification failed");
