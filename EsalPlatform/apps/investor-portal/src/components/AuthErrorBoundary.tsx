@@ -19,7 +19,6 @@ class AuthErrorBoundary extends Component<Props, State> {
     // Update state so the next render will show the fallback UI
     return { hasError: true, error };
   }
-
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("Auth Error Boundary caught an error:", error, errorInfo);
 
@@ -35,10 +34,8 @@ class AuthErrorBoundary extends Component<Props, State> {
         timestamp: new Date().toISOString(),
       });
 
-      // Attempt recovery by reloading the page
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      // DO NOT auto-reload to prevent infinite loops
+      // User can manually refresh if needed
     }
   }
 
