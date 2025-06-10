@@ -285,75 +285,76 @@ const Dashboard: React.FC = () => {
       </div>
     );
   }
-
   return (
-    <div className="space-y-6 sm:space-y-8">
-      {" "}
-      {/* Enhanced Header with Gradient Background */}
-      <div className="bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 rounded-xl p-6 sm:p-8 text-white shadow-lg">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8">
+      {/* Enhanced Header with Gradient Background - Mobile Responsive */}
+      <div className="bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 rounded-xl p-4 sm:p-6 lg:p-8 text-white shadow-lg">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <div className="flex items-center space-x-3 mb-2">
-              <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
-                <Briefcase size={28} className="stroke-2" />
+            <div className="flex items-center space-x-2 sm:space-x-3 mb-2">
+              <div className="p-1.5 sm:p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                <Briefcase size={24} className="stroke-2 sm:w-7 sm:h-7" />
               </div>
-              <h1 className="text-3xl sm:text-4xl font-bold">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
                 Investor Dashboard
               </h1>
             </div>
-            <p className="text-green-100 mt-2 text-lg flex items-center space-x-2">
-              <Sparkles size={18} className="stroke-2" />
-              <span>
+            <p className="text-green-100 mt-2 text-sm sm:text-base lg:text-lg flex items-center space-x-2">
+              <Sparkles size={16} className="stroke-2 sm:w-5 sm:h-5" />
+              <span className="leading-tight">
                 Welcome back! Here's your investment portfolio overview
               </span>
             </p>
-            <div className="flex items-center space-x-2 text-sm text-green-200 mt-3">
-              <Clock size={14} className="stroke-2" />
+            <div className="flex items-center space-x-2 text-xs sm:text-sm text-green-200 mt-2 sm:mt-3">
+              <Clock size={12} className="stroke-2 sm:w-4 sm:h-4" />
               <span>Last updated: {lastRefresh.toLocaleTimeString()}</span>
             </div>
           </div>
 
-          {/* Dashboard Tabs */}
-          <div className="flex bg-white/20 rounded-lg p-1 backdrop-blur-sm">
-            {[
-              { key: "overview", icon: PieChart, label: "Overview" },
-              { key: "portfolio", icon: Briefcase, label: "Portfolio" },
-              { key: "opportunities", icon: Target, label: "Opportunities" },
-            ].map((tab) => {
-              const TabIcon = tab.icon;
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center space-x-2 ${
-                    activeTab === tab.key
-                      ? "bg-white text-green-600 shadow-sm"
-                      : "text-white/80 hover:text-white hover:bg-white/10"
-                  }`}
-                >
-                  <TabIcon size={16} className="stroke-2" />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
+          {/* Dashboard Tabs - Mobile Responsive */}
+          <div className="flex flex-col sm:flex-row gap-3 lg:gap-0">
+            <div className="flex bg-white/20 rounded-lg p-1 backdrop-blur-sm overflow-x-auto">
+              {[
+                { key: "overview", icon: PieChart, label: "Overview" },
+                { key: "portfolio", icon: Briefcase, label: "Portfolio" },
+                { key: "opportunities", icon: Target, label: "Opportunities" },
+              ].map((tab) => {
+                const TabIcon = tab.icon;
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key)}
+                    className={`px-3 py-2 sm:px-4 rounded-md text-xs sm:text-sm font-medium transition-all flex items-center space-x-1 sm:space-x-2 whitespace-nowrap ${
+                      activeTab === tab.key
+                        ? "bg-white text-green-600 shadow-sm"
+                        : "text-white/80 hover:text-white hover:bg-white/10"
+                    }`}
+                  >
+                    <TabIcon size={14} className="stroke-2 sm:w-4 sm:h-4" />
+                    <span className="hidden sm:inline">{tab.label}</span>
+                    <span className="sm:hidden">{tab.label.substring(0, 4)}</span>
+                  </button>
+                );
+              })}
+            </div>
 
-          <Button
-            onClick={handleRefresh}
-            variant="outline"
-            disabled={isLoading}
-            className="bg-white/20 border-white/30 text-white hover:bg-white/30 backdrop-blur-sm flex items-center space-x-2"
-          >
-            <RefreshCw
-              size={16}
-              className={`stroke-2 ${isLoading ? "animate-spin" : ""}`}
-            />
-            <span>{isLoading ? "Refreshing..." : "Refresh Data"}</span>
-          </Button>
+            <Button
+              onClick={handleRefresh}
+              variant="outline"
+              disabled={isLoading}
+              className="bg-white/20 border-white/30 text-white hover:bg-white/30 backdrop-blur-sm flex items-center justify-center space-x-2 text-xs sm:text-sm px-3 py-2"
+            >
+              <RefreshCw
+                size={14}
+                className={`stroke-2 sm:w-4 sm:h-4 ${isLoading ? "animate-spin" : ""}`}
+              />
+              <span className="hidden sm:inline">{isLoading ? "Refreshing..." : "Refresh Data"}</span>
+              <span className="sm:hidden">Refresh</span>
+            </Button>
+          </div>
         </div>
-      </div>
-      {/* Enhanced Portfolio Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      </div>      {/* Enhanced Portfolio Stats - Mobile Responsive */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {portfolioStats.map((stat, index) => {
           const IconComponent = stat.icon;
           return (
@@ -364,130 +365,130 @@ const Dashboard: React.FC = () => {
               <div
                 className={`absolute inset-0 bg-gradient-to-br ${stat.bgColor} group-hover:opacity-80 transition-opacity`}
               ></div>
-              <CardContent className="pt-6 pb-6 px-6 relative">
+              <CardContent className="pt-4 pb-4 px-4 sm:pt-6 sm:pb-6 sm:px-6 relative">
                 <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-3 sm:space-x-4 flex-1 min-w-0">
                     <div
-                      className={`p-3 rounded-xl bg-white shadow-sm ${stat.iconColor}`}
+                      className={`p-2 sm:p-3 rounded-xl bg-white shadow-sm ${stat.iconColor} flex-shrink-0`}
                     >
-                      <IconComponent size={24} className="stroke-2" />
+                      <IconComponent size={20} className="stroke-2 sm:w-6 sm:h-6" />
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-700 mb-1">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs sm:text-sm font-medium text-gray-700 mb-1 truncate">
                         {stat.label}
                       </p>
-                      <p className="text-2xl font-bold text-gray-900 mb-1">
+                      <p className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-1 truncate">
                         {stat.value}
                       </p>
-                      <p className="text-xs text-gray-600">
+                      <p className="text-xs text-gray-600 truncate">
                         {stat.description}
                       </p>
                     </div>
                   </div>
                   <div
-                    className={`flex items-center space-x-1 text-sm font-semibold px-3 py-1 rounded-full ${
+                    className={`flex items-center space-x-1 text-xs sm:text-sm font-semibold px-2 py-1 sm:px-3 rounded-full flex-shrink-0 ${
                       stat.changeType === "positive"
                         ? "text-green-700 bg-green-100 border border-green-200"
                         : "text-red-700 bg-red-100 border border-red-200"
                     }`}
                   >
                     {stat.trendUp ? (
-                      <TrendingUp size={14} className="stroke-2" />
+                      <TrendingUp size={12} className="stroke-2 sm:w-3.5 sm:h-3.5" />
                     ) : (
-                      <TrendingDown size={14} className="stroke-2" />
+                      <TrendingDown size={12} className="stroke-2 sm:w-3.5 sm:h-3.5" />
                     )}
-                    <span>{stat.trend}</span>
+                    <span className="hidden sm:inline">{stat.trend}</span>
+                    <span className="sm:hidden">{stat.trend.replace(/\s.*/, "")}</span>
                   </div>
                 </div>
                 {stat.detail && (
-                  <div className="text-xs text-gray-600 mt-4 pt-4 border-t border-gray-200 flex items-center space-x-1">
-                    <Activity size={12} className="stroke-2" />
-                    <span>{stat.detail}</span>
+                  <div className="text-xs text-gray-600 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200 flex items-center space-x-1">
+                    <Activity size={10} className="stroke-2 sm:w-3 sm:h-3 flex-shrink-0" />
+                    <span className="truncate">{stat.detail}</span>
                   </div>
                 )}
               </CardContent>
             </Card>
           );
         })}
-      </div>
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
-        {" "}
-        {/* Enhanced Recent Opportunities */}
+      </div>      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+        {/* Enhanced Recent Opportunities - Mobile Responsive */}
         <Card className="hover:shadow-lg transition-shadow border-0 shadow-md">
           <CardHeader>
-            <div className="flex items-center justify-between border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 -m-6 mb-0">
-              <div>
+            <div className="flex items-center justify-between border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 sm:p-6 -m-4 sm:-m-6 mb-0">
+              <div className="flex-1 min-w-0">
                 <CardTitle>
-                  <div className="text-xl font-semibold text-gray-900 flex items-center space-x-3">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <Target size={20} className="stroke-2 text-blue-600" />
+                  <div className="text-lg sm:text-xl font-semibold text-gray-900 flex items-center space-x-2 sm:space-x-3">
+                    <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg flex-shrink-0">
+                      <Target size={16} className="stroke-2 text-blue-600 sm:w-5 sm:h-5" />
                     </div>
-                    <span>Recent Opportunities</span>
+                    <span className="truncate">Recent Opportunities</span>
                   </div>
                 </CardTitle>
-                <p className="text-sm text-gray-600 mt-1 ml-11">
+                <p className="text-xs sm:text-sm text-gray-600 mt-1 ml-8 sm:ml-11 truncate">
                   Top AI-matched startup opportunities
                 </p>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-800 border border-blue-200">
-                  <Sparkles size={12} className="stroke-2 mr-1" />
-                  {opportunities.length} Available
+              <div className="flex items-center space-x-2 flex-shrink-0">
+                <span className="inline-flex items-center px-2 py-1 sm:px-3 rounded-full text-xs bg-blue-100 text-blue-800 border border-blue-200">
+                  <Sparkles size={10} className="stroke-2 mr-1 sm:w-3 sm:h-3" />
+                  <span className="hidden sm:inline">{opportunities.length} Available</span>
+                  <span className="sm:hidden">{opportunities.length}</span>
                 </span>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             {recentMatches.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {recentMatches.map((match) => (
                   <div
                     key={match.id}
-                    className="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-blue-200 transition-all group"
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-blue-200 transition-all group space-y-2 sm:space-y-0"
                   >
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h3 className="font-semibold text-gray-900">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-3 mb-2">
+                        <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">
                           {match.company}
                         </h3>
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-purple-100 text-purple-800 border border-purple-200">
-                          <Rocket size={10} className="stroke-2 mr-1" />
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-purple-100 text-purple-800 border border-purple-200 w-fit">
+                          <Rocket size={8} className="stroke-2 mr-1 sm:w-2.5 sm:h-2.5" />
                           {match.stage}
                         </span>
                       </div>
-                      <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600 mb-2">
                         <span className="flex items-center space-x-1">
                           <Building2
-                            size={14}
-                            className="stroke-2 text-gray-500"
+                            size={12}
+                            className="stroke-2 text-gray-500 sm:w-3.5 sm:h-3.5"
                           />
-                          <span>{match.industry}</span>
+                          <span className="truncate">{match.industry}</span>
                         </span>
                         <span className="flex items-center space-x-1">
                           <DollarSign
-                            size={14}
-                            className="stroke-2 text-gray-500"
+                            size={12}
+                            className="stroke-2 text-gray-500 sm:w-3.5 sm:h-3.5"
                           />
-                          <span>{match.funding}</span>
+                          <span className="truncate">{match.funding}</span>
                         </span>
                         <span className="flex items-center space-x-1">
                           <BarChart3
-                            size={14}
-                            className="stroke-2 text-gray-500"
+                            size={12}
+                            className="stroke-2 text-gray-500 sm:w-3.5 sm:h-3.5"
                           />
-                          <span>{match.valuation}</span>
+                          <span className="truncate">{match.valuation}</span>
                         </span>
                       </div>
-                      <div className="text-xs text-gray-500 line-clamp-2">
+                      <div className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
                         {match.description}
                       </div>
                     </div>
-                    <div className="flex items-center ml-4">
+                    <div className="flex items-center justify-end sm:ml-4 mt-2 sm:mt-0">
                       <Button
                         size="sm"
-                        className="shrink-0 group-hover:bg-blue-700 transition-colors flex items-center space-x-1"
+                        className="shrink-0 group-hover:bg-blue-700 transition-colors flex items-center space-x-1 text-xs sm:text-sm px-3 py-1.5 sm:px-4 sm:py-2"
                       >
-                        <Eye size={14} className="stroke-2" />
+                        <Eye size={12} className="stroke-2 sm:w-3.5 sm:h-3.5" />
                         <span>Review</span>
                       </Button>
                     </div>
@@ -495,260 +496,260 @@ const Dashboard: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12 text-gray-500">
-                <div className="p-4 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  <Search size={24} className="stroke-2 text-gray-400" />
+              <div className="text-center py-8 sm:py-12 text-gray-500">
+                <div className="p-3 sm:p-4 bg-gray-100 rounded-full w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 flex items-center justify-center">
+                  <Search size={20} className="stroke-2 text-gray-400 sm:w-6 sm:h-6" />
                 </div>
-                <div className="text-lg font-medium">
+                <div className="text-base sm:text-lg font-medium">
                   No opportunities available
                 </div>
-                <div className="text-sm mt-2">
+                <div className="text-xs sm:text-sm mt-2">
                   Check back later for new startup matches
                 </div>
               </div>
             )}
-            <div className="mt-6">
+            <div className="mt-4 sm:mt-6">
               <Button
                 variant="outline"
-                className="w-full flex items-center justify-center space-x-2 hover:bg-blue-50 hover:border-blue-200"
+                className="w-full flex items-center justify-center space-x-2 hover:bg-blue-50 hover:border-blue-200 text-xs sm:text-sm py-2 sm:py-3"
               >
-                <ExternalLink size={16} className="stroke-2" />
+                <ExternalLink size={14} className="stroke-2 sm:w-4 sm:h-4" />
                 <span>View All Matches ({opportunities.length})</span>
               </Button>
             </div>
           </CardContent>
-        </Card>{" "}
-        {/* Enhanced Portfolio Companies */}
+        </Card>        {/* Enhanced Portfolio Companies - Mobile Responsive */}
         <Card className="hover:shadow-lg transition-shadow border-0 shadow-md">
           <CardHeader>
-            <div className="flex items-center justify-between border-b border-gray-100 bg-gradient-to-r from-green-50 to-emerald-50 p-6 -m-6 mb-0">
-              <div>
+            <div className="flex items-center justify-between border-b border-gray-100 bg-gradient-to-r from-green-50 to-emerald-50 p-4 sm:p-6 -m-4 sm:-m-6 mb-0">
+              <div className="flex-1 min-w-0">
                 <CardTitle>
-                  <div className="text-xl font-semibold text-gray-900 flex items-center space-x-3">
-                    <div className="p-2 bg-green-100 rounded-lg">
+                  <div className="text-lg sm:text-xl font-semibold text-gray-900 flex items-center space-x-2 sm:space-x-3">
+                    <div className="p-1.5 sm:p-2 bg-green-100 rounded-lg flex-shrink-0">
                       <Briefcase
-                        size={20}
-                        className="stroke-2 text-green-600"
+                        size={16}
+                        className="stroke-2 text-green-600 sm:w-5 sm:h-5"
                       />
                     </div>
-                    <span>Portfolio Activity</span>
+                    <span className="truncate">Portfolio Activity</span>
                   </div>
                 </CardTitle>
-                <p className="text-sm text-gray-600 mt-1 ml-11">
+                <p className="text-xs sm:text-sm text-gray-600 mt-1 ml-8 sm:ml-11 truncate">
                   Recent updates from your portfolio companies
                 </p>
               </div>
               {portfolio && (
-                <div className="flex items-center space-x-2">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs bg-green-100 text-green-800 border border-green-200">
-                    <Building2 size={12} className="stroke-2 mr-1" />
-                    {portfolio.portfolio.length} Companies
+                <div className="flex items-center space-x-2 flex-shrink-0">
+                  <span className="inline-flex items-center px-2 py-1 sm:px-3 rounded-full text-xs bg-green-100 text-green-800 border border-green-200">
+                    <Building2 size={10} className="stroke-2 mr-1 sm:w-3 sm:h-3" />
+                    <span className="hidden sm:inline">{portfolio.portfolio.length} Companies</span>
+                    <span className="sm:hidden">{portfolio.portfolio.length}</span>
                   </span>
                 </div>
               )}
             </div>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             {portfolio && portfolio.portfolio.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {portfolio.portfolio.slice(0, 3).map((company) => (
                   <div
                     key={company.id}
-                    className="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-green-200 transition-all"
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-green-200 transition-all space-y-2 sm:space-y-0"
                   >
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-1">
-                        <h3 className="font-semibold text-gray-900">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-3 mb-1">
+                        <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">
                           {company.company}
                         </h3>
                         <span
-                          className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(company.status)}`}
+                          className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full w-fit ${getStatusColor(company.status)}`}
                         >
-                          <CheckCircle2 size={10} className="stroke-2 mr-1" />
+                          <CheckCircle2 size={8} className="stroke-2 mr-1 sm:w-2.5 sm:h-2.5" />
                           {company.status}
                         </span>
                       </div>
-                      <div className="flex items-center space-x-1 text-sm text-gray-600 mb-1">
-                        <Globe size={14} className="stroke-2 text-gray-500" />
-                        <span>{company.industry}</span>
+                      <div className="flex items-center space-x-1 text-xs sm:text-sm text-gray-600 mb-1">
+                        <Globe size={12} className="stroke-2 text-gray-500 sm:w-3.5 sm:h-3.5" />
+                        <span className="truncate">{company.industry}</span>
                       </div>
                       <div className="flex items-center space-x-1 text-xs text-gray-500">
-                        <Calendar size={12} className="stroke-2" />
-                        <span>
+                        <Calendar size={10} className="stroke-2 sm:w-3 sm:h-3" />
+                        <span className="truncate">
                           Invested: {formatDate(company.investment_date)}
                         </span>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="flex items-center space-x-1 text-sm font-semibold text-gray-900 mb-1">
-                        <DollarSign
-                          size={14}
-                          className="stroke-2 text-gray-600"
-                        />
-                        <span>
-                          {formatCompactCurrency(company.investment_amount)}
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-1 text-xs text-gray-500">
-                        <TrendingUp
-                          size={12}
-                          className="stroke-2 text-green-500"
-                        />
-                        <span>
-                          Current:{" "}
-                          {formatCompactCurrency(company.current_valuation)}
-                        </span>
+                    <div className="text-left sm:text-right">
+                      <div className="flex flex-col sm:items-end space-y-1">
+                        <div className="flex items-center space-x-1 text-xs sm:text-sm font-semibold text-gray-900">
+                          <DollarSign
+                            size={12}
+                            className="stroke-2 text-gray-600 sm:w-3.5 sm:h-3.5"
+                          />
+                          <span>
+                            {formatCompactCurrency(company.investment_amount)}
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-1 text-xs text-gray-500">
+                          <TrendingUp
+                            size={10}
+                            className="stroke-2 text-green-500 sm:w-3 sm:h-3"
+                          />
+                          <span className="truncate">
+                            Current:{" "}
+                            {formatCompactCurrency(company.current_valuation)}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12 text-gray-500">
-                <div className="p-4 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  <Briefcase size={24} className="stroke-2 text-gray-400" />
+              <div className="text-center py-8 sm:py-12 text-gray-500">
+                <div className="p-3 sm:p-4 bg-gray-100 rounded-full w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 flex items-center justify-center">
+                  <Briefcase size={20} className="stroke-2 text-gray-400 sm:w-6 sm:h-6" />
                 </div>
-                <div className="text-lg font-medium">
+                <div className="text-base sm:text-lg font-medium">
                   No portfolio companies yet
                 </div>
-                <div className="text-sm mt-2">
+                <div className="text-xs sm:text-sm mt-2">
                   Start investing to build your portfolio
                 </div>
               </div>
             )}
-            <div className="mt-6">
+            <div className="mt-4 sm:mt-6">
               <Button
                 variant="outline"
-                className="w-full flex items-center justify-center space-x-2 hover:bg-green-50 hover:border-green-200"
+                className="w-full flex items-center justify-center space-x-2 hover:bg-green-50 hover:border-green-200 text-xs sm:text-sm py-2 sm:py-3"
               >
-                <ExternalLink size={16} className="stroke-2" />
+                <ExternalLink size={14} className="stroke-2 sm:w-4 sm:h-4" />
                 <span>View Full Portfolio</span>
               </Button>
             </div>
           </CardContent>
         </Card>
-      </div>{" "}
-      {/* Enhanced Quick Actions */}
+      </div>      {/* Enhanced Quick Actions - Mobile Responsive */}
       <Card className="hover:shadow-lg transition-shadow border-0 shadow-md">
         <CardHeader>
-          <div className="border-b border-gray-100 bg-gradient-to-r from-purple-50 to-pink-50 p-6 -m-6 mb-0">
+          <div className="border-b border-gray-100 bg-gradient-to-r from-purple-50 to-pink-50 p-4 sm:p-6 -m-4 sm:-m-6 mb-0">
             <CardTitle>
-              <div className="text-xl font-semibold text-gray-900 flex items-center space-x-3">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <Zap size={20} className="stroke-2 text-purple-600" />
+              <div className="text-lg sm:text-xl font-semibold text-gray-900 flex items-center space-x-2 sm:space-x-3">
+                <div className="p-1.5 sm:p-2 bg-purple-100 rounded-lg">
+                  <Zap size={16} className="stroke-2 text-purple-600 sm:w-5 sm:h-5" />
                 </div>
                 <span>Quick Actions</span>
               </div>
             </CardTitle>
-            <p className="text-sm text-gray-600 mt-1 ml-11">
+            <p className="text-xs sm:text-sm text-gray-600 mt-1 ml-8 sm:ml-11">
               Streamline your investment workflow
             </p>
           </div>
         </CardHeader>
-        <CardContent className="p-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Button className="h-20 flex flex-col items-center justify-center space-y-2 bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-105 shadow-md">
-              <Search size={24} className="stroke-2" />
-              <span className="text-sm font-medium">Find Startups</span>
+        <CardContent className="p-4 sm:p-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <Button className="h-16 sm:h-20 flex flex-col items-center justify-center space-y-1 sm:space-y-2 bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-105 shadow-md text-xs sm:text-sm">
+              <Search size={18} className="stroke-2 sm:w-6 sm:h-6" />
+              <span className="font-medium">Find Startups</span>
             </Button>
             <Button
               variant="outline"
-              className="h-20 flex flex-col items-center justify-center space-y-2 hover:bg-gray-50 hover:border-gray-300 transition-all transform hover:scale-105 border-2"
+              className="h-16 sm:h-20 flex flex-col items-center justify-center space-y-1 sm:space-y-2 hover:bg-gray-50 hover:border-gray-300 transition-all transform hover:scale-105 border-2 text-xs sm:text-sm"
             >
-              <Settings size={24} className="stroke-2 text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">
+              <Settings size={18} className="stroke-2 text-gray-600 sm:w-6 sm:h-6" />
+              <span className="font-medium text-gray-700">
                 Preferences
               </span>
             </Button>
             <Button
               variant="outline"
-              className="h-20 flex flex-col items-center justify-center space-y-2 hover:bg-gray-50 hover:border-gray-300 transition-all transform hover:scale-105 border-2"
+              className="h-16 sm:h-20 flex flex-col items-center justify-center space-y-1 sm:space-y-2 hover:bg-gray-50 hover:border-gray-300 transition-all transform hover:scale-105 border-2 text-xs sm:text-sm"
             >
-              <PieChart size={24} className="stroke-2 text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">
+              <PieChart size={18} className="stroke-2 text-gray-600 sm:w-6 sm:h-6" />
+              <span className="font-medium text-gray-700">
                 Analytics
               </span>
             </Button>
             <Button
               variant="outline"
-              className="h-20 flex flex-col items-center justify-center space-y-2 hover:bg-gray-50 hover:border-gray-300 transition-all transform hover:scale-105 border-2"
+              className="h-16 sm:h-20 flex flex-col items-center justify-center space-y-1 sm:space-y-2 hover:bg-gray-50 hover:border-gray-300 transition-all transform hover:scale-105 border-2 text-xs sm:text-sm"
             >
-              <Calendar size={24} className="stroke-2 text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">
+              <Calendar size={18} className="stroke-2 text-gray-600 sm:w-6 sm:h-6" />
+              <span className="font-medium text-gray-700">
                 Meetings
               </span>
             </Button>
           </div>
         </CardContent>
-      </Card>{" "}
-      {/* Enhanced Investment Insights */}
+      </Card>{" "}      {/* Enhanced Investment Insights */}
       {dashboardData && (
         <Card className="hover:shadow-lg transition-shadow border-0 shadow-md">
           <CardHeader>
-            <div className="border-b border-gray-100 bg-gradient-to-r from-orange-50 to-yellow-50 p-6 -m-6 mb-0">
+            <div className="border-b border-gray-100 bg-gradient-to-r from-orange-50 to-yellow-50 p-4 sm:p-6 -m-4 sm:-m-6 mb-0">
               <CardTitle>
-                <div className="text-xl font-semibold text-gray-900 flex items-center space-x-3">
-                  <div className="p-2 bg-orange-100 rounded-lg">
-                    <Lightbulb size={20} className="stroke-2 text-orange-600" />
+                <div className="text-lg sm:text-xl font-semibold text-gray-900 flex items-center space-x-2 sm:space-x-3">
+                  <div className="p-1.5 sm:p-2 bg-orange-100 rounded-lg">
+                    <Lightbulb size={18} className="sm:size-5 stroke-2 text-orange-600" />
                   </div>
                   <span>Investment Insights</span>
                 </div>
               </CardTitle>
-              <p className="text-sm text-gray-600 mt-1 ml-11">
+              <p className="text-xs sm:text-sm text-gray-600 mt-1 ml-8 sm:ml-11">
                 Key metrics and performance indicators
               </p>
             </div>
           </CardHeader>
-          <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border-2 border-blue-200 hover:border-blue-300 transition-all transform hover:scale-105">
-                <div className="flex items-center justify-center mb-3">
-                  <div className="p-3 bg-blue-200 rounded-full">
-                    <Users size={24} className="stroke-2 text-blue-700" />
+          <CardContent className="p-4 sm:p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="text-center p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border-2 border-blue-200 hover:border-blue-300 transition-all transform hover:scale-105">
+                <div className="flex items-center justify-center mb-2 sm:mb-3">
+                  <div className="p-2 sm:p-3 bg-blue-200 rounded-full">
+                    <Users size={20} className="sm:size-6 stroke-2 text-blue-700" />
                   </div>
                 </div>
-                <div className="text-3xl font-bold text-blue-600 mb-2">
+                <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-1 sm:mb-2">
                   {dashboardData.stats.sectors_invested.length}
                 </div>
-                <div className="text-sm font-semibold text-blue-900 mb-2">
+                <div className="text-xs sm:text-sm font-semibold text-blue-900 mb-1 sm:mb-2">
                   Sectors Invested
                 </div>
-                <div className="text-xs text-blue-700">
+                <div className="text-xs text-blue-700 leading-tight">
                   {dashboardData.stats.sectors_invested.slice(0, 3).join(", ")}
                   {dashboardData.stats.sectors_invested.length > 3 && "..."}
                 </div>
               </div>
 
-              <div className="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border-2 border-green-200 hover:border-green-300 transition-all transform hover:scale-105">
-                <div className="flex items-center justify-center mb-3">
-                  <div className="p-3 bg-green-200 rounded-full">
-                    <Trophy size={24} className="stroke-2 text-green-700" />
+              <div className="text-center p-4 sm:p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border-2 border-green-200 hover:border-green-300 transition-all transform hover:scale-105">
+                <div className="flex items-center justify-center mb-2 sm:mb-3">
+                  <div className="p-2 sm:p-3 bg-green-200 rounded-full">
+                    <Trophy size={20} className="sm:size-6 stroke-2 text-green-700" />
                   </div>
                 </div>
-                <div className="text-3xl font-bold text-green-600 mb-2">
+                <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-1 sm:mb-2">
                   {dashboardData.stats.successful_exits}
                 </div>
-                <div className="text-sm font-semibold text-green-900 mb-2">
+                <div className="text-xs sm:text-sm font-semibold text-green-900 mb-1 sm:mb-2">
                   Successful Exits
                 </div>
-                <div className="text-xs text-green-700">
+                <div className="text-xs text-green-700 leading-tight">
                   Portfolio performance
                 </div>
               </div>
 
-              <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border-2 border-purple-200 hover:border-purple-300 transition-all transform hover:scale-105">
-                <div className="flex items-center justify-center mb-3">
-                  <div className="p-3 bg-purple-200 rounded-full">
-                    <Award size={24} className="stroke-2 text-purple-700" />
+              <div className="text-center p-4 sm:p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border-2 border-purple-200 hover:border-purple-300 transition-all transform hover:scale-105 sm:col-span-2 lg:col-span-1">
+                <div className="flex items-center justify-center mb-2 sm:mb-3">
+                  <div className="p-2 sm:p-3 bg-purple-200 rounded-full">
+                    <Award size={20} className="sm:size-6 stroke-2 text-purple-700" />
                   </div>
                 </div>
-                <div className="text-3xl font-bold text-purple-600 mb-2">
+                <div className="text-2xl sm:text-3xl font-bold text-purple-600 mb-1 sm:mb-2">
                   {formatPercentage(dashboardData.stats.roi_average)}
                 </div>
-                <div className="text-sm font-semibold text-purple-900 mb-2">
+                <div className="text-xs sm:text-sm font-semibold text-purple-900 mb-1 sm:mb-2">
                   Average ROI
                 </div>
-                <div className="text-xs text-purple-700">
+                <div className="text-xs text-purple-700 leading-tight">
                   Return on investment
                 </div>
               </div>
