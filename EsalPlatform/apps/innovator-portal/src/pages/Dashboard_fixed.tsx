@@ -1,5 +1,6 @@
 // filepath: d:\esalPlatform\EsalPlatform\apps\innovator-portal\src\pages\Dashboard_fixed.tsx
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, Button } from "@esal/ui";
 import { API_BASE_URL } from "../config/api";
 import {
@@ -225,6 +226,7 @@ const IdeaCard: React.FC<{ idea: RecentIdea; onView: () => void }> = ({
 };
 
 const DashboardModern: React.FC = () => {
+  const navigate = useNavigate();
   const [recentIdeas, setRecentIdeas] = useState<RecentIdea[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
     total_ideas: 0,
@@ -333,27 +335,26 @@ const DashboardModern: React.FC = () => {
       gradient: "bg-gradient-to-br from-pink-500 to-pink-600",
       trend: { value: "+8% this week", isUp: true },
     },
-  ];
-  const quickActions = [
+  ];  const quickActions = [
     {
       title: "Create New Idea",
       description: "Share your innovative startup concept",
       icon: <Sparkles className="w-6 h-6" />,
-      action: () => (window.location.href = "/my-ideas?create=true"),
+      action: () => navigate("/my-ideas?create=true"),
       variant: "primary" as const,
     },
     {
       title: "AI Generator",
       description: "Generate ideas with artificial intelligence",
       icon: <Bot className="w-6 h-6" />,
-      action: () => (window.location.href = "/ai-generator"),
+      action: () => navigate("/ai-generator"),
       variant: "secondary" as const,
     },
     {
       title: "Analytics",
       description: "View detailed performance metrics",
       icon: <BarChart3 className="w-6 h-6" />,
-      action: () => (window.location.href = "/metrics"),
+      action: () => navigate("/metrics"),
       variant: "accent" as const,
     },
   ];
@@ -458,10 +459,9 @@ const DashboardModern: React.FC = () => {
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
               <Lightbulb className="w-6 h-6 mr-2 sm:mr-3" />
               Recent Ideas
-            </h2>
-            <Button
+            </h2>            <Button
               variant="outline"
-              onClick={() => (window.location.href = "/my-ideas")}
+              onClick={() => navigate("/my-ideas")}
               className="bg-white/80 border-gray-200 hover:bg-white hover:shadow-md w-full sm:w-auto"
             >
               View All Ideas →
@@ -469,12 +469,11 @@ const DashboardModern: React.FC = () => {
           </div>
 
           {recentIdeas.length > 0 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-              {recentIdeas.slice(0, 4).map((idea) => (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">              {recentIdeas.slice(0, 4).map((idea) => (
                 <IdeaCard
                   key={idea.id}
                   idea={idea}
-                  onView={() => (window.location.href = `/ideas/${idea.id}`)}
+                  onView={() => navigate(`/ideas/${idea.id}`)}
                 />
               ))}
             </div>
@@ -491,12 +490,9 @@ const DashboardModern: React.FC = () => {
                   Transform your innovative concepts into reality. Start by
                   creating your first startup idea and connecting with potential
                   investors who share your vision.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                </p>                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                   <Button
-                    onClick={() =>
-                      (window.location.href = "/my-ideas?create=true")
-                    }
+                    onClick={() => navigate("/my-ideas?create=true")}
                     className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-0 px-6 sm:px-8 py-2 sm:py-3 w-full sm:w-auto"
                   >
                     <Sparkles className="w-4 h-4 mr-2" />
@@ -504,7 +500,7 @@ const DashboardModern: React.FC = () => {
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={() => (window.location.href = "/ai-generator")}
+                    onClick={() => navigate("/ai-generator")}
                     className="bg-white/80 border-gray-200 hover:bg-white hover:shadow-md px-6 sm:px-8 py-2 sm:py-3 w-full sm:w-auto"
                   >
                     <Bot className="w-4 h-4 mr-2" />
@@ -597,11 +593,9 @@ const DashboardModern: React.FC = () => {
                           </div>
                         </div>
                       )}
-                  </div>
-
-                  <div className="flex-shrink-0 w-full lg:w-auto">
+                  </div>                  <div className="flex-shrink-0 w-full lg:w-auto">
                     <Button
-                      onClick={() => (window.location.href = "/profile")}
+                      onClick={() => navigate("/profile")}
                       className="w-full lg:w-auto bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-0"
                     >
                       Edit Profile
@@ -695,13 +689,10 @@ const DashboardModern: React.FC = () => {
                           </span>
                         </div>
                       ))}
-                    </div>
-                    <div className="mt-4 sm:mt-6 space-y-3">
+                    </div>                    <div className="mt-4 sm:mt-6 space-y-3">
                       {" "}
                       <Button
-                        onClick={() =>
-                          (window.location.href = "/my-ideas?create=true")
-                        }
+                        onClick={() => navigate("/my-ideas?create=true")}
                         className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 border-0"
                       >
                         <Rocket className="w-4 h-4 mr-2" />
@@ -709,7 +700,7 @@ const DashboardModern: React.FC = () => {
                       </Button>
                       <Button
                         variant="outline"
-                        onClick={() => (window.location.href = "/ai-generator")}
+                        onClick={() => navigate("/ai-generator")}
                         className="w-full bg-white/80 border-gray-200 hover:bg-white hover:shadow-md"
                       >
                         <Bot className="w-4 h-4 mr-2" />

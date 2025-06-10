@@ -7,11 +7,14 @@ export default defineConfig({
   server: {
     port: 3001,
     host: true,
+    // Enable CSR fallback for development
+    historyApiFallback: true,
   },
   build: {
     outDir: "dist",
     emptyOutDir: true,
     sourcemap: false,
+    // CSR optimization
     rollupOptions: {
       output: {
         manualChunks: undefined,
@@ -23,4 +26,6 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Ensure proper base path for CSR
+  base: "/",
 });

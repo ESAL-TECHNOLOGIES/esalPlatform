@@ -1,10 +1,10 @@
 import react from "@vitejs/plugin-react";
 
 export default {
-  plugins: [react()],
-  server: {
+  plugins: [react()],  server: {
     port: 3001,
     host: true,
+    historyApiFallback: true, // Enable CSR routing support
   },
   build: {
     outDir: "dist",
@@ -15,6 +15,11 @@ export default {
         manualChunks: undefined,
       },
     },
+  },
+  // Enable SPA mode for client-side routing
+  preview: {
+    port: 3001,
+    host: true,
   },
   resolve: {
     alias: {
