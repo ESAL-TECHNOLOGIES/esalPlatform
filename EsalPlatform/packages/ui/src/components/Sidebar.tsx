@@ -12,10 +12,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onMobileClose,
   onNavigate, // Add navigation callback prop
 }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  // Use provided user data or fallback to localStorage/defaults
+  const [isCollapsed, setIsCollapsed] = useState(false);  // Use provided user data or fallback to localStorage/defaults with portal detection
   const getUserData = () => {
     if (propUser) return propUser;
+
+    // Detect current portal from URL to set appropriate default role
+    const getPortalRole = () => {
+      const hostname = window.location.hostname;
+      const pathname = window.location.pathname;
+      
+      // Check for portal-specific subdomains or paths
+      if (hostname.includes('investor') || pathname.includes('investor')) {
+        return "Investor";
+      } else if (hostname.includes('admin') || pathname.includes('admin')) {
+        return "Administrator";
+      } else if (hostname.includes('hub') || pathname.includes('hub')) {
+        return "Hub Admin";
+      } else {
+        return "Innovator"; // Default to innovator
+      }
+    };
 
     // Try to get user data from localStorage or context
     try {
@@ -25,7 +41,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         return {
           name: parsed.full_name || parsed.name || "User",
           email: parsed.email || null,
-          role: parsed.role || "Innovator",
+          role: parsed.role || getPortalRole(),
           avatar_url: parsed.avatar_url,
         };
       }
@@ -36,7 +52,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return {
       name: "User",
       email: null,
-      role: "Innovator",
+      role: getPortalRole(),
       avatar_url: null,
     };
   };

@@ -85,6 +85,12 @@ function AppContent() {
             items={sidebarItems} 
             currentPath={location.pathname}
             onNavigate={handleNavigate}
+            user={{
+              name: user?.full_name || "Investor",
+              email: user?.email || "",
+              role: "Investor",
+              avatar_url: user?.avatar_url,
+            }}
           />
         }
       >

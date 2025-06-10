@@ -176,6 +176,12 @@ function App() {
                   items={sidebarItems}
                   currentPath={window.location.pathname}
                   onNavigate={handleSidebarNavigation}
+                  user={{
+                    name: user?.name || "Innovator",
+                    email: user?.email || "",
+                    role: "Innovator",
+                    avatar_url: user?.avatar_url,
+                  }}
                 />
               }
             >
