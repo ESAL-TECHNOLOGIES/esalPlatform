@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Lightbulb } from "lucide-react";
 import { cn } from "../utils";
 import type { SidebarProps } from "../types";
@@ -12,6 +13,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onMobileClose,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const navigate = useNavigate();
   // Use provided user data or fallback to localStorage/defaults
   const getUserData = () => {
     if (propUser) return propUser;
@@ -172,22 +174,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4 px-3">
             Navigation
           </div>
-        )}{" "}
-        {items.map((item) => {
+        )}{" "}        {items.map((item) => {
           const isActive = currentPath === item.href;
           return (
             <div key={item.href} className="relative">
               {" "}
-              <a
-                href={item.href}
+              <button
                 onClick={() => {
+                  navigate(item.href);
                   // Close mobile menu when navigation link is clicked
                   if (onMobileClose && window.innerWidth < 1024) {
                     onMobileClose();
                   }
                 }}
                 className={cn(
-                  "group relative flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 hover:scale-105",
+                  "group relative flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 hover:scale-105 w-full text-left",
                   isActive
                     ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25"
                     : "text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:shadow-md"
@@ -231,7 +232,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {isActive && (
                   <div className="absolute inset-0 rounded-xl bg-white/20 opacity-75"></div>
                 )}
-              </a>
+              </button>
             </div>
           );
         })}
