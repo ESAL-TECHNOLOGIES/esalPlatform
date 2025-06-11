@@ -1255,9 +1255,9 @@ const LandingPage: React.FC = () => {
                 Contact
               </a>
             </div>
-          </div>        </div>
+          </div>{" "}
+        </div>
       </footer>
-
       {/* Platform Chatbot */}
       <PlatformChatbot />
     </div>
