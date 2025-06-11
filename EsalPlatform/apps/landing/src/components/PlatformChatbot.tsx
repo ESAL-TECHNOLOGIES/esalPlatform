@@ -131,70 +131,66 @@ const PlatformChatbot: React.FC<ChatbotProps> = ({
 • **Idea Development Tools**: AI-assisted pitch generation and improvement
 • **Analytics & Insights**: Comprehensive tracking and performance metrics
 
-ESAL stands for "Entidades Sin Ánimo de Lucro" (Non-profit Organizations) and serves the entire entrepreneurship ecosystem.`,
-
-      // AI Matchmaking
-      'ai matchmaking': `Our AI Matchmaking system uses Google Gemini AI to intelligently connect investors with startups:
+ESAL stands for "Entidades Sin Ánimo de Lucro" (Non-profit Organizations) and serves the entire entrepreneurship ecosystem.`,      // AI Matchmaking
+      'ai matchmaking': `Our AI Matchmaking system uses complex AI algorithms developed by the ESAL team to intelligently connect investors with startups:
 
 🤖 **How It Works:**
 • **Smart Analysis**: AI analyzes startup profiles including industry, stage, funding needs, and market potential
 • **Investor Preferences**: Matches based on investment criteria, risk tolerance, and portfolio preferences  
-• **Scoring Algorithm**: Provides match scores (0-100%) with detailed explanations
-• **Real-time Processing**: Fast analysis of hundreds of startups in seconds
+• **Scoring Algorithm**: Provides match scores with detailed explanations
+• **Real-time Processing**: Fast analysis of hundreds of startups
 
 📊 **Matching Factors:**
-• Industry alignment (30%)
-• Development stage (25%) 
-• Market opportunity (20%)
-• Risk-return profile (15%)
-• Geographic preferences (10%)
+• Industry alignment and compatibility
+• Development stage matching
+• Market opportunity assessment
+• Risk-return profile analysis
+• Geographic and sector preferences
 
-The AI provides fallback scoring when needed and explains why specific matches are recommended!`,
+The AI provides intelligent scoring and explains why specific matches are recommended!`,
 
-      'how does ai work': `Our AI system is powered by Google Gemini and provides several key services:
+      'how does ai work': `Our AI system is powered by complex algorithms developed by the ESAL team and provides several key services:
 
 🧠 **AI Capabilities:**
 • **Idea Generation**: Creates detailed startup ideas based on your interests and skills
 • **Pitch Optimization**: Improves existing business ideas and pitches
-• **Idea Evaluation**: Scores and provides feedback on startup concepts (0-10 scale)
+• **Idea Evaluation**: Scores and provides feedback on startup concepts
 • **Strategic Recommendations**: Offers personalized business development advice
 • **Investor Matching**: Connects startups with compatible investors
 
 ⚡ **AI Features:**
-• Natural language processing for better understanding
+• Advanced natural language processing
 • Real-time analysis and feedback
-• Confidence scoring for transparency
-• Fallback systems for reliability
-• Continuous learning from interactions`,
-
-      // Platform portals
+• Intelligent scoring systems
+• Reliable recommendation engine
+• Continuous learning from platform interactions`,      // Platform portals
       'portals': `ESAL Platform has specialized portals for different user types:
 
-🎯 **Innovator Portal** (Port 3001)
+🎯 **Innovator Portal**
 • Submit and manage startup ideas
 • AI-powered idea generation and improvement
 • Analytics and performance tracking
 • Progress visualization
 
-💰 **Investor Portal** (Port 3002)  
+💰 **Investor Portal**
 • Browse curated investment opportunities
 • AI-powered startup matching
 • Portfolio management tools
 • Due diligence resources
 
-🏢 **Hub Portal** (Port 3003)
+🏢 **Hub Portal**
 • Manage startup cohorts and programs
 • Event planning and coordination
 • Member management system
 • Resource allocation tools
 
-🛠️ **Admin Portal** (Port 3004)
+🛠️ **Admin Portal**
 • Platform-wide management
 • User administration
 • Analytics and reporting
 • System configuration
 
-🌐 **Landing Page** (Port 3000)
+🌐 **Landing Page**
 • Public information and onboarding
 • Portal selection and access
 • Platform overview`,
@@ -220,31 +216,22 @@ The AI provides fallback scoring when needed and explains why specific matches a
 • **Hubs**: Add programs, import member data
 • **Admins**: Review system status, configure settings
 
-Need help with anything specific? Just ask!`,
-
-      // Technical details
+Need help with anything specific? Just ask!`,      // Technical details
       'technology': `ESAL Platform is built with modern, scalable technologies:
 
 🏗️ **Architecture:**
-• **Frontend**: React 18 + TypeScript + Vite for fast development
-• **Backend**: FastAPI (Python) for high-performance APIs
-• **Database**: Supabase (PostgreSQL) with real-time features
-• **AI**: Google Gemini AI for intelligent features
-• **Styling**: Tailwind CSS for modern, responsive design
+• **Frontend**: Modern web technologies for fast, responsive interfaces
+• **Backend**: High-performance APIs and server infrastructure
+• **Database**: Robust data management with real-time capabilities
+• **AI**: Advanced artificial intelligence developed by the ESAL team
+• **Security**: Enterprise-grade security and authentication systems
 
-🛡️ **Security:**
-• JWT-based authentication
-• Role-based access control
-• Supabase integration for user management
-• Input validation and SQL injection protection
-
-⚡ **Performance:**
-• Code splitting and lazy loading
-• Optimized bundle sizes
-• CDN distribution ready
-• Real-time updates via WebSocket`,
-
-      // Default responses
+🛡️ **Security & Performance:**
+• Secure authentication and access control
+• Role-based permissions system
+• Data protection and privacy compliance
+• Optimized performance and scalability
+• Real-time updates and notifications`,      // Default responses
       'default': `I'm here to help you learn about the ESAL Platform! You can ask me about:
 
 💡 **Platform Features:**
@@ -257,12 +244,12 @@ Need help with anything specific? Just ask!`,
 • How our AI generates and improves startup ideas
 • AI-powered investor matching algorithm
 • Scoring and evaluation systems
-• Technology stack and architecture
+• Platform benefits and features
 
 📚 **General Information:**
 • Platform benefits and success stories
-• Technical specifications
-• Support and documentation
+• Getting started guide
+• Support and assistance
 
 What would you like to know more about?`
     };
@@ -279,12 +266,18 @@ What would you like to know more about?`
     }
     if (lowerMessage.includes('portal') || lowerMessage.includes('interface')) {
       return responses['portals'];
-    }
-    if (lowerMessage.includes('get started') || lowerMessage.includes('how to start') || lowerMessage.includes('begin')) {
+    }    if (lowerMessage.includes('get started') || lowerMessage.includes('how to start') || lowerMessage.includes('begin')) {
       return responses['get started'];
     }
     if (lowerMessage.includes('technology') || lowerMessage.includes('tech stack') || lowerMessage.includes('architecture')) {
       return responses['technology'];
+    }
+
+    // Block sensitive technical questions
+    if (lowerMessage.includes('port') || lowerMessage.includes('localhost') || lowerMessage.includes('3000') || lowerMessage.includes('3001') || lowerMessage.includes('3002') || lowerMessage.includes('3003') || lowerMessage.includes('3004')) {
+      return `I can help you with general platform information and features. For technical support or specific system details, please contact our support team.`;
+    }    if (lowerMessage.includes('gemini') || lowerMessage.includes('google') || lowerMessage.includes('openai') || lowerMessage.includes('api key') || lowerMessage.includes('database') || lowerMessage.includes('supabase') || lowerMessage.includes('fastapi')) {
+      return `Our platform uses advanced AI algorithms developed by the ESAL team. For specific technical details, please contact our technical support team.`;
     }
 
     // Specific feature questions
@@ -293,8 +286,8 @@ What would you like to know more about?`
 
 🚀 **Key Features:**
 • **Idea Submission**: Upload and manage your startup concepts
-• **AI Assistance**: Generate new ideas or improve existing ones using Gemini AI
-• **Pitch Development**: Get AI feedback and scoring (0-10 scale)
+• **AI Assistance**: Generate new ideas or improve existing ones using our advanced AI
+• **Pitch Development**: Get AI feedback and scoring on your ideas
 • **Analytics Dashboard**: Track views, investor interest, and performance metrics
 • **Progress Tracking**: Monitor your startup development journey
 
@@ -306,7 +299,7 @@ What would you like to know more about?`
 
 Ready to submit your first startup idea? Access the Innovator Portal to get started!`;
     }
-
+    
     if (lowerMessage.includes('investor')) {
       return `The **Investor Portal** helps investors discover and evaluate opportunities:
 
@@ -319,7 +312,7 @@ Ready to submit your first startup idea? Access the Innovator Portal to get star
 🎯 **AI Matching Process:**
 1. Set your investment preferences (industries, stages, funding range, risk tolerance)
 2. AI analyzes all available startups against your criteria
-3. Receive ranked matches with explanations and confidence scores
+3. Receive ranked matches with explanations and scores
 4. Express interest in promising opportunities
 
 The AI considers industry alignment, development stage, market opportunity, and risk profile to find your perfect matches!`;
@@ -409,20 +402,18 @@ The AI considers funding alignment as a key matching factor, ensuring startups a
 • Better quality matches between stakeholders
 • AI assistance for better decision-making
 • Centralized platform for all innovation activities`;
-    }
-
-    // Help and support
+    }    // Help and support
     if (lowerMessage.includes('help') || lowerMessage.includes('support') || lowerMessage.includes('problem')) {
       return `I'm here to help! Here are ways to get support:
 
 🤖 **Chat with Me:**
 Ask about platform features, AI capabilities, getting started, or any general questions
 
-📚 **Documentation:**
+📚 **Support Resources:**
 • Comprehensive guides for each portal
-• API documentation for developers
-• Architecture and technical details
-• Deployment and setup instructions
+• Getting started documentation
+• Feature explanations and tutorials
+• Platform overview and navigation help
 
 🚀 **Getting Started:**
 • Choose your role and access the appropriate portal
@@ -437,29 +428,7 @@ Ask about platform features, AI capabilities, getting started, or any general qu
 • "How do I find investors?"
 
 What specific help do you need?`;
-    }
-
-    // Try Gemini AI for more complex questions
-    try {
-      const response = await fetch(`${apiUrl}/api/v1/chat/platform-assistant`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: userMessage,
-          context: 'platform_assistance'
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        return data.response || responses['default'];
-      }
-    } catch (error) {
-      console.log('AI service unavailable, using fallback responses');
-    }
-
+    }    // For more complex questions, return default response
     return responses['default'];
   };
   const handleSendMessage = async () => {
