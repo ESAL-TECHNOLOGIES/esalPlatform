@@ -9,7 +9,7 @@ import logging
 import sys
 
 from app.database import create_tables
-from app.routers import auth, innovator, hub, investor, admin, ideas, users, contact
+from app.routers import auth, innovator, hub, investor, admin, ideas, users, contact, chat
 from app.config import settings
 
 # Configure logging based on environment
@@ -133,6 +133,7 @@ app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])
 app.include_router(ideas.router, prefix="/api/v1/ideas", tags=["Ideas"])
 app.include_router(users.router, prefix="/api/v1/users", tags=["User Management"])
 app.include_router(contact.router, prefix="/api/v1/contact", tags=["Contact"])
+app.include_router(chat.router, prefix="/api/v1", tags=["Chat Assistant"])
 
 
 @app.options("/{path:path}")

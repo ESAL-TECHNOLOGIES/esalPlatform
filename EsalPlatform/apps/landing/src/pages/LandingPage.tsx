@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@esal/ui";
+import PlatformChatbot from "../components/PlatformChatbot";
 
 interface ContactFormData {
   firstName: string;
@@ -1254,9 +1255,11 @@ const LandingPage: React.FC = () => {
                 Contact
               </a>
             </div>
-          </div>
-        </div>
+          </div>        </div>
       </footer>
+
+      {/* Platform Chatbot */}
+      <PlatformChatbot />
     </div>
   );
 };
