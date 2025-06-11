@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Bot, User, Loader2 } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, User, Loader2, Zap, Brain, Sparkles } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -381,7 +381,6 @@ What specific help do you need?`;
 
     return responses['default'];
   };
-
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
 
@@ -393,11 +392,12 @@ What specific help do you need?`;
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const messageToSend = inputValue;
     setInputValue('');
     setIsLoading(true);
 
     try {
-      const botResponse = await generateBotResponse(inputValue);
+      const botResponse = await generateBotResponse(messageToSend);
       
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -419,12 +419,22 @@ What specific help do you need?`;
       setIsLoading(false);
     }
   };
-
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
+  };
+
+  const handleQuickAction = (message: string) => {
+    if (isLoading) return;
+    setInputValue(message);
+    // Auto-send the message after a short delay to show it was clicked
+    setTimeout(() => {
+      if (!isLoading) {
+        handleSendMessage();
+      }
+    }, 100);
   };
 
   const formatMessage = (content: string) => {
@@ -434,18 +444,20 @@ What specific help do you need?`;
       .replace(/•/g, '•')
       .replace(/\n/g, '<br />');
   };
-
   return (
     <>
       {/* Floating Chat Button */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 z-50 group"
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white p-3 sm:p-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 z-50 group"
           aria-label="Open chat assistant"
         >
-          <MessageCircle size={24} />
-          <div className="absolute -top-12 right-0 bg-gray-800 text-white px-3 py-1 rounded-lg text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+          <div className="relative">
+            <Bot size={20} className="sm:w-6 sm:h-6" />
+            <Sparkles size={12} className="absolute -top-1 -right-1 text-yellow-300 animate-pulse" />
+          </div>
+          <div className="absolute -top-12 right-0 bg-gray-800 text-white px-3 py-1 rounded-lg text-xs sm:text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none">
             Ask about ESAL Platform
           </div>
         </button>
@@ -453,45 +465,65 @@ What specific help do you need?`;
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-white rounded-lg shadow-2xl border border-gray-200 z-50 flex flex-col">
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-[calc(100vw-2rem)] max-w-sm sm:w-96 h-[70vh] sm:h-[500px] bg-white rounded-lg shadow-2xl border border-gray-200 z-50 flex flex-col">
           {/* Header */}
-          <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4 rounded-t-lg flex items-center justify-between">
+          <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-3 sm:p-4 rounded-t-lg flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Bot size={20} />
-              <span className="font-semibold">ESAL Assistant</span>
+              <div className="relative">
+                <Bot size={18} className="sm:w-5 sm:h-5" />
+                <Zap size={10} className="absolute -bottom-1 -right-1 text-yellow-300" />
+              </div>
+              <div>
+                <span className="font-semibold text-sm sm:text-base">ESAL Assistant</span>
+                <div className="flex items-center space-x-1 text-xs opacity-90">
+                  <Brain size={12} />
+                  <span>AI-Powered</span>
+                </div>
+              </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="hover:bg-white/20 p-1 rounded"
+              className="hover:bg-white/20 p-1 rounded transition-colors"
               aria-label="Close chat"
             >
-              <X size={20} />
+              <X size={18} className="sm:w-5 sm:h-5" />
             </button>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
             {messages.map((message) => (
               <div
                 key={message.id}
                 className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[85%] p-3 rounded-lg ${
+                  className={`max-w-[85%] sm:max-w-[80%] p-2 sm:p-3 rounded-lg ${
                     message.isUser
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-800'
+                      ? 'bg-blue-600 text-white rounded-br-sm'
+                      : 'bg-gray-100 text-gray-800 rounded-bl-sm'
                   }`}
                 >
                   <div className="flex items-start space-x-2">
-                    {!message.isUser && <Bot size={16} className="mt-1 flex-shrink-0" />}
+                    {!message.isUser && (
+                      <div className="flex-shrink-0 mt-0.5">
+                        <div className="relative">
+                          <Bot size={14} className="sm:w-4 sm:h-4 text-purple-600" />
+                          <Sparkles size={8} className="absolute -top-1 -right-1 text-blue-500" />
+                        </div>
+                      </div>
+                    )}
                     <div 
-                      className="text-sm leading-relaxed"
+                      className="text-xs sm:text-sm leading-relaxed flex-1"
                       dangerouslySetInnerHTML={{ 
                         __html: formatMessage(message.content) 
                       }}
                     />
-                    {message.isUser && <User size={16} className="mt-1 flex-shrink-0" />}
+                    {message.isUser && (
+                      <div className="flex-shrink-0 mt-0.5">
+                        <User size={14} className="sm:w-4 sm:h-4" />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -499,11 +531,14 @@ What specific help do you need?`;
             
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-gray-100 text-gray-800 p-3 rounded-lg">
+                <div className="bg-gray-100 text-gray-800 p-2 sm:p-3 rounded-lg rounded-bl-sm">
                   <div className="flex items-center space-x-2">
-                    <Bot size={16} />
-                    <Loader2 size={16} className="animate-spin" />
-                    <span className="text-sm">Thinking...</span>
+                    <div className="relative">
+                      <Bot size={14} className="sm:w-4 sm:h-4 text-purple-600" />
+                      <Brain size={8} className="absolute -top-1 -right-1 text-blue-500 animate-pulse" />
+                    </div>
+                    <Loader2 size={14} className="sm:w-4 sm:h-4 animate-spin text-purple-600" />
+                    <span className="text-xs sm:text-sm text-gray-600">Thinking...</span>
                   </div>
                 </div>
               </div>
@@ -512,7 +547,7 @@ What specific help do you need?`;
           </div>
 
           {/* Input */}
-          <div className="p-4 border-t border-gray-200">
+          <div className="p-3 sm:p-4 border-t border-gray-200">
             <div className="flex space-x-2">
               <input
                 type="text"
@@ -520,16 +555,40 @@ What specific help do you need?`;
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Ask about ESAL Platform..."
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs sm:text-sm"
                 disabled={isLoading}
               />
               <button
                 onClick={handleSendMessage}
                 disabled={!inputValue.trim() || isLoading}
-                className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-2 rounded-lg hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex-shrink-0"
                 aria-label="Send message"
               >
-                <Send size={16} />
+                <Send size={14} className="sm:w-4 sm:h-4" />
+              </button>
+            </div>
+              {/* Quick action buttons for mobile */}
+            <div className="mt-2 sm:mt-3 flex flex-wrap gap-1 sm:gap-2">
+              <button
+                onClick={() => handleQuickAction("What is ESAL Platform?")}
+                className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full hover:bg-purple-200 transition-colors"
+                disabled={isLoading}
+              >
+                What is ESAL?
+              </button>
+              <button
+                onClick={() => handleQuickAction("How does AI matchmaking work?")}
+                className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors"
+                disabled={isLoading}
+              >
+                AI Matching
+              </button>
+              <button
+                onClick={() => handleQuickAction("How to get started?")}
+                className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full hover:bg-green-200 transition-colors"
+                disabled={isLoading}
+              >
+                Get Started
               </button>
             </div>
           </div>
