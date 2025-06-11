@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Bot, User, Loader2, Zap, Brain, Sparkles } from 'lucide-react';
+import { 
+  X, Send, Bot, User, Loader2, Zap, Brain, Sparkles, Move
+} from 'lucide-react';
 
 interface Message {
   id: string;
@@ -16,6 +18,10 @@ const PlatformChatbot: React.FC<ChatbotProps> = ({
   apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000" 
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const chatWindowRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -27,7 +33,6 @@ const PlatformChatbot: React.FC<ChatbotProps> = ({
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -35,6 +40,82 @@ const PlatformChatbot: React.FC<ChatbotProps> = ({
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+  // Drag functionality
+  const handleMouseDown = (e: React.MouseEvent) => {
+    // Only allow dragging from the header area (elements with drag-handle class)
+    const target = e.target as HTMLElement;
+    if (target.classList.contains('drag-handle') || target.closest('.drag-handle')) {
+      setIsDragging(true);
+      setDragStart({
+        x: e.clientX - position.x,
+        y: e.clientY - position.y,
+      });
+      e.preventDefault(); // Prevent text selection
+    }
+  };
+
+  const resetPosition = () => {
+    setPosition({ x: 0, y: 0 });
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDragging) {
+      const newX = e.clientX - dragStart.x;
+      const newY = e.clientY - dragStart.y;
+      
+      // Constrain to viewport
+      const maxX = window.innerWidth - 384; // 384px is the width of the chatbot
+      const maxY = window.innerHeight - 500; // 500px is the height of the chatbot
+      
+      setPosition({
+        x: Math.max(0, Math.min(newX, maxX)),
+        y: Math.max(0, Math.min(newY, maxY)),
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, dragStart, position]);
+  // Icon components for responses
+  const formatResponseWithIcons = (content: string) => {
+    return content
+      .replace(/🚀/g, '<span class="inline-flex items-center justify-center w-5 h-5 text-blue-600 mr-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg></span>')
+      .replace(/💡/g, '<span class="inline-flex items-center justify-center w-5 h-5 text-yellow-600 mr-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></span>')
+      .replace(/🤖/g, '<span class="inline-flex items-center justify-center w-5 h-5 text-purple-600 mr-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg></span>')
+      .replace(/💰/g, '<span class="inline-flex items-center justify-center w-5 h-5 text-green-600 mr-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/></svg></span>')
+      .replace(/🎯/g, '<span class="inline-flex items-center justify-center w-5 h-5 text-red-600 mr-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg></span>')
+      .replace(/📊/g, '<span class="inline-flex items-center justify-center w-5 h-5 text-blue-600 mr-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></span>')
+      .replace(/🏢/g, '<span class="inline-flex items-center justify-center w-5 h-5 text-gray-600 mr-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></span>')
+      .replace(/🛠️/g, '<span class="inline-flex items-center justify-center w-5 h-5 text-gray-600 mr-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></span>')
+      .replace(/📈/g, '<span class="inline-flex items-center justify-center w-5 h-5 text-green-600 mr-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></span>')
+      .replace(/💸/g, '<span class="inline-flex items-center justify-center w-5 h-5 text-green-600 mr-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/></svg></span>')
+      .replace(/🌟/g, '<span class="inline-flex items-center justify-center w-5 h-5 text-yellow-600 mr-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg></span>')
+      .replace(/📚/g, '<span class="inline-flex items-center justify-center w-5 h-5 text-blue-600 mr-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></span>')
+      .replace(/❓/g, '<span class="inline-flex items-center justify-center w-5 h-5 text-blue-600 mr-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>')
+      .replace(/⚡/g, '<span class="inline-flex items-center justify-center w-5 h-5 text-yellow-600 mr-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></span>')
+      .replace(/🧠/g, '<span class="inline-flex items-center justify-center w-5 h-5 text-purple-600 mr-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></span>')
+      .replace(/🏗️/g, '<span class="inline-flex items-center justify-center w-5 h-5 text-orange-600 mr-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></span>')
+      .replace(/🛡️/g, '<span class="inline-flex items-center justify-center w-5 h-5 text-green-600 mr-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></span>')
+      .replace(/🌐/g, '<span class="inline-flex items-center justify-center w-5 h-5 text-blue-600 mr-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg></span>')
+      .replace(/1️⃣/g, '<span class="inline-flex items-center justify-center w-5 h-5 bg-blue-600 text-white rounded-full text-xs font-bold mr-1">1</span>')
+      .replace(/2️⃣/g, '<span class="inline-flex items-center justify-center w-5 h-5 bg-blue-600 text-white rounded-full text-xs font-bold mr-1">2</span>')
+      .replace(/3️⃣/g, '<span class="inline-flex items-center justify-center w-5 h-5 bg-blue-600 text-white rounded-full text-xs font-bold mr-1">3</span>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/•/g, '•')
+      .replace(/\n/g, '<br />');
+  };
 
   const generateBotResponse = async (userMessage: string): Promise<string> => {
     const lowerMessage = userMessage.toLowerCase();
@@ -436,21 +517,42 @@ What specific help do you need?`;
       }
     }, 100);
   };
-
   const formatMessage = (content: string) => {
-    // Convert markdown-like formatting to HTML
-    return content
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/•/g, '•')
-      .replace(/\n/g, '<br />');
-  };
+    // Convert markdown-like formatting to HTML and replace emojis with Lucide icons
+    return formatResponseWithIcons(content);
+  };  // Set CSS custom properties for dynamic positioning
+  useEffect(() => {
+    if (position.x !== 0 || position.y !== 0) {
+      document.documentElement.style.setProperty('--chatbot-x', `${position.x}px`);
+      document.documentElement.style.setProperty('--chatbot-y', `${position.y}px`);
+      document.documentElement.style.setProperty('--chatbot-button-x', `${position.x + 344}px`);
+      document.documentElement.style.setProperty('--chatbot-button-y', `${position.y + 456}px`);
+    }
+  }, [position]);
+
   return (
     <>
+      {/* Custom CSS for dynamic positioning */}
+      <style>{`
+        .chatbot-custom-position {
+          left: var(--chatbot-x, auto) !important;
+          top: var(--chatbot-y, auto) !important;
+          right: auto !important;
+          bottom: auto !important;
+        }
+        .chatbot-button-custom-position {
+          left: var(--chatbot-button-x, auto) !important;
+          top: var(--chatbot-button-y, auto) !important;
+          right: auto !important;
+          bottom: auto !important;
+        }
+      `}</style>
+
       {/* Floating Chat Button */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white p-3 sm:p-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 z-50 group"
+          className={`fixed bg-gradient-to-r from-purple-600 to-blue-600 text-white p-3 sm:p-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 z-50 group ${position.x === 0 && position.y === 0 ? 'bottom-4 right-4 sm:bottom-6 sm:right-6' : 'chatbot-button-custom-position'}`}
           aria-label="Open chat assistant"
         >
           <div className="relative">
@@ -461,13 +563,15 @@ What specific help do you need?`;
             Ask about ESAL Platform
           </div>
         </button>
-      )}
-
-      {/* Chat Window */}
+      )}      {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-[calc(100vw-2rem)] max-w-sm sm:w-96 h-[70vh] sm:h-[500px] bg-white rounded-lg shadow-2xl border border-gray-200 z-50 flex flex-col">
+        <div 
+          ref={chatWindowRef}
+          className={`fixed w-[calc(100vw-2rem)] max-w-sm sm:w-96 h-[70vh] sm:h-[500px] bg-white rounded-lg shadow-2xl border border-gray-200 z-50 flex flex-col ${position.x === 0 && position.y === 0 ? 'bottom-4 right-4 sm:bottom-6 sm:right-6' : 'chatbot-custom-position'} ${isDragging ? 'cursor-grabbing' : 'cursor-default'}`}
+          onMouseDown={handleMouseDown}
+        >
           {/* Header */}
-          <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-3 sm:p-4 rounded-t-lg flex items-center justify-between">
+          <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-3 sm:p-4 rounded-t-lg flex items-center justify-between drag-handle cursor-grab active:cursor-grabbing">
             <div className="flex items-center space-x-2">
               <div className="relative">
                 <Bot size={18} className="sm:w-5 sm:h-5" />
@@ -480,14 +584,36 @@ What specific help do you need?`;
                   <span>AI-Powered</span>
                 </div>
               </div>
+            </div>            <div className="flex items-center space-x-2">
+              <div 
+                className="text-white/70 hover:text-white cursor-grab drag-handle flex items-center"
+                aria-label="Drag to move"
+              >
+                <Move size={16} />
+              </div>
+              {position.x !== 0 || position.y !== 0 ? (
+                <button
+                  onClick={resetPosition}
+                  className="hover:bg-white/20 p-1 rounded transition-colors text-white/70 hover:text-white"
+                  aria-label="Reset position"
+                  title="Reset to default position"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                    <path d="M21 3v5h-5"/>
+                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                    <path d="M3 21v-5h5"/>
+                  </svg>
+                </button>
+              ) : null}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="hover:bg-white/20 p-1 rounded transition-colors"
+                aria-label="Close chat"
+              >
+                <X size={18} className="sm:w-5 sm:h-5" />
+              </button>
             </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="hover:bg-white/20 p-1 rounded transition-colors"
-              aria-label="Close chat"
-            >
-              <X size={18} className="sm:w-5 sm:h-5" />
-            </button>
           </div>
 
           {/* Messages */}
