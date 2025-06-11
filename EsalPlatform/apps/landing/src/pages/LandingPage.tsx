@@ -1257,9 +1257,11 @@ const LandingPage: React.FC = () => {
             </div>
           </div>{" "}
         </div>
-      </footer>
-      {/* Platform Chatbot */}
-      <PlatformChatbot />
+      </footer>      {/* Platform Chatbot */}
+      <PlatformChatbot 
+        apiUrl={`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/api/v1/chat/platform-assistant`}
+        enableExternalAPI={true}
+      />
     </div>
   );
 };

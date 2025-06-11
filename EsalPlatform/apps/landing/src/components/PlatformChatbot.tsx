@@ -11,12 +11,11 @@ interface Message {
 }
 
 interface ChatbotProps {
-  apiUrl?: string;
+  apiUrl?: string; // Optional external API endpoint for complex questions
+  enableExternalAPI?: boolean; // Flag to enable/disable external API calls
 }
 
-const PlatformChatbot: React.FC<ChatbotProps> = ({ 
-  apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000" 
-}) => {
+const PlatformChatbot: React.FC<ChatbotProps> = ({ apiUrl, enableExternalAPI = true }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -116,12 +115,11 @@ const PlatformChatbot: React.FC<ChatbotProps> = ({
       .replace(/•/g, '•')
       .replace(/\n/g, '<br />');
   };
-
   const generateBotResponse = async (userMessage: string): Promise<string> => {
     const lowerMessage = userMessage.toLowerCase();
     
     // Knowledge base about ESAL Platform
-    const responses = {
+    const predefinedResponses: { [key: string]: string } = {
       // Platform overview
       'what is esal platform': `ESAL Platform is a comprehensive entrepreneurship and innovation platform that connects innovators, investors, and entrepreneurship hubs in a unified ecosystem. 
 
@@ -131,7 +129,9 @@ const PlatformChatbot: React.FC<ChatbotProps> = ({
 • **Idea Development Tools**: AI-assisted pitch generation and improvement
 • **Analytics & Insights**: Comprehensive tracking and performance metrics
 
-ESAL stands for "Entidades Sin Ánimo de Lucro" (Non-profit Organizations) and serves the entire entrepreneurship ecosystem.`,      // AI Matchmaking
+ESAL stands for "Entidades Sin Ánimo de Lucro" (Non-profit Organizations) and serves the entire entrepreneurship ecosystem.`,      
+      
+      // AI Matchmaking
       'ai matchmaking': `Our AI Matchmaking system uses complex AI algorithms developed by the ESAL team to intelligently connect investors with startups:
 
 🤖 **How It Works:**
@@ -163,7 +163,9 @@ The AI provides intelligent scoring and explains why specific matches are recomm
 • Real-time analysis and feedback
 • Intelligent scoring systems
 • Reliable recommendation engine
-• Continuous learning from platform interactions`,      // Platform portals
+• Continuous learning from platform interactions`,      
+      
+      // Platform portals
       'portals': `ESAL Platform has specialized portals for different user types:
 
 🎯 **Innovator Portal**
@@ -216,7 +218,9 @@ The AI provides intelligent scoring and explains why specific matches are recomm
 • **Hubs**: Add programs, import member data
 • **Admins**: Review system status, configure settings
 
-Need help with anything specific? Just ask!`,      // Technical details
+Need help with anything specific? Just ask!`,      
+      
+      // Technical details
       'technology': `ESAL Platform is built with modern, scalable technologies:
 
 🏗️ **Architecture:**
@@ -231,7 +235,9 @@ Need help with anything specific? Just ask!`,      // Technical details
 • Role-based permissions system
 • Data protection and privacy compliance
 • Optimized performance and scalability
-• Real-time updates and notifications`,      // Default responses
+• Real-time updates and notifications`,      
+      
+      // Default responses
       'default': `I'm here to help you learn about the ESAL Platform! You can ask me about:
 
 💡 **Platform Features:**
@@ -254,29 +260,31 @@ Need help with anything specific? Just ask!`,      // Technical details
 What would you like to know more about?`
     };
 
-    // Check for specific topics
+    // Check for predefined responses first
     if (lowerMessage.includes('what is esal') || lowerMessage.includes('esal platform')) {
-      return responses['what is esal platform'];
+      return predefinedResponses['what is esal platform'];
     }
     if (lowerMessage.includes('ai match') || lowerMessage.includes('matchmaking')) {
-      return responses['ai matchmaking'];
+      return predefinedResponses['ai matchmaking'];
     }
     if (lowerMessage.includes('ai work') || lowerMessage.includes('how does ai')) {
-      return responses['how does ai work'];
+      return predefinedResponses['how does ai work'];
     }
     if (lowerMessage.includes('portal') || lowerMessage.includes('interface')) {
-      return responses['portals'];
-    }    if (lowerMessage.includes('get started') || lowerMessage.includes('how to start') || lowerMessage.includes('begin')) {
-      return responses['get started'];
+      return predefinedResponses['portals'];
+    }    
+    if (lowerMessage.includes('get started') || lowerMessage.includes('how to start') || lowerMessage.includes('begin')) {
+      return predefinedResponses['get started'];
     }
     if (lowerMessage.includes('technology') || lowerMessage.includes('tech stack') || lowerMessage.includes('architecture')) {
-      return responses['technology'];
+      return predefinedResponses['technology'];
     }
 
     // Block sensitive technical questions
     if (lowerMessage.includes('port') || lowerMessage.includes('localhost') || lowerMessage.includes('3000') || lowerMessage.includes('3001') || lowerMessage.includes('3002') || lowerMessage.includes('3003') || lowerMessage.includes('3004')) {
       return `I can help you with general platform information and features. For technical support or specific system details, please contact our support team.`;
-    }    if (lowerMessage.includes('gemini') || lowerMessage.includes('google') || lowerMessage.includes('openai') || lowerMessage.includes('api key') || lowerMessage.includes('database') || lowerMessage.includes('supabase') || lowerMessage.includes('fastapi')) {
+    }    
+    if (lowerMessage.includes('gemini') || lowerMessage.includes('google') || lowerMessage.includes('openai') || lowerMessage.includes('api key') || lowerMessage.includes('database') || lowerMessage.includes('supabase') || lowerMessage.includes('fastapi')) {
       return `Our platform uses advanced AI algorithms developed by the ESAL team. For specific technical details, please contact our technical support team.`;
     }
 
@@ -402,7 +410,9 @@ The AI considers funding alignment as a key matching factor, ensuring startups a
 • Better quality matches between stakeholders
 • AI assistance for better decision-making
 • Centralized platform for all innovation activities`;
-    }    // Help and support
+    }    
+    
+    // Help and support
     if (lowerMessage.includes('help') || lowerMessage.includes('support') || lowerMessage.includes('problem')) {
       return `I'm here to help! Here are ways to get support:
 
@@ -428,8 +438,36 @@ Ask about platform features, AI capabilities, getting started, or any general qu
 • "How do I find investors?"
 
 What specific help do you need?`;
-    }    // For more complex questions, return default response
-    return responses['default'];
+    }    
+
+    // If no predefined response matches and external API is enabled, try external API
+    if (enableExternalAPI && apiUrl) {
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message: userMessage,
+            context: 'ESAL Platform Customer Support'
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          return data.response || data.message || "I received your question and our AI is processing it. Please contact our support team for more detailed assistance.";
+        } else {
+          throw new Error(`API request failed with status: ${response.status}`);
+        }
+      } catch (error) {
+        console.warn('External API call failed:', error);
+        // Fall through to default response
+      }
+    }
+
+    // Default response when no match is found and API is unavailable
+    return predefinedResponses['default'];
   };
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
