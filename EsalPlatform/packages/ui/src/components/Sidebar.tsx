@@ -12,7 +12,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onMobileClose,
   onNavigate, // Add navigation callback prop
 }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);  // Use provided user data or fallback to localStorage/defaults with portal detection
+  const [isCollapsed, setIsCollapsed] = useState(false); // Use provided user data or fallback to localStorage/defaults with portal detection
   const getUserData = () => {
     if (propUser) return propUser;
 
@@ -20,13 +20,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
     const getPortalRole = () => {
       const hostname = window.location.hostname;
       const pathname = window.location.pathname;
-      
+
       // Check for portal-specific subdomains or paths
-      if (hostname.includes('investor') || pathname.includes('investor')) {
+      if (hostname.includes("investor") || pathname.includes("investor")) {
         return "Investor";
-      } else if (hostname.includes('admin') || pathname.includes('admin')) {
+      } else if (hostname.includes("admin") || pathname.includes("admin")) {
         return "Administrator";
-      } else if (hostname.includes('hub') || pathname.includes('hub')) {
+      } else if (hostname.includes("hub") || pathname.includes("hub")) {
         return "Hub Admin";
       } else {
         return "Innovator"; // Default to innovator
@@ -189,11 +189,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4 px-3">
             Navigation
           </div>
-        )}{" "}        {items.map((item) => {
+        )}{" "}
+        {items.map((item) => {
           const isActive = currentPath === item.href;
           return (
             <div key={item.href} className="relative">
-              {" "}              <button
+              {" "}
+              <button
                 onClick={() => {
                   onNavigate?.(item.href);
                   // Close mobile menu when navigation link is clicked

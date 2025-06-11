@@ -682,32 +682,28 @@ const Settings: React.FC = () => {
       }
     }
   };
-
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6 p-4 sm:p-6 lg:p-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-          <p className="text-gray-600">Loading your settings...</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Settings</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">Loading your settings...</p>
         </div>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="flex items-center justify-center h-32 sm:h-48 lg:h-64">
+          <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 border-b-2 border-blue-600"></div>
         </div>
       </div>
     );
   }
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6 lg:p-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Settings</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">
           Manage your account settings and preferences
         </p>
-      </div>
-
-      {error && (
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
+      </div>      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-md p-3 sm:p-4">
           <div className="flex">
             <div className="text-red-600 text-sm">❌ Error: {error}</div>
           </div>
@@ -715,7 +711,7 @@ const Settings: React.FC = () => {
       )}
 
       {successMessage && (
-        <div className="bg-green-50 border border-green-200 rounded-md p-4">
+        <div className="bg-green-50 border border-green-200 rounded-md p-3 sm:p-4">
           <div className="flex">
             <div className="text-green-400">
               <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -733,10 +729,10 @@ const Settings: React.FC = () => {
         </div>
       )}
 
-      <div className="flex space-x-2 border-b">
+      <div className="flex space-x-1 sm:space-x-2 border-b overflow-x-auto scrollbar-hide">
         <button
           onClick={() => setActiveTab("notifications")}
-          className={`py-2 px-4 border-b-2 font-medium text-sm ${
+          className={`py-2 px-3 sm:px-4 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
             activeTab === "notifications"
               ? "border-blue-500 text-blue-600"
               : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -746,7 +742,7 @@ const Settings: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab("privacy")}
-          className={`py-2 px-4 border-b-2 font-medium text-sm ${
+          className={`py-2 px-3 sm:px-4 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
             activeTab === "privacy"
               ? "border-blue-500 text-blue-600"
               : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -756,7 +752,7 @@ const Settings: React.FC = () => {
         </button>{" "}
         <button
           onClick={() => setActiveTab("security")}
-          className={`py-2 px-4 border-b-2 font-medium text-sm ${
+          className={`py-2 px-3 sm:px-4 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
             activeTab === "security"
               ? "border-blue-500 text-blue-600"
               : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -766,7 +762,7 @@ const Settings: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab("preferences")}
-          className={`py-2 px-4 border-b-2 font-medium text-sm ${
+          className={`py-2 px-3 sm:px-4 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
             activeTab === "preferences"
               ? "border-blue-500 text-blue-600"
               : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -776,7 +772,7 @@ const Settings: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab("danger")}
-          className={`py-2 px-4 border-b-2 font-medium text-sm ${
+          className={`py-2 px-3 sm:px-4 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
             activeTab === "danger"
               ? "border-red-500 text-red-600"
               : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -786,161 +782,172 @@ const Settings: React.FC = () => {
         </button>
       </div>
 
-      <div className="mt-6">
-        {activeTab === "notifications" && (
+      <div className="mt-4 sm:mt-6">        {activeTab === "notifications" && (
           <Card>
-            <CardHeader>
-              <CardTitle>Notification Settings</CardTitle>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-lg sm:text-xl">Notification Settings</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium text-gray-900">
+            <CardContent className="p-4 sm:p-6">
+              <div className="space-y-4 sm:space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-gray-900 text-sm sm:text-base">
                       Email Notifications
                     </h3>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-xs sm:text-sm text-gray-500 mt-1">
                       Receive email notifications for important updates
                     </p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      name="email_notifications"
-                      className="sr-only peer"
-                      checked={settings.notifications.email_notifications}
-                      onChange={handleNotificationChange}
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                  </label>
+                  <div className="flex-shrink-0">
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="email_notifications"
+                        className="sr-only peer"
+                        checked={settings.notifications.email_notifications}
+                        onChange={handleNotificationChange}
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                  </div>
                 </div>
 
-                <div className="border-t pt-4 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium text-gray-900">
+                <div className="border-t pt-4 sm:pt-6 space-y-4 sm:space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-gray-900 text-sm sm:text-base">
                         Comment Notifications
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs sm:text-sm text-gray-500 mt-1">
                         Receive notifications when someone comments on your
                         ideas
                       </p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="idea_comments"
-                        className="sr-only peer"
-                        checked={settings.notifications.idea_comments}
-                        onChange={handleNotificationChange}
-                        disabled={!settings.notifications.email_notifications}
-                      />
-                      <div
-                        className={`w-11 h-6 ${settings.notifications.email_notifications ? "bg-gray-200" : "bg-gray-100"} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}
-                      ></div>
-                    </label>
+                    <div className="flex-shrink-0">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="idea_comments"
+                          className="sr-only peer"
+                          checked={settings.notifications.idea_comments}
+                          onChange={handleNotificationChange}
+                          disabled={!settings.notifications.email_notifications}
+                        />
+                        <div
+                          className={`w-11 h-6 ${settings.notifications.email_notifications ? "bg-gray-200" : "bg-gray-100"} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}
+                        ></div>
+                      </label>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium text-gray-900">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-gray-900 text-sm sm:text-base">
                         Interest Notifications
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs sm:text-sm text-gray-500 mt-1">
                         Receive notifications when someone shows interest in
                         your ideas
                       </p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="idea_interests"
-                        className="sr-only peer"
-                        checked={settings.notifications.idea_interests}
-                        onChange={handleNotificationChange}
-                        disabled={!settings.notifications.email_notifications}
-                      />
-                      <div
-                        className={`w-11 h-6 ${settings.notifications.email_notifications ? "bg-gray-200" : "bg-gray-100"} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}
-                      ></div>
-                    </label>
+                    <div className="flex-shrink-0">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="idea_interests"
+                          className="sr-only peer"
+                          checked={settings.notifications.idea_interests}
+                          onChange={handleNotificationChange}
+                          disabled={!settings.notifications.email_notifications}
+                        />
+                        <div
+                          className={`w-11 h-6 ${settings.notifications.email_notifications ? "bg-gray-200" : "bg-gray-100"} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}
+                        ></div>
+                      </label>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium text-gray-900">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-gray-900 text-sm sm:text-base">
                         Platform Updates
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs sm:text-sm text-gray-500 mt-1">
                         Receive notifications about platform updates and new
                         features
                       </p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="platform_updates"
-                        className="sr-only peer"
-                        checked={settings.notifications.platform_updates}
-                        onChange={handleNotificationChange}
-                        disabled={!settings.notifications.email_notifications}
-                      />
-                      <div
-                        className={`w-11 h-6 ${settings.notifications.email_notifications ? "bg-gray-200" : "bg-gray-100"} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}
-                      ></div>
-                    </label>
+                    <div className="flex-shrink-0">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="platform_updates"
+                          className="sr-only peer"
+                          checked={settings.notifications.platform_updates}
+                          onChange={handleNotificationChange}
+                          disabled={!settings.notifications.email_notifications}
+                        />
+                        <div
+                          className={`w-11 h-6 ${settings.notifications.email_notifications ? "bg-gray-200" : "bg-gray-100"} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}
+                        ></div>
+                      </label>
+                    </div>
                   </div>{" "}
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium text-gray-900">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-gray-900 text-sm sm:text-base">
                         Marketing Emails
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs sm:text-sm text-gray-500 mt-1">
                         Receive marketing and promotional emails about our
                         services
                       </p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="marketing_emails"
-                        className="sr-only peer"
-                        checked={settings.notifications.marketing_emails}
-                        onChange={handleNotificationChange}
-                        disabled={!settings.notifications.email_notifications}
-                      />
-                      <div
-                        className={`w-11 h-6 ${settings.notifications.email_notifications ? "bg-gray-200" : "bg-gray-100"} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}
-                      ></div>
-                    </label>
+                    <div className="flex-shrink-0">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="marketing_emails"
+                          className="sr-only peer"
+                          checked={settings.notifications.marketing_emails}
+                          onChange={handleNotificationChange}
+                          disabled={!settings.notifications.email_notifications}
+                        />
+                        <div
+                          className={`w-11 h-6 ${settings.notifications.email_notifications ? "bg-gray-200" : "bg-gray-100"} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}
+                        ></div>
+                      </label>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium text-gray-900">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-gray-900 text-sm sm:text-base">
                         Weekly Digest
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs sm:text-sm text-gray-500 mt-1">
                         Receive a weekly summary of platform activity and new
                         ideas
                       </p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="weekly_digest"
-                        className="sr-only peer"
-                        checked={settings.notifications.weekly_digest}
-                        onChange={handleNotificationChange}
-                        disabled={!settings.notifications.email_notifications}
-                      />
-                      <div
-                        className={`w-11 h-6 ${settings.notifications.email_notifications ? "bg-gray-200" : "bg-gray-100"} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}
-                      ></div>{" "}
-                    </label>
+                    <div className="flex-shrink-0">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="weekly_digest"
+                          className="sr-only peer"
+                          checked={settings.notifications.weekly_digest}
+                          onChange={handleNotificationChange}
+                          disabled={!settings.notifications.email_notifications}
+                        />
+                        <div
+                          className={`w-11 h-6 ${settings.notifications.email_notifications ? "bg-gray-200" : "bg-gray-100"} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}
+                        ></div>{" "}
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-6 pt-6 border-t">
-                <Button onClick={handleSaveNotifications} disabled={isSaving}>
+              <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t">
+                <Button onClick={handleSaveNotifications} disabled={isSaving} className="w-full sm:w-auto">
                   {isSaving ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -953,23 +960,22 @@ const Settings: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-        )}
-        {activeTab === "privacy" && (
+        )}        {activeTab === "privacy" && (
           <Card>
-            <CardHeader>
-              <CardTitle>Privacy Settings</CardTitle>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-lg sm:text-xl">Privacy Settings</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
+            <CardContent className="p-4 sm:p-6">
+              <div className="space-y-4 sm:space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Profile Visibility
                   </label>
                   <select
                     name="profile_visibility"
                     value={settings.privacy.profile_visibility}
                     onChange={handlePrivacyChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="public">Public - Visible to everyone</option>
                     <option value="registered">
@@ -979,98 +985,103 @@ const Settings: React.FC = () => {
                       Private - Only visible to you
                     </option>
                   </select>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <p className="mt-2 text-xs sm:text-sm text-gray-500">
                     Control who can see your profile information
                   </p>
                 </div>
 
-                <div className="border-t pt-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h3 className="font-medium text-gray-900">
+                <div className="border-t pt-4 sm:pt-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 mb-4 sm:mb-6">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-gray-900 text-sm sm:text-base">
                         Show Contact Information
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs sm:text-sm text-gray-500 mt-1">
                         Allow others to see your contact information
                       </p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="show_contact_info"
-                        className="sr-only peer"
-                        checked={settings.privacy.show_contact_info}
+                    <div className="flex-shrink-0">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="show_contact_info"
+                          className="sr-only peer"                        checked={settings.privacy.show_contact_info}
                         onChange={handlePrivacyChange}
                       />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                     </label>
                   </div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h3 className="font-medium text-gray-900">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 mb-4 sm:mb-6">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-gray-900 text-sm sm:text-base">
                         Allow Direct Messages
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs sm:text-sm text-gray-500 mt-1">
                         Allow other users to send you direct messages
                       </p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="allow_messages"
-                        className="sr-only peer"
-                        checked={settings.privacy.allow_messages}
-                        onChange={handlePrivacyChange}
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>
-                  </div>{" "}
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium text-gray-900">
+                    <div className="flex-shrink-0">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="allow_messages"
+                          className="sr-only peer"
+                          checked={settings.privacy.allow_messages}
+                          onChange={handlePrivacyChange}
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 mb-4 sm:mb-6">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-gray-900 text-sm sm:text-base">
                         Show My Ideas
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs sm:text-sm text-gray-500 mt-1">
                         Make your startup ideas visible in your public profile
                       </p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="show_ideas"
-                        className="sr-only peer"
-                        checked={settings.privacy.show_ideas}
-                        onChange={handlePrivacyChange}
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>
+                    <div className="flex-shrink-0">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="show_ideas"
+                          className="sr-only peer"
+                          checked={settings.privacy.show_ideas}
+                          onChange={handlePrivacyChange}
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium text-gray-900">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-gray-900 text-sm sm:text-base">
                         Allow Data Sharing
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs sm:text-sm text-gray-500 mt-1">
                         Allow anonymized data sharing for platform improvement
                         and research
                       </p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="data_sharing"
-                        className="sr-only peer"
-                        checked={settings.privacy.data_sharing}
-                        onChange={handlePrivacyChange}
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>{" "}
+                    <div className="flex-shrink-0">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="data_sharing"
+                          className="sr-only peer"
+                          checked={settings.privacy.data_sharing}
+                          onChange={handlePrivacyChange}
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>                    </div>
                   </div>
                 </div>
               </div>
-
-              <div className="mt-6 pt-6 border-t">
-                <Button onClick={handleSavePrivacy} disabled={isSaving}>
+              
+              <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t">
+                <Button onClick={handleSavePrivacy} disabled={isSaving} className="w-full sm:w-auto">
                   {isSaving ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -1082,22 +1093,21 @@ const Settings: React.FC = () => {
                 </Button>
               </div>
             </CardContent>
-          </Card>
-        )}
+          </Card>        )}
         {activeTab === "security" && (
           <Card>
-            <CardHeader>
-              <CardTitle>Security Settings</CardTitle>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-lg sm:text-xl">Security Settings</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
+            <CardContent className="p-4 sm:p-6">
+              <div className="space-y-4 sm:space-y-6">
                 <div>
-                  <h3 className="font-medium text-gray-900 mb-4">
+                  <h3 className="font-medium text-gray-900 mb-3 sm:mb-4 text-sm sm:text-base">
                     Change Password
-                  </h3>{" "}
-                  <form className="space-y-4" onSubmit={handleChangePassword}>
+                  </h3>
+                  <form className="space-y-3 sm:space-y-4" onSubmit={handleChangePassword}>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                         Current Password
                       </label>
                       <input
@@ -1105,14 +1115,14 @@ const Settings: React.FC = () => {
                         name="current_password"
                         value={passwordForm.current_password}
                         onChange={handlePasswordFormChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Enter your current password"
                         required
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                         New Password
                       </label>
                       <input
@@ -1120,7 +1130,7 @@ const Settings: React.FC = () => {
                         name="new_password"
                         value={passwordForm.new_password}
                         onChange={handlePasswordFormChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Enter new password"
                         required
                         minLength={8}
@@ -1128,7 +1138,7 @@ const Settings: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                         Confirm New Password
                       </label>
                       <input
@@ -1136,71 +1146,72 @@ const Settings: React.FC = () => {
                         name="confirm_password"
                         value={passwordForm.confirm_password}
                         onChange={handlePasswordFormChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Confirm new password"
                         required
                         minLength={8}
                       />
                     </div>
 
-                    <Button type="submit">Change Password</Button>
+                    <Button type="submit" className="w-full sm:w-auto">Change Password</Button>
                   </form>
-                </div>{" "}
-                <div className="border-t pt-6">
-                  <h3 className="font-medium text-gray-900 mb-4">
+                </div>
+                <div className="border-t pt-4 sm:pt-6">
+                  <h3 className="font-medium text-gray-900 mb-3 sm:mb-4 text-sm sm:text-base">
                     Two-Factor Authentication
                   </h3>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-700 mb-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs sm:text-sm text-gray-700 mb-1">
                         {securityInfo?.two_factor_enabled
                           ? "Two-factor authentication is enabled"
                           : "Enable two-factor authentication for enhanced security"}
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs sm:text-sm text-gray-500">
                         {securityInfo?.two_factor_enabled
                           ? "Your account is protected with an additional security layer"
                           : "Protect your account with an additional security layer"}
                       </p>
                     </div>
-                    {securityInfo?.two_factor_enabled ? (
-                      <Button
-                        variant="outline"
-                        className="border-red-300 text-red-600 hover:bg-red-50"
-                        onClick={handleDisable2FA}
-                      >
-                        Disable 2FA
-                      </Button>
-                    ) : (
-                      <Button variant="outline" onClick={handleEnable2FA}>
-                        Enable 2FA
-                      </Button>
-                    )}
+                    <div className="flex-shrink-0 w-full sm:w-auto">
+                      {securityInfo?.two_factor_enabled ? (
+                        <Button
+                          variant="outline"
+                          className="w-full sm:w-auto border-red-300 text-red-600 hover:bg-red-50"
+                          onClick={handleDisable2FA}
+                        >
+                          Disable 2FA
+                        </Button>
+                      ) : (
+                        <Button variant="outline" className="w-full sm:w-auto" onClick={handleEnable2FA}>
+                          Enable 2FA
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                </div>{" "}
-                <div className="border-t pt-6">
-                  <h3 className="font-medium text-gray-900 mb-4">
+                </div>
+                <div className="border-t pt-4 sm:pt-6">
+                  <h3 className="font-medium text-gray-900 mb-3 sm:mb-4 text-sm sm:text-base">
                     Session Management
                   </h3>
                   <div>
-                    <p className="text-sm text-gray-700 mb-4">
+                    <p className="text-xs sm:text-sm text-gray-700 mb-3 sm:mb-4">
                       You're currently logged in on these devices:
                     </p>
-
-                    <div className="space-y-3">
+                    <div className="space-y-2 sm:space-y-3">
                       {sessions.length > 0 ? (
                         sessions.map((session, index) => (
                           <div
                             key={index}
-                            className="flex justify-between items-center p-3 bg-gray-50 rounded-md"
+                            className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-3 bg-gray-50 rounded-md space-y-2 sm:space-y-0"
                           >
-                            <div>
-                              <p className="font-medium">
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm sm:text-base">
                                 {session.is_current
                                   ? "Current Device"
                                   : session.device}
                               </p>
-                              <p className="text-sm text-gray-600">
+                              <p className="text-xs sm:text-sm text-gray-600 break-words">
                                 {session.browser} • IP: {session.ip_address}
                                 {session.location && ` • ${session.location}`}
                                 {!session.is_current &&
@@ -1208,23 +1219,26 @@ const Settings: React.FC = () => {
                               </p>
                             </div>
                             {!session.is_current && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() =>
-                                  handleRevokeSession(index.toString())
-                                }
-                              >
-                                Log Out
-                              </Button>
+                              <div className="flex-shrink-0 w-full sm:w-auto">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="w-full sm:w-auto"
+                                  onClick={() =>
+                                    handleRevokeSession(index.toString())
+                                  }
+                                >
+                                  Log Out
+                                </Button>
+                              </div>
                             )}
                           </div>
                         ))
                       ) : (
                         <div className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
                           <div>
-                            <p className="font-medium">Current Device</p>
-                            <p className="text-sm text-gray-600">
+                            <p className="font-medium text-sm sm:text-base">Current Device</p>
+                            <p className="text-xs sm:text-sm text-gray-600">
                               No session information available
                             </p>
                           </div>
@@ -1233,20 +1247,20 @@ const Settings: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <div className="border-t pt-6">
-                  <h3 className="font-medium text-gray-900 mb-4">
+                <div className="border-t pt-4 sm:pt-6">
+                  <h3 className="font-medium text-gray-900 mb-3 sm:mb-4 text-sm sm:text-base">
                     Security Preferences
                   </h3>
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                         Session Timeout (minutes)
                       </label>
                       <select
                         name="session_timeout"
                         value={settings.security.session_timeout}
                         onChange={handleSecurityChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         <option value={15}>15 minutes</option>
                         <option value={30}>30 minutes</option>
@@ -1255,37 +1269,38 @@ const Settings: React.FC = () => {
                         <option value={240}>4 hours</option>
                         <option value={480}>8 hours</option>
                       </select>
-                      <p className="mt-1 text-sm text-gray-500">
+                      <p className="mt-2 text-xs sm:text-sm text-gray-500">
                         Automatically log out after this period of inactivity
                       </p>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium text-gray-900">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-gray-900 text-sm sm:text-base">
                           Login Notifications
                         </h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-xs sm:text-sm text-gray-500 mt-1">
                           Receive notifications when someone logs into your
                           account
                         </p>
                       </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          name="login_notifications"
-                          className="sr-only peer"
-                          checked={settings.security.login_notifications}
-                          onChange={handleSecurityChange}
-                        />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                      </label>
-                    </div>{" "}
+                      <div className="flex-shrink-0">
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            name="login_notifications"
+                            className="sr-only peer"
+                            checked={settings.security.login_notifications}
+                            onChange={handleSecurityChange}                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-6 pt-6 border-t">
-                <Button onClick={handleSaveSettings} disabled={isSaving}>
+              <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t">
+                <Button onClick={handleSaveSettings} disabled={isSaving} className="w-full sm:w-auto">
                   {isSaving ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -1295,19 +1310,18 @@ const Settings: React.FC = () => {
                     "Save Changes"
                   )}
                 </Button>
-              </div>
-            </CardContent>
+              </div>            </CardContent>
           </Card>
-        )}{" "}
+        )}
         {activeTab === "preferences" && (
           <Card>
-            <CardHeader>
-              <CardTitle>Preferences</CardTitle>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-lg sm:text-xl">Preferences</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
+            <CardContent className="p-4 sm:p-6">
+              <div className="space-y-4 sm:space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                     Theme
                   </label>
                   <select
@@ -1319,19 +1333,19 @@ const Settings: React.FC = () => {
                         theme: e.target.value,
                       }))
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="light">Light</option>
                     <option value="dark">Dark</option>
                     <option value="auto">Auto (System)</option>
                   </select>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <p className="mt-2 text-xs sm:text-sm text-gray-500">
                     Choose your preferred color theme
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                     Language
                   </label>
                   <select
@@ -1343,20 +1357,20 @@ const Settings: React.FC = () => {
                         language: e.target.value,
                       }))
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="en">English</option>
                     <option value="ar">العربية (Arabic)</option>
                     <option value="fr">Français</option>
                     <option value="es">Español</option>
                   </select>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <p className="mt-2 text-xs sm:text-sm text-gray-500">
                     Select your preferred language
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                     Timezone
                   </label>
                   <select
@@ -1368,7 +1382,7 @@ const Settings: React.FC = () => {
                         timezone: e.target.value,
                       }))
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="UTC">UTC</option>
                     <option value="America/New_York">Eastern Time</option>
@@ -1381,14 +1395,14 @@ const Settings: React.FC = () => {
                     <option value="Asia/Riyadh">Riyadh</option>
                     <option value="Asia/Tokyo">Tokyo</option>
                   </select>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <p className="mt-2 text-xs sm:text-sm text-gray-500">
                     Set your timezone for accurate timestamps
                   </p>
                 </div>
               </div>
 
-              <div className="mt-6 pt-6 border-t">
-                <Button onClick={handleSaveSettings} disabled={isSaving}>
+              <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t">
+                <Button onClick={handleSaveSettings} disabled={isSaving} className="w-full sm:w-auto">
                   {isSaving ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -1398,43 +1412,41 @@ const Settings: React.FC = () => {
                     "Save Changes"
                   )}
                 </Button>
-              </div>
-            </CardContent>
+              </div>            </CardContent>
           </Card>
         )}
         {activeTab === "danger" && (
           <Card className="border-red-200">
-            <CardHeader>
+            <CardHeader className="p-4 sm:p-6">
               <CardTitle>
-                <div className="text-red-600">Danger Zone</div>
+                <div className="text-red-600 text-lg sm:text-xl">Danger Zone</div>
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {" "}
+            <CardContent className="p-4 sm:p-6">
+              <div className="space-y-4 sm:space-y-6">
                 <div>
-                  <h3 className="font-medium text-gray-900 mb-2">
+                  <h3 className="font-medium text-gray-900 mb-2 text-sm sm:text-base">
                     Export Your Data
                   </h3>
-                  <p className="text-sm text-gray-500 mb-4">
+                  <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">
                     Download all your personal data and startup ideas in a
                     portable format
                   </p>
-                  <Button variant="outline" onClick={handleExportData}>
+                  <Button variant="outline" onClick={handleExportData} className="w-full sm:w-auto">
                     Export My Data
                   </Button>
                 </div>
-                <div className="border-t pt-6">
-                  <h3 className="font-medium text-red-600 mb-2">
+                <div className="border-t pt-4 sm:pt-6">
+                  <h3 className="font-medium text-red-600 mb-2 text-sm sm:text-base">
                     Delete Account
                   </h3>
-                  <p className="text-sm text-gray-500 mb-4">
+                  <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">
                     Permanently delete your account and all associated data.
                     This action cannot be undone.
                   </p>
                   <Button
                     variant="outline"
-                    className="border-red-300 text-red-600 hover:bg-red-50"
+                    className="w-full sm:w-auto border-red-300 text-red-600 hover:bg-red-50"
                     onClick={handleDeleteAccount}
                   >
                     Delete My Account

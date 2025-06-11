@@ -332,7 +332,9 @@ const Dashboard: React.FC = () => {
                   >
                     <TabIcon size={14} className="stroke-2 sm:w-4 sm:h-4" />
                     <span className="hidden sm:inline">{tab.label}</span>
-                    <span className="sm:hidden">{tab.label.substring(0, 4)}</span>
+                    <span className="sm:hidden">
+                      {tab.label.substring(0, 4)}
+                    </span>
                   </button>
                 );
               })}
@@ -348,12 +350,15 @@ const Dashboard: React.FC = () => {
                 size={14}
                 className={`stroke-2 sm:w-4 sm:h-4 ${isLoading ? "animate-spin" : ""}`}
               />
-              <span className="hidden sm:inline">{isLoading ? "Refreshing..." : "Refresh Data"}</span>
+              <span className="hidden sm:inline">
+                {isLoading ? "Refreshing..." : "Refresh Data"}
+              </span>
               <span className="sm:hidden">Refresh</span>
             </Button>
           </div>
         </div>
-      </div>      {/* Enhanced Portfolio Stats - Mobile Responsive */}
+      </div>{" "}
+      {/* Enhanced Portfolio Stats - Mobile Responsive */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {portfolioStats.map((stat, index) => {
           const IconComponent = stat.icon;
@@ -371,7 +376,10 @@ const Dashboard: React.FC = () => {
                     <div
                       className={`p-2 sm:p-3 rounded-xl bg-white shadow-sm ${stat.iconColor} flex-shrink-0`}
                     >
-                      <IconComponent size={20} className="stroke-2 sm:w-6 sm:h-6" />
+                      <IconComponent
+                        size={20}
+                        className="stroke-2 sm:w-6 sm:h-6"
+                      />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-xs sm:text-sm font-medium text-gray-700 mb-1 truncate">
@@ -393,17 +401,28 @@ const Dashboard: React.FC = () => {
                     }`}
                   >
                     {stat.trendUp ? (
-                      <TrendingUp size={12} className="stroke-2 sm:w-3.5 sm:h-3.5" />
+                      <TrendingUp
+                        size={12}
+                        className="stroke-2 sm:w-3.5 sm:h-3.5"
+                      />
                     ) : (
-                      <TrendingDown size={12} className="stroke-2 sm:w-3.5 sm:h-3.5" />
+                      <TrendingDown
+                        size={12}
+                        className="stroke-2 sm:w-3.5 sm:h-3.5"
+                      />
                     )}
                     <span className="hidden sm:inline">{stat.trend}</span>
-                    <span className="sm:hidden">{stat.trend.replace(/\s.*/, "")}</span>
+                    <span className="sm:hidden">
+                      {stat.trend.replace(/\s.*/, "")}
+                    </span>
                   </div>
                 </div>
                 {stat.detail && (
                   <div className="text-xs text-gray-600 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200 flex items-center space-x-1">
-                    <Activity size={10} className="stroke-2 sm:w-3 sm:h-3 flex-shrink-0" />
+                    <Activity
+                      size={10}
+                      className="stroke-2 sm:w-3 sm:h-3 flex-shrink-0"
+                    />
                     <span className="truncate">{stat.detail}</span>
                   </div>
                 )}
@@ -411,7 +430,8 @@ const Dashboard: React.FC = () => {
             </Card>
           );
         })}
-      </div>      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+      </div>{" "}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
         {/* Enhanced Recent Opportunities - Mobile Responsive */}
         <Card className="hover:shadow-lg transition-shadow border-0 shadow-md">
           <CardHeader>
@@ -420,7 +440,10 @@ const Dashboard: React.FC = () => {
                 <CardTitle>
                   <div className="text-lg sm:text-xl font-semibold text-gray-900 flex items-center space-x-2 sm:space-x-3">
                     <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg flex-shrink-0">
-                      <Target size={16} className="stroke-2 text-blue-600 sm:w-5 sm:h-5" />
+                      <Target
+                        size={16}
+                        className="stroke-2 text-blue-600 sm:w-5 sm:h-5"
+                      />
                     </div>
                     <span className="truncate">Recent Opportunities</span>
                   </div>
@@ -432,7 +455,9 @@ const Dashboard: React.FC = () => {
               <div className="flex items-center space-x-2 flex-shrink-0">
                 <span className="inline-flex items-center px-2 py-1 sm:px-3 rounded-full text-xs bg-blue-100 text-blue-800 border border-blue-200">
                   <Sparkles size={10} className="stroke-2 mr-1 sm:w-3 sm:h-3" />
-                  <span className="hidden sm:inline">{opportunities.length} Available</span>
+                  <span className="hidden sm:inline">
+                    {opportunities.length} Available
+                  </span>
                   <span className="sm:hidden">{opportunities.length}</span>
                 </span>
               </div>
@@ -452,7 +477,10 @@ const Dashboard: React.FC = () => {
                           {match.company}
                         </h3>
                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-purple-100 text-purple-800 border border-purple-200 w-fit">
-                          <Rocket size={8} className="stroke-2 mr-1 sm:w-2.5 sm:h-2.5" />
+                          <Rocket
+                            size={8}
+                            className="stroke-2 mr-1 sm:w-2.5 sm:h-2.5"
+                          />
                           {match.stage}
                         </span>
                       </div>
@@ -498,7 +526,10 @@ const Dashboard: React.FC = () => {
             ) : (
               <div className="text-center py-8 sm:py-12 text-gray-500">
                 <div className="p-3 sm:p-4 bg-gray-100 rounded-full w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 flex items-center justify-center">
-                  <Search size={20} className="stroke-2 text-gray-400 sm:w-6 sm:h-6" />
+                  <Search
+                    size={20}
+                    className="stroke-2 text-gray-400 sm:w-6 sm:h-6"
+                  />
                 </div>
                 <div className="text-base sm:text-lg font-medium">
                   No opportunities available
@@ -518,7 +549,8 @@ const Dashboard: React.FC = () => {
               </Button>
             </div>
           </CardContent>
-        </Card>        {/* Enhanced Portfolio Companies - Mobile Responsive */}
+        </Card>{" "}
+        {/* Enhanced Portfolio Companies - Mobile Responsive */}
         <Card className="hover:shadow-lg transition-shadow border-0 shadow-md">
           <CardHeader>
             <div className="flex items-center justify-between border-b border-gray-100 bg-gradient-to-r from-green-50 to-emerald-50 p-4 sm:p-6 -m-4 sm:-m-6 mb-0">
@@ -541,9 +573,16 @@ const Dashboard: React.FC = () => {
               {portfolio && (
                 <div className="flex items-center space-x-2 flex-shrink-0">
                   <span className="inline-flex items-center px-2 py-1 sm:px-3 rounded-full text-xs bg-green-100 text-green-800 border border-green-200">
-                    <Building2 size={10} className="stroke-2 mr-1 sm:w-3 sm:h-3" />
-                    <span className="hidden sm:inline">{portfolio.portfolio.length} Companies</span>
-                    <span className="sm:hidden">{portfolio.portfolio.length}</span>
+                    <Building2
+                      size={10}
+                      className="stroke-2 mr-1 sm:w-3 sm:h-3"
+                    />
+                    <span className="hidden sm:inline">
+                      {portfolio.portfolio.length} Companies
+                    </span>
+                    <span className="sm:hidden">
+                      {portfolio.portfolio.length}
+                    </span>
                   </span>
                 </div>
               )}
@@ -565,16 +604,25 @@ const Dashboard: React.FC = () => {
                         <span
                           className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full w-fit ${getStatusColor(company.status)}`}
                         >
-                          <CheckCircle2 size={8} className="stroke-2 mr-1 sm:w-2.5 sm:h-2.5" />
+                          <CheckCircle2
+                            size={8}
+                            className="stroke-2 mr-1 sm:w-2.5 sm:h-2.5"
+                          />
                           {company.status}
                         </span>
                       </div>
                       <div className="flex items-center space-x-1 text-xs sm:text-sm text-gray-600 mb-1">
-                        <Globe size={12} className="stroke-2 text-gray-500 sm:w-3.5 sm:h-3.5" />
+                        <Globe
+                          size={12}
+                          className="stroke-2 text-gray-500 sm:w-3.5 sm:h-3.5"
+                        />
                         <span className="truncate">{company.industry}</span>
                       </div>
                       <div className="flex items-center space-x-1 text-xs text-gray-500">
-                        <Calendar size={10} className="stroke-2 sm:w-3 sm:h-3" />
+                        <Calendar
+                          size={10}
+                          className="stroke-2 sm:w-3 sm:h-3"
+                        />
                         <span className="truncate">
                           Invested: {formatDate(company.investment_date)}
                         </span>
@@ -609,7 +657,10 @@ const Dashboard: React.FC = () => {
             ) : (
               <div className="text-center py-8 sm:py-12 text-gray-500">
                 <div className="p-3 sm:p-4 bg-gray-100 rounded-full w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 flex items-center justify-center">
-                  <Briefcase size={20} className="stroke-2 text-gray-400 sm:w-6 sm:h-6" />
+                  <Briefcase
+                    size={20}
+                    className="stroke-2 text-gray-400 sm:w-6 sm:h-6"
+                  />
                 </div>
                 <div className="text-base sm:text-lg font-medium">
                   No portfolio companies yet
@@ -630,14 +681,18 @@ const Dashboard: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-      </div>      {/* Enhanced Quick Actions - Mobile Responsive */}
+      </div>{" "}
+      {/* Enhanced Quick Actions - Mobile Responsive */}
       <Card className="hover:shadow-lg transition-shadow border-0 shadow-md">
         <CardHeader>
           <div className="border-b border-gray-100 bg-gradient-to-r from-purple-50 to-pink-50 p-4 sm:p-6 -m-4 sm:-m-6 mb-0">
             <CardTitle>
               <div className="text-lg sm:text-xl font-semibold text-gray-900 flex items-center space-x-2 sm:space-x-3">
                 <div className="p-1.5 sm:p-2 bg-purple-100 rounded-lg">
-                  <Zap size={16} className="stroke-2 text-purple-600 sm:w-5 sm:h-5" />
+                  <Zap
+                    size={16}
+                    className="stroke-2 text-purple-600 sm:w-5 sm:h-5"
+                  />
                 </div>
                 <span>Quick Actions</span>
               </div>
@@ -657,32 +712,36 @@ const Dashboard: React.FC = () => {
               variant="outline"
               className="h-16 sm:h-20 flex flex-col items-center justify-center space-y-1 sm:space-y-2 hover:bg-gray-50 hover:border-gray-300 transition-all transform hover:scale-105 border-2 text-xs sm:text-sm"
             >
-              <Settings size={18} className="stroke-2 text-gray-600 sm:w-6 sm:h-6" />
-              <span className="font-medium text-gray-700">
-                Preferences
-              </span>
+              <Settings
+                size={18}
+                className="stroke-2 text-gray-600 sm:w-6 sm:h-6"
+              />
+              <span className="font-medium text-gray-700">Preferences</span>
             </Button>
             <Button
               variant="outline"
               className="h-16 sm:h-20 flex flex-col items-center justify-center space-y-1 sm:space-y-2 hover:bg-gray-50 hover:border-gray-300 transition-all transform hover:scale-105 border-2 text-xs sm:text-sm"
             >
-              <PieChart size={18} className="stroke-2 text-gray-600 sm:w-6 sm:h-6" />
-              <span className="font-medium text-gray-700">
-                Analytics
-              </span>
+              <PieChart
+                size={18}
+                className="stroke-2 text-gray-600 sm:w-6 sm:h-6"
+              />
+              <span className="font-medium text-gray-700">Analytics</span>
             </Button>
             <Button
               variant="outline"
               className="h-16 sm:h-20 flex flex-col items-center justify-center space-y-1 sm:space-y-2 hover:bg-gray-50 hover:border-gray-300 transition-all transform hover:scale-105 border-2 text-xs sm:text-sm"
             >
-              <Calendar size={18} className="stroke-2 text-gray-600 sm:w-6 sm:h-6" />
-              <span className="font-medium text-gray-700">
-                Meetings
-              </span>
+              <Calendar
+                size={18}
+                className="stroke-2 text-gray-600 sm:w-6 sm:h-6"
+              />
+              <span className="font-medium text-gray-700">Meetings</span>
             </Button>
           </div>
         </CardContent>
-      </Card>{" "}      {/* Enhanced Investment Insights */}
+      </Card>{" "}
+      {/* Enhanced Investment Insights */}
       {dashboardData && (
         <Card className="hover:shadow-lg transition-shadow border-0 shadow-md">
           <CardHeader>
@@ -690,7 +749,10 @@ const Dashboard: React.FC = () => {
               <CardTitle>
                 <div className="text-lg sm:text-xl font-semibold text-gray-900 flex items-center space-x-2 sm:space-x-3">
                   <div className="p-1.5 sm:p-2 bg-orange-100 rounded-lg">
-                    <Lightbulb size={18} className="sm:size-5 stroke-2 text-orange-600" />
+                    <Lightbulb
+                      size={18}
+                      className="sm:size-5 stroke-2 text-orange-600"
+                    />
                   </div>
                   <span>Investment Insights</span>
                 </div>
@@ -705,7 +767,10 @@ const Dashboard: React.FC = () => {
               <div className="text-center p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border-2 border-blue-200 hover:border-blue-300 transition-all transform hover:scale-105">
                 <div className="flex items-center justify-center mb-2 sm:mb-3">
                   <div className="p-2 sm:p-3 bg-blue-200 rounded-full">
-                    <Users size={20} className="sm:size-6 stroke-2 text-blue-700" />
+                    <Users
+                      size={20}
+                      className="sm:size-6 stroke-2 text-blue-700"
+                    />
                   </div>
                 </div>
                 <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-1 sm:mb-2">
@@ -723,7 +788,10 @@ const Dashboard: React.FC = () => {
               <div className="text-center p-4 sm:p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border-2 border-green-200 hover:border-green-300 transition-all transform hover:scale-105">
                 <div className="flex items-center justify-center mb-2 sm:mb-3">
                   <div className="p-2 sm:p-3 bg-green-200 rounded-full">
-                    <Trophy size={20} className="sm:size-6 stroke-2 text-green-700" />
+                    <Trophy
+                      size={20}
+                      className="sm:size-6 stroke-2 text-green-700"
+                    />
                   </div>
                 </div>
                 <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-1 sm:mb-2">
@@ -740,7 +808,10 @@ const Dashboard: React.FC = () => {
               <div className="text-center p-4 sm:p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border-2 border-purple-200 hover:border-purple-300 transition-all transform hover:scale-105 sm:col-span-2 lg:col-span-1">
                 <div className="flex items-center justify-center mb-2 sm:mb-3">
                   <div className="p-2 sm:p-3 bg-purple-200 rounded-full">
-                    <Award size={20} className="sm:size-6 stroke-2 text-purple-700" />
+                    <Award
+                      size={20}
+                      className="sm:size-6 stroke-2 text-purple-700"
+                    />
                   </div>
                 </div>
                 <div className="text-2xl sm:text-3xl font-bold text-purple-600 mb-1 sm:mb-2">

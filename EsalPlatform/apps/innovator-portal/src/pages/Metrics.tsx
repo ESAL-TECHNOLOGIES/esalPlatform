@@ -367,7 +367,8 @@ const Metrics: React.FC = () => {
     );
   }
 
-  return (    <div className="space-y-4 sm:space-y-6 lg:space-y-8 p-4 sm:p-6 lg:p-0">
+  return (
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8 p-4 sm:p-6 lg:p-0">
       {/* Enhanced Header with Gradient Background - Mobile Responsive */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-4 sm:p-6 lg:p-8 text-white">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -400,7 +401,8 @@ const Metrics: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>      {error && (
+      </div>{" "}
+      {error && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-3 sm:p-4">
           <div className="flex items-start space-x-2 sm:space-x-3">
             <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -410,9 +412,9 @@ const Metrics: React.FC = () => {
           </div>
         </div>
       )}
-
       {/* Enhanced Mobile Responsive KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">{enhancedPerformanceData.map((item, index) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+        {enhancedPerformanceData.map((item, index) => (
           <Card
             key={index}
             className="relative overflow-hidden hover:shadow-lg transition-all duration-300 group"
@@ -423,7 +425,9 @@ const Metrics: React.FC = () => {
             <CardContent className="p-4 sm:p-6 relative">
               <div className="flex items-start justify-between">
                 <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-                  <div className="text-xl sm:text-2xl flex-shrink-0">{item.icon}</div>
+                  <div className="text-xl sm:text-2xl flex-shrink-0">
+                    {item.icon}
+                  </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 truncate">
                       {item.metric}
@@ -449,7 +453,8 @@ const Metrics: React.FC = () => {
             </CardContent>
           </Card>
         ))}
-      </div>      {/* Enhanced Mobile Responsive Charts Section */}
+      </div>{" "}
+      {/* Enhanced Mobile Responsive Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
         {/* Enhanced Views Over Time Chart */}
         <Card className="hover:shadow-lg transition-shadow">
@@ -614,7 +619,8 @@ const Metrics: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-      </div>      {/* Enhanced Mobile Responsive Performance Comparison Chart */}
+      </div>{" "}
+      {/* Enhanced Mobile Responsive Performance Comparison Chart */}
       <Card className="hover:shadow-lg transition-shadow">
         <CardHeader className="border-b border-gray-100 p-4 sm:p-6">
           <div className="flex flex-col gap-3 sm:gap-4">
@@ -646,11 +652,11 @@ const Metrics: React.FC = () => {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={getPerformanceComparisonData()}
-                  margin={{ 
-                    bottom: 40, 
-                    left: 10, 
-                    right: 10, 
-                    top: 10 
+                  margin={{
+                    bottom: 40,
+                    left: 10,
+                    right: 10,
+                    top: 10,
                   }}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -663,11 +669,7 @@ const Metrics: React.FC = () => {
                     stroke="#666"
                     interval={0}
                   />
-                  <YAxis 
-                    fontSize={10} 
-                    stroke="#666" 
-                    width={40}
-                  />
+                  <YAxis fontSize={10} stroke="#666" width={40} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "#fff",
@@ -704,7 +706,9 @@ const Metrics: React.FC = () => {
                   <div className="mb-3 sm:mb-4">
                     <TrendingUp className="w-12 h-12 sm:w-16 sm:h-16 mx-auto text-gray-400" />
                   </div>
-                  <div className="text-base sm:text-lg font-medium">No ideas to compare</div>
+                  <div className="text-base sm:text-lg font-medium">
+                    No ideas to compare
+                  </div>
                   <div className="text-xs sm:text-sm mt-1 sm:mt-2 text-gray-400">
                     Create your first idea to see performance data
                   </div>
@@ -713,7 +717,8 @@ const Metrics: React.FC = () => {
             )}
           </div>
         </CardContent>
-      </Card>      {/* Enhanced Mobile Responsive Individual Idea Performance Table */}
+      </Card>{" "}
+      {/* Enhanced Mobile Responsive Individual Idea Performance Table */}
       <Card className="hover:shadow-lg transition-shadow">
         <CardHeader className="border-b border-gray-100 p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
@@ -812,7 +817,9 @@ const Metrics: React.FC = () => {
                                   </span>
                                 </div>
                               ) : (
-                                <span className="text-gray-400 text-sm">N/A</span>
+                                <span className="text-gray-400 text-sm">
+                                  N/A
+                                </span>
                               )}
                             </div>
                           </td>
@@ -835,14 +842,18 @@ const Metrics: React.FC = () => {
                 {metricsData.map((idea, index) => {
                   const statusInfo = getStatusDisplay(idea.status);
                   return (
-                    <div key={index} className="p-4 hover:bg-gray-50 transition-colors">
+                    <div
+                      key={index}
+                      className="p-4 hover:bg-gray-50 transition-colors"
+                    >
                       {/* Idea Title and Date */}
                       <div className="mb-3">
                         <h3 className="font-medium text-gray-900 text-sm leading-tight mb-1">
                           {idea.title}
                         </h3>
                         <p className="text-xs text-gray-500">
-                          Created {new Date(idea.created_at).toLocaleDateString()}
+                          Created{" "}
+                          {new Date(idea.created_at).toLocaleDateString()}
                         </p>
                       </div>
 
@@ -899,7 +910,9 @@ const Metrics: React.FC = () => {
                               <span className="text-xs text-gray-500">/10</span>
                             </>
                           ) : (
-                            <span className="text-gray-400 text-xs">No AI Score</span>
+                            <span className="text-gray-400 text-xs">
+                              No AI Score
+                            </span>
                           )}
                         </div>
                       </div>
@@ -926,7 +939,8 @@ const Metrics: React.FC = () => {
             </div>
           )}
         </CardContent>
-      </Card>      {/* Enhanced Mobile Responsive Dynamic Recommendations */}
+      </Card>{" "}
+      {/* Enhanced Mobile Responsive Dynamic Recommendations */}
       {backendAnalytics && (
         <Card className="hover:shadow-lg transition-shadow">
           <CardHeader className="border-b border-gray-100 p-4 sm:p-6">

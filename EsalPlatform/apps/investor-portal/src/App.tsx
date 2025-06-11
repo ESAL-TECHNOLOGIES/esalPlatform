@@ -80,9 +80,10 @@ function AppContent() {
             }}
             onLogout={handleLogout}
           />
-        }        sidebar={
-          <Sidebar 
-            items={sidebarItems} 
+        }
+        sidebar={
+          <Sidebar
+            items={sidebarItems}
             currentPath={location.pathname}
             onNavigate={handleNavigate}
             user={{

@@ -171,7 +171,8 @@ function App() {
                   user={user}
                   onLogout={handleLogout}
                 />
-              }              sidebar={
+              }
+              sidebar={
                 <Sidebar
                   items={sidebarItems}
                   currentPath={window.location.pathname}
