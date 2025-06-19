@@ -1089,11 +1089,12 @@ const Settings: React.FC = () => {
                     </>
                   ) : (
                     "Save Privacy Settings"
-                  )}
-                </Button>
+                  )}                </Button>
+              </div>
               </div>
             </CardContent>
-          </Card>        )}
+          </Card>
+        )}
         {activeTab === "security" && (
           <Card>
             <CardHeader className="p-4 sm:p-6">

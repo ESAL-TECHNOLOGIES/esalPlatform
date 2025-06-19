@@ -120,7 +120,6 @@ const MyIdeas: React.FC = () => {
       window.history.replaceState({}, "", "/my-ideas");
     }
   }, []);
-
   const fetchIdeas = async () => {
     setIsLoading(true);
     setError(null);
@@ -128,7 +127,7 @@ const MyIdeas: React.FC = () => {
     try {
       const token = localStorage.getItem("access_token");
       if (!token) {
-        throw new Error("Authentication required");
+        throw new Error("Authentication required. Please log in again.");
       }
 
       const response = await fetch(
@@ -143,16 +142,23 @@ const MyIdeas: React.FC = () => {
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to fetch ideas");
+        if (response.status === 401) {
+          throw new Error("Session expired. Please log in again.");
+        } else if (response.status === 404) {
+          throw new Error("Ideas service not found. Please contact support.");
+        } else if (response.status === 500) {
+          throw new Error("Server error. Please try again later.");
+        }
+        
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `Failed to fetch ideas (Error ${response.status})`);
       }
 
       const ideasData = await response.json();
       setIdeas(ideasData);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "An error occurred fetching ideas"
-      );
+      const errorMessage = err instanceof Error ? err.message : "Network error occurred while fetching ideas";
+      setError(errorMessage);
       console.error("Error fetching ideas:", err);
     } finally {
       setIsLoading(false);
@@ -226,18 +232,21 @@ const MyIdeas: React.FC = () => {
       }
 
       // Clear selection
-      setSelectedIdeas(new Set());
-
-      // Show results
+      setSelectedIdeas(new Set());      // Show results
       if (failedDeletes.length === 0) {
-        alert(
+        setCreateSuccessMessage(
           `Successfully deleted ${successfulDeletes.length} idea${successfulDeletes.length > 1 ? "s" : ""}!`
         );
       } else {
-        alert(
+        setCreateSuccessMessage(
           `Deleted ${successfulDeletes.length} idea${successfulDeletes.length > 1 ? "s" : ""}, but failed to delete ${failedDeletes.length}.`
         );
       }
+      
+      // Clear success message after delay
+      setTimeout(() => {
+        setCreateSuccessMessage(null);
+      }, 3000);
     } catch (err) {
       setError(
         err instanceof Error
@@ -275,13 +284,14 @@ const MyIdeas: React.FC = () => {
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.detail || "Failed to delete idea");
-        }
-
-        // Remove the deleted idea from the state
+        }        // Remove the deleted idea from the state
         setIdeas((prevIdeas) => prevIdeas.filter((idea) => idea.id !== ideaId));
 
         // Show success message
-        alert("Idea deleted successfully!");
+        setCreateSuccessMessage("Idea deleted successfully!");
+        setTimeout(() => {
+          setCreateSuccessMessage(null);
+        }, 3000);
       } catch (err) {
         setError(
           err instanceof Error
@@ -291,8 +301,7 @@ const MyIdeas: React.FC = () => {
         console.error("Error deleting idea:", err);
       }
     }
-  };
-  // Create idea form validation - separate for complete vs partial validation
+  };  // Create idea form validation - separate for complete vs partial validation
   const validateCreateForm = (isComplete = true) => {
     const errors: Record<string, string> = {};
 
@@ -300,14 +309,14 @@ const MyIdeas: React.FC = () => {
     if (isComplete) {
       if (!createFormData.title.trim()) {
         errors.title = "Title is required";
-      } else if (createFormData.title.length < 5) {
-        errors.title = "Title must be at least 5 characters long";
+      } else if (createFormData.title.length < 3) {
+        errors.title = "Title must be at least 3 characters long";
       }
 
       if (!createFormData.description.trim()) {
         errors.description = "Description is required";
-      } else if (createFormData.description.length < 50) {
-        errors.description = "Description must be at least 50 characters long";
+      } else if (createFormData.description.length < 10) {
+        errors.description = "Description must be at least 10 characters long";
       }
 
       if (!createFormData.category) {
@@ -315,22 +324,21 @@ const MyIdeas: React.FC = () => {
       }
     } else {
       // For partial validation, only check if fields have minimum length when filled
-      if (createFormData.title.trim() && createFormData.title.length < 5) {
-        errors.title = "Title must be at least 5 characters long";
+      if (createFormData.title.trim() && createFormData.title.length < 3) {
+        errors.title = "Title must be at least 3 characters long";
       }
 
       if (
         createFormData.description.trim() &&
-        createFormData.description.length < 50
+        createFormData.description.length < 10
       ) {
-        errors.description = "Description must be at least 50 characters long";
+        errors.description = "Description must be at least 10 characters long";
       }
     }
 
     setCreateValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
-
   const handleCreateInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -338,6 +346,14 @@ const MyIdeas: React.FC = () => {
   ) => {
     const { name, value } = e.target;
     setCreateFormData((prev) => ({ ...prev, [name]: value }));
+    
+    // Clear validation error for this field when user starts typing
+    if (createValidationErrors[name]) {
+      setCreateValidationErrors((prev) => ({
+        ...prev,
+        [name]: ""
+      }));
+    }
   };
   const handleCreateFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -364,8 +380,7 @@ const MyIdeas: React.FC = () => {
 
     // Clear any previous error
     setCreateError(null);
-    setCreateFormData((prev) => ({ ...prev, documents: files }));
-  };
+    setCreateFormData((prev) => ({ ...prev, documents: files }));  };
 
   // Handle independent file upload without requiring complete form
   const handleFileUploadOnly = async () => {
@@ -377,6 +392,7 @@ const MyIdeas: React.FC = () => {
     setIsCreating(true);
     setCreateError(null);
     setCreateSuccessMessage(null);
+    setError(null); // Clear any existing general errors
 
     try {
       const token = localStorage.getItem("access_token");
@@ -456,16 +472,14 @@ const MyIdeas: React.FC = () => {
         } else {
           console.warn(`Failed to upload file: ${file.name}`);
         }
-      }
-
-      setCreateSuccessMessage(
+      }      setCreateSuccessMessage(
         `Files uploaded successfully! ${uploadedCount} of ${createFormData.documents.length} files uploaded. A draft idea was created to attach your files.`
       );
 
       // Clear only the file input, keep form data
       setCreateFormData((prev) => ({ ...prev, documents: [] }));
 
-      // Refresh ideas list
+      // Refresh ideas list immediately
       await fetchIdeas();
     } catch (err) {
       setCreateError(
@@ -475,14 +489,14 @@ const MyIdeas: React.FC = () => {
       );
     } finally {
       setIsCreating(false);
-    }
-  };
+    }  };
 
   // Handle partial form save without file upload
   const handlePartialFormSave = async () => {
     setIsCreating(true);
     setCreateError(null);
     setCreateSuccessMessage(null);
+    setError(null); // Clear any existing general errors
 
     // Use partial validation
     if (!validateCreateForm(false)) {
@@ -539,13 +553,11 @@ const MyIdeas: React.FC = () => {
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || "Failed to save partial idea");
-      }
-
-      setCreateSuccessMessage(
+      }      setCreateSuccessMessage(
         "Progress saved successfully! You can continue editing your idea later."
       );
 
-      // Refresh ideas list
+      // Refresh ideas list immediately
       await fetchIdeas();
     } catch (err) {
       setCreateError(
@@ -556,11 +568,11 @@ const MyIdeas: React.FC = () => {
     } finally {
       setIsCreating(false);
     }
-  };
-  const handleCreateSubmit = async (isDraft = false) => {
+  };  const handleCreateSubmit = async (isDraft = false) => {
     setIsCreating(true);
     setCreateError(null);
     setCreateSuccessMessage(null);
+    setError(null); // Clear any existing general errors
 
     // Use complete validation for full submission, partial for drafts
     if (!validateCreateForm(!isDraft)) {
@@ -632,9 +644,7 @@ const MyIdeas: React.FC = () => {
             console.warn(`Failed to upload file: ${file.name}`);
           }
         }
-      }
-
-      setCreateSuccessMessage(
+      }      setCreateSuccessMessage(
         isDraft
           ? "Draft saved successfully! You can continue editing it later."
           : "Idea created successfully! You can now track its progress in your dashboard."
@@ -651,14 +661,14 @@ const MyIdeas: React.FC = () => {
         documents: [],
       });
 
-      // Refresh ideas list
+      // Refresh ideas list immediately
       await fetchIdeas();
 
-      // Close modal after a delay
+      // Close modal after a short delay to show success message
       setTimeout(() => {
         setIsCreateModalOpen(false);
         setCreateSuccessMessage(null);
-      }, 2000);
+      }, 1500);
     } catch (err) {
       setCreateError(
         err instanceof Error
@@ -724,9 +734,7 @@ const MyIdeas: React.FC = () => {
         prevIdeas.map((idea) =>
           idea.id === ideaId ? { ...idea, ...updatedIdeaData } : idea
         )
-      );
-
-      // Close the edit modal
+      );      // Close the edit modal
       setEditingIdea(null);
       setEditFormData({
         title: "",
@@ -740,8 +748,14 @@ const MyIdeas: React.FC = () => {
         tags: "",
       });
 
-      // Show success message
-      alert("Idea updated successfully!");
+      // Show success message and refresh ideas list
+      setCreateSuccessMessage("Idea updated successfully!");
+      await fetchIdeas();
+      
+      // Clear success message after delay
+      setTimeout(() => {
+        setCreateSuccessMessage(null);
+      }, 3000);
     } catch (err) {
       setUpdateError(
         err instanceof Error
@@ -899,9 +913,13 @@ const MyIdeas: React.FC = () => {
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-            {" "}
-            <Button
-              onClick={() => setIsCreateModalOpen(true)}
+            {" "}            <Button
+              onClick={() => {
+                setCreateError(null);
+                setCreateSuccessMessage(null);
+                setCreateValidationErrors({});
+                setIsCreateModalOpen(true);
+              }}
               className="bg-white text-blue-600 hover:bg-blue-50 px-4 sm:px-6 py-2 sm:py-3 font-semibold transition-all transform hover:scale-105 text-sm sm:text-base w-full sm:w-auto flex items-center justify-center gap-2"
             >
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -910,7 +928,30 @@ const MyIdeas: React.FC = () => {
             </Button>
           </div>
         </div>
-      </div>
+      </div>      {/* Success Message Display */}
+      {createSuccessMessage && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <svg
+                className="h-5 w-5 text-green-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <div className="ml-3 flex-1">
+              <p className="text-sm text-green-700">{createSuccessMessage}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Error Display */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -1667,10 +1708,14 @@ const MyIdeas: React.FC = () => {
           </div>
         )}
       </Modal>{" "}
-      {/* Mobile-Optimized Create Idea Modal */}
-      <Modal
+      {/* Mobile-Optimized Create Idea Modal */}      <Modal
         isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
+        onClose={() => {
+          setIsCreateModalOpen(false);
+          setCreateError(null);
+          setCreateSuccessMessage(null);
+          setCreateValidationErrors({});
+        }}
         title="Create New Startup Idea"
         size="lg"
       >
@@ -1730,8 +1775,7 @@ const MyIdeas: React.FC = () => {
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
                 Idea Title *
-              </label>
-              <input
+              </label>              <input
                 type="text"
                 id="create-title"
                 name="title"
@@ -1739,7 +1783,7 @@ const MyIdeas: React.FC = () => {
                 value={createFormData.title}
                 onChange={handleCreateInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                placeholder="Enter your startup idea title"
+                placeholder="Enter your startup idea title (minimum 3 characters)"
               />
               {createValidationErrors.title && (
                 <p className="text-xs text-red-600 mt-1">
@@ -1754,8 +1798,7 @@ const MyIdeas: React.FC = () => {
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
                 Description *
-              </label>
-              <textarea
+              </label>              <textarea
                 id="create-description"
                 name="description"
                 required
@@ -1763,7 +1806,7 @@ const MyIdeas: React.FC = () => {
                 value={createFormData.description}
                 onChange={handleCreateInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                placeholder="Describe your idea in detail - the problem it solves, your solution, target market, etc."
+                placeholder="Describe your idea in detail - the problem it solves, your solution, target market, etc. (minimum 10 characters)"
               />
               {createValidationErrors.description && (
                 <p className="text-xs text-red-600 mt-1">

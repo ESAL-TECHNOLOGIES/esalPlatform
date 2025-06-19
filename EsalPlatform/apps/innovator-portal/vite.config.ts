@@ -10,6 +10,12 @@ export default defineConfig({
     // Enable CSR fallback for development
     historyApiFallback: true,
   },
+  preview: {
+    port: 3001,
+    host: true,
+    // Enable CSR fallback for preview mode
+    historyApiFallback: true,
+  },
   build: {
     outDir: "dist",
     emptyOutDir: true,

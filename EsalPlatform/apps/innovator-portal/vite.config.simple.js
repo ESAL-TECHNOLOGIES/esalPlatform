@@ -20,6 +20,7 @@ export default {
   preview: {
     port: 3001,
     host: true,
+    historyApiFallback: true, // Enable CSR routing support for preview
   },
   resolve: {
     alias: {
