@@ -686,8 +686,12 @@ const Settings: React.FC = () => {
     return (
       <div className="space-y-4 sm:space-y-6 p-4 sm:p-6 lg:p-8">
         <div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Settings</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">Loading your settings...</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+            Settings
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">
+            Loading your settings...
+          </p>
         </div>
         <div className="flex items-center justify-center h-32 sm:h-48 lg:h-64">
           <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 border-b-2 border-blue-600"></div>
@@ -698,18 +702,20 @@ const Settings: React.FC = () => {
   return (
     <div className="space-y-4 sm:space-y-6 p-4 sm:p-6 lg:p-8">
       <div>
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Settings</h1>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+          Settings
+        </h1>
         <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">
           Manage your account settings and preferences
         </p>
-      </div>      {error && (
+      </div>{" "}
+      {error && (
         <div className="bg-red-50 border border-red-200 rounded-md p-3 sm:p-4">
           <div className="flex">
             <div className="text-red-600 text-sm">❌ Error: {error}</div>
           </div>
         </div>
       )}
-
       {successMessage && (
         <div className="bg-green-50 border border-green-200 rounded-md p-3 sm:p-4">
           <div className="flex">
@@ -728,7 +734,6 @@ const Settings: React.FC = () => {
           </div>
         </div>
       )}
-
       <div className="flex space-x-1 sm:space-x-2 border-b overflow-x-auto scrollbar-hide">
         <button
           onClick={() => setActiveTab("notifications")}
@@ -781,11 +786,14 @@ const Settings: React.FC = () => {
           Danger Zone
         </button>
       </div>
-
-      <div className="mt-4 sm:mt-6">        {activeTab === "notifications" && (
+      <div className="mt-4 sm:mt-6">
+        {" "}
+        {activeTab === "notifications" && (
           <Card>
             <CardHeader className="p-4 sm:p-6">
-              <CardTitle className="text-lg sm:text-xl">Notification Settings</CardTitle>
+              <CardTitle className="text-lg sm:text-xl">
+                Notification Settings
+              </CardTitle>
             </CardHeader>
             <CardContent className="p-4 sm:p-6">
               <div className="space-y-4 sm:space-y-6">
@@ -947,7 +955,11 @@ const Settings: React.FC = () => {
               </div>
 
               <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t">
-                <Button onClick={handleSaveNotifications} disabled={isSaving} className="w-full sm:w-auto">
+                <Button
+                  onClick={handleSaveNotifications}
+                  disabled={isSaving}
+                  className="w-full sm:w-auto"
+                >
                   {isSaving ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -960,10 +972,13 @@ const Settings: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-        )}        {activeTab === "privacy" && (
+        )}{" "}
+        {activeTab === "privacy" && (
           <Card>
             <CardHeader className="p-4 sm:p-6">
-              <CardTitle className="text-lg sm:text-xl">Privacy Settings</CardTitle>
+              <CardTitle className="text-lg sm:text-xl">
+                Privacy Settings
+              </CardTitle>
             </CardHeader>
             <CardContent className="p-4 sm:p-6">
               <div className="space-y-4 sm:space-y-6">
@@ -1005,92 +1020,99 @@ const Settings: React.FC = () => {
                         <input
                           type="checkbox"
                           name="show_contact_info"
-                          className="sr-only peer"                        checked={settings.privacy.show_contact_info}
-                        onChange={handlePrivacyChange}
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>
-                  </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 mb-4 sm:mb-6">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-gray-900 text-sm sm:text-base">
-                        Allow Direct Messages
-                      </h3>
-                      <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                        Allow other users to send you direct messages
-                      </p>
-                    </div>
-                    <div className="flex-shrink-0">
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          name="allow_messages"
                           className="sr-only peer"
-                          checked={settings.privacy.allow_messages}
+                          checked={settings.privacy.show_contact_info}
                           onChange={handlePrivacyChange}
                         />
                         <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                       </label>
                     </div>
-                  </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 mb-4 sm:mb-6">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-gray-900 text-sm sm:text-base">
-                        Show My Ideas
-                      </h3>
-                      <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                        Make your startup ideas visible in your public profile
-                      </p>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 mb-4 sm:mb-6">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-gray-900 text-sm sm:text-base">
+                          Allow Direct Messages
+                        </h3>
+                        <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                          Allow other users to send you direct messages
+                        </p>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            name="allow_messages"
+                            className="sr-only peer"
+                            checked={settings.privacy.allow_messages}
+                            onChange={handlePrivacyChange}
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                      </div>
                     </div>
-                    <div className="flex-shrink-0">
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          name="show_ideas"
-                          className="sr-only peer"
-                          checked={settings.privacy.show_ideas}
-                          onChange={handlePrivacyChange}
-                        />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                      </label>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 mb-4 sm:mb-6">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-gray-900 text-sm sm:text-base">
+                          Show My Ideas
+                        </h3>
+                        <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                          Make your startup ideas visible in your public profile
+                        </p>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            name="show_ideas"
+                            className="sr-only peer"
+                            checked={settings.privacy.show_ideas}
+                            onChange={handlePrivacyChange}
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-gray-900 text-sm sm:text-base">
-                        Allow Data Sharing
-                      </h3>
-                      <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                        Allow anonymized data sharing for platform improvement
-                        and research
-                      </p>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-gray-900 text-sm sm:text-base">
+                          Allow Data Sharing
+                        </h3>
+                        <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                          Allow anonymized data sharing for platform improvement
+                          and research
+                        </p>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            name="data_sharing"
+                            className="sr-only peer"
+                            checked={settings.privacy.data_sharing}
+                            onChange={handlePrivacyChange}
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>{" "}
+                      </div>
                     </div>
-                    <div className="flex-shrink-0">
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          name="data_sharing"
-                          className="sr-only peer"
-                          checked={settings.privacy.data_sharing}
-                          onChange={handlePrivacyChange}
-                        />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                      </label>                    </div>
                   </div>
                 </div>
-              </div>
-              
-              <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t">
-                <Button onClick={handleSavePrivacy} disabled={isSaving} className="w-full sm:w-auto">
-                  {isSaving ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Saving...
-                    </>
-                  ) : (
-                    "Save Privacy Settings"
-                  )}                </Button>
-              </div>
+
+                <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t">
+                  <Button
+                    onClick={handleSavePrivacy}
+                    disabled={isSaving}
+                    className="w-full sm:w-auto"
+                  >
+                    {isSaving ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Saving...
+                      </>
+                    ) : (
+                      "Save Privacy Settings"
+                    )}{" "}
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -1098,7 +1120,9 @@ const Settings: React.FC = () => {
         {activeTab === "security" && (
           <Card>
             <CardHeader className="p-4 sm:p-6">
-              <CardTitle className="text-lg sm:text-xl">Security Settings</CardTitle>
+              <CardTitle className="text-lg sm:text-xl">
+                Security Settings
+              </CardTitle>
             </CardHeader>
             <CardContent className="p-4 sm:p-6">
               <div className="space-y-4 sm:space-y-6">
@@ -1106,7 +1130,10 @@ const Settings: React.FC = () => {
                   <h3 className="font-medium text-gray-900 mb-3 sm:mb-4 text-sm sm:text-base">
                     Change Password
                   </h3>
-                  <form className="space-y-3 sm:space-y-4" onSubmit={handleChangePassword}>
+                  <form
+                    className="space-y-3 sm:space-y-4"
+                    onSubmit={handleChangePassword}
+                  >
                     <div>
                       <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                         Current Password
@@ -1154,7 +1181,9 @@ const Settings: React.FC = () => {
                       />
                     </div>
 
-                    <Button type="submit" className="w-full sm:w-auto">Change Password</Button>
+                    <Button type="submit" className="w-full sm:w-auto">
+                      Change Password
+                    </Button>
                   </form>
                 </div>
                 <div className="border-t pt-4 sm:pt-6">
@@ -1184,7 +1213,11 @@ const Settings: React.FC = () => {
                           Disable 2FA
                         </Button>
                       ) : (
-                        <Button variant="outline" className="w-full sm:w-auto" onClick={handleEnable2FA}>
+                        <Button
+                          variant="outline"
+                          className="w-full sm:w-auto"
+                          onClick={handleEnable2FA}
+                        >
                           Enable 2FA
                         </Button>
                       )}
@@ -1238,7 +1271,9 @@ const Settings: React.FC = () => {
                       ) : (
                         <div className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
                           <div>
-                            <p className="font-medium text-sm sm:text-base">Current Device</p>
+                            <p className="font-medium text-sm sm:text-base">
+                              Current Device
+                            </p>
                             <p className="text-xs sm:text-sm text-gray-600">
                               No session information available
                             </p>
@@ -1291,7 +1326,8 @@ const Settings: React.FC = () => {
                             name="login_notifications"
                             className="sr-only peer"
                             checked={settings.security.login_notifications}
-                            onChange={handleSecurityChange}                          />
+                            onChange={handleSecurityChange}
+                          />
                           <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                         </label>
                       </div>
@@ -1299,9 +1335,12 @@ const Settings: React.FC = () => {
                   </div>
                 </div>
               </div>
-
               <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t">
-                <Button onClick={handleSaveSettings} disabled={isSaving} className="w-full sm:w-auto">
+                <Button
+                  onClick={handleSaveSettings}
+                  disabled={isSaving}
+                  className="w-full sm:w-auto"
+                >
                   {isSaving ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -1311,7 +1350,8 @@ const Settings: React.FC = () => {
                     "Save Changes"
                   )}
                 </Button>
-              </div>            </CardContent>
+              </div>{" "}
+            </CardContent>
           </Card>
         )}
         {activeTab === "preferences" && (
@@ -1401,9 +1441,12 @@ const Settings: React.FC = () => {
                   </p>
                 </div>
               </div>
-
               <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t">
-                <Button onClick={handleSaveSettings} disabled={isSaving} className="w-full sm:w-auto">
+                <Button
+                  onClick={handleSaveSettings}
+                  disabled={isSaving}
+                  className="w-full sm:w-auto"
+                >
                   {isSaving ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -1413,14 +1456,17 @@ const Settings: React.FC = () => {
                     "Save Changes"
                   )}
                 </Button>
-              </div>            </CardContent>
+              </div>{" "}
+            </CardContent>
           </Card>
         )}
         {activeTab === "danger" && (
           <Card className="border-red-200">
             <CardHeader className="p-4 sm:p-6">
               <CardTitle>
-                <div className="text-red-600 text-lg sm:text-xl">Danger Zone</div>
+                <div className="text-red-600 text-lg sm:text-xl">
+                  Danger Zone
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4 sm:p-6">
@@ -1433,7 +1479,11 @@ const Settings: React.FC = () => {
                     Download all your personal data and startup ideas in a
                     portable format
                   </p>
-                  <Button variant="outline" onClick={handleExportData} className="w-full sm:w-auto">
+                  <Button
+                    variant="outline"
+                    onClick={handleExportData}
+                    className="w-full sm:w-auto"
+                  >
                     Export My Data
                   </Button>
                 </div>

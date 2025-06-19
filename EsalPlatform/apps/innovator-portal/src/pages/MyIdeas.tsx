@@ -149,15 +149,20 @@ const MyIdeas: React.FC = () => {
         } else if (response.status === 500) {
           throw new Error("Server error. Please try again later.");
         }
-        
+
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || `Failed to fetch ideas (Error ${response.status})`);
+        throw new Error(
+          errorData.detail || `Failed to fetch ideas (Error ${response.status})`
+        );
       }
 
       const ideasData = await response.json();
       setIdeas(ideasData);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Network error occurred while fetching ideas";
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Network error occurred while fetching ideas";
       setError(errorMessage);
       console.error("Error fetching ideas:", err);
     } finally {
@@ -232,7 +237,7 @@ const MyIdeas: React.FC = () => {
       }
 
       // Clear selection
-      setSelectedIdeas(new Set());      // Show results
+      setSelectedIdeas(new Set()); // Show results
       if (failedDeletes.length === 0) {
         setCreateSuccessMessage(
           `Successfully deleted ${successfulDeletes.length} idea${successfulDeletes.length > 1 ? "s" : ""}!`
@@ -242,7 +247,7 @@ const MyIdeas: React.FC = () => {
           `Deleted ${successfulDeletes.length} idea${successfulDeletes.length > 1 ? "s" : ""}, but failed to delete ${failedDeletes.length}.`
         );
       }
-      
+
       // Clear success message after delay
       setTimeout(() => {
         setCreateSuccessMessage(null);
@@ -284,7 +289,7 @@ const MyIdeas: React.FC = () => {
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.detail || "Failed to delete idea");
-        }        // Remove the deleted idea from the state
+        } // Remove the deleted idea from the state
         setIdeas((prevIdeas) => prevIdeas.filter((idea) => idea.id !== ideaId));
 
         // Show success message
@@ -301,7 +306,7 @@ const MyIdeas: React.FC = () => {
         console.error("Error deleting idea:", err);
       }
     }
-  };  // Create idea form validation - separate for complete vs partial validation
+  }; // Create idea form validation - separate for complete vs partial validation
   const validateCreateForm = (isComplete = true) => {
     const errors: Record<string, string> = {};
 
@@ -346,12 +351,12 @@ const MyIdeas: React.FC = () => {
   ) => {
     const { name, value } = e.target;
     setCreateFormData((prev) => ({ ...prev, [name]: value }));
-    
+
     // Clear validation error for this field when user starts typing
     if (createValidationErrors[name]) {
       setCreateValidationErrors((prev) => ({
         ...prev,
-        [name]: ""
+        [name]: "",
       }));
     }
   };
@@ -380,7 +385,8 @@ const MyIdeas: React.FC = () => {
 
     // Clear any previous error
     setCreateError(null);
-    setCreateFormData((prev) => ({ ...prev, documents: files }));  };
+    setCreateFormData((prev) => ({ ...prev, documents: files }));
+  };
 
   // Handle independent file upload without requiring complete form
   const handleFileUploadOnly = async () => {
@@ -472,7 +478,8 @@ const MyIdeas: React.FC = () => {
         } else {
           console.warn(`Failed to upload file: ${file.name}`);
         }
-      }      setCreateSuccessMessage(
+      }
+      setCreateSuccessMessage(
         `Files uploaded successfully! ${uploadedCount} of ${createFormData.documents.length} files uploaded. A draft idea was created to attach your files.`
       );
 
@@ -489,7 +496,8 @@ const MyIdeas: React.FC = () => {
       );
     } finally {
       setIsCreating(false);
-    }  };
+    }
+  };
 
   // Handle partial form save without file upload
   const handlePartialFormSave = async () => {
@@ -553,7 +561,8 @@ const MyIdeas: React.FC = () => {
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || "Failed to save partial idea");
-      }      setCreateSuccessMessage(
+      }
+      setCreateSuccessMessage(
         "Progress saved successfully! You can continue editing your idea later."
       );
 
@@ -568,7 +577,8 @@ const MyIdeas: React.FC = () => {
     } finally {
       setIsCreating(false);
     }
-  };  const handleCreateSubmit = async (isDraft = false) => {
+  };
+  const handleCreateSubmit = async (isDraft = false) => {
     setIsCreating(true);
     setCreateError(null);
     setCreateSuccessMessage(null);
@@ -644,7 +654,8 @@ const MyIdeas: React.FC = () => {
             console.warn(`Failed to upload file: ${file.name}`);
           }
         }
-      }      setCreateSuccessMessage(
+      }
+      setCreateSuccessMessage(
         isDraft
           ? "Draft saved successfully! You can continue editing it later."
           : "Idea created successfully! You can now track its progress in your dashboard."
@@ -734,7 +745,7 @@ const MyIdeas: React.FC = () => {
         prevIdeas.map((idea) =>
           idea.id === ideaId ? { ...idea, ...updatedIdeaData } : idea
         )
-      );      // Close the edit modal
+      ); // Close the edit modal
       setEditingIdea(null);
       setEditFormData({
         title: "",
@@ -751,7 +762,7 @@ const MyIdeas: React.FC = () => {
       // Show success message and refresh ideas list
       setCreateSuccessMessage("Idea updated successfully!");
       await fetchIdeas();
-      
+
       // Clear success message after delay
       setTimeout(() => {
         setCreateSuccessMessage(null);
@@ -913,7 +924,8 @@ const MyIdeas: React.FC = () => {
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-            {" "}            <Button
+            {" "}
+            <Button
               onClick={() => {
                 setCreateError(null);
                 setCreateSuccessMessage(null);
@@ -928,7 +940,8 @@ const MyIdeas: React.FC = () => {
             </Button>
           </div>
         </div>
-      </div>      {/* Success Message Display */}
+      </div>{" "}
+      {/* Success Message Display */}
       {createSuccessMessage && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <div className="flex items-start">
@@ -951,7 +964,6 @@ const MyIdeas: React.FC = () => {
           </div>
         </div>
       )}
-
       {/* Error Display */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -1708,7 +1720,8 @@ const MyIdeas: React.FC = () => {
           </div>
         )}
       </Modal>{" "}
-      {/* Mobile-Optimized Create Idea Modal */}      <Modal
+      {/* Mobile-Optimized Create Idea Modal */}{" "}
+      <Modal
         isOpen={isCreateModalOpen}
         onClose={() => {
           setIsCreateModalOpen(false);
@@ -1775,7 +1788,8 @@ const MyIdeas: React.FC = () => {
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
                 Idea Title *
-              </label>              <input
+              </label>{" "}
+              <input
                 type="text"
                 id="create-title"
                 name="title"
@@ -1798,7 +1812,8 @@ const MyIdeas: React.FC = () => {
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
                 Description *
-              </label>              <textarea
+              </label>{" "}
+              <textarea
                 id="create-description"
                 name="description"
                 required
