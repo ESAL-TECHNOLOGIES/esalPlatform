@@ -1,4 +1,4 @@
-# 🚀 ESAL Platform - Turning AI's Opportunity into Reality for Africa
+# 🚀 ESAL Platform - Connecting Africa's Innovation Ecosystem
 
 **An AI-powered entrepreneurship and innovation ecosystem that transforms how African innovators, investors, and entrepreneurship hubs connect, collaborate, and create solutions for Africa's future.**
 
@@ -241,6 +241,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **ESAL Platform** - AI-Powered African Entrepreneurship Ecosystem 🚀  
-*"Turning AI's Opportunity into Reality for Africa"*
+*"Connecting Africa's Innovation Ecosystem"*
 
 **Last Updated**: July 2025
