@@ -1,7 +1,5 @@
 # 🚀 ESAL Platform - Turning AI's Opportunity into Reality for Africa
 
-> **ESAL** - Entidades Sin Ánimo de Lucro (Non-profit Organizations) Platform
-
 **An AI-powered entrepreneurship and innovation ecosystem that transforms how African innovators, investors, and entrepreneurship hubs connect, collaborate, and create solutions for Africa's future.**
 
 ---
