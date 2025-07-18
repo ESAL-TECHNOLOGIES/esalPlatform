@@ -6,7 +6,7 @@
 
 ---
 
-## 🌍 **For Africa, By Innovation - Hackathon Project 2025**
+## 🌍 **For Africa, By Innovation**
 
 ### 🎯 **Problem Statement**
 Africa's entrepreneurial talent is abundant, but disconnected. Innovators struggle to:
@@ -73,7 +73,7 @@ EsalPlatform leverages cutting-edge AI to create an intelligent ecosystem where:
 
 ---
 
-## 🎯 **Hackathon Categories Alignment**
+## 🎯 **AI Innovation Categories**
 
 ### **🏢 Future of AI x Work**
 - **Economic Transformation**: AI tools accelerate startup development and investor connections
@@ -137,10 +137,9 @@ EsalPlatform leverages cutting-edge AI to create an intelligent ecosystem where:
    pnpm run dev:admin
    ```
 
-### **🌐 Access Points**
-- **Main Platform**: http://localhost:3333
-- **API Documentation**: http://localhost:8000/docs
-- **Admin Portal**: http://localhost:3004
+### **🌐 Development Environment**
+
+After starting the services, the platform will be available locally for development and testing.
 
 ---
 
@@ -243,7 +242,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Built for the Google AI Hackathon 2025** 🏆  
-*"Turning AI's Opportunity into Reality for Africa: Chase The Future"*
+**ESAL Platform** - AI-Powered African Entrepreneurship Ecosystem 🚀  
+*"Turning AI's Opportunity into Reality for Africa"*
 
-**Last Updated**: January 2025
+**Last Updated**: July 2025
