@@ -26,12 +26,12 @@ Welcome to the comprehensive documentation for the ESAL Platform - an innovative
 
 | Portal | URL | Documentation |
 |--------|-----|---------------|
-| Landing Page | `http://localhost:3000` | [Landing Docs](./ui/landing.md) |
-| Innovator Portal | `http://localhost:3001` | [Innovator Docs](./ui/innovator-portal.md) |
-| Investor Portal | `http://localhost:3002` | [Investor Docs](./ui/investor-portal.md) |
-| Hub Portal | `http://localhost:3003` | [Hub Docs](./ui/hub-portal.md) |
-| Admin Portal | `http://localhost:3004` | [Admin Docs](./ui/admin-portal.md) |
-| API Server | `http://localhost:8000` | [API Docs](./api/README.md) |
+| Landing Page | `https://esalplatform.onrender.com` | [Landing Docs](./ui/landing.md) |
+| Innovator Portal | `https://esalplatform.onrender.com/innovator` | [Innovator Docs](./ui/innovator-portal.md) |
+| Investor Portal | `https://esalplatform.onrender.com/investor` | [Investor Docs](./ui/investor-portal.md) |
+| Hub Portal | `https://esalplatform.onrender.com/hub` | [Hub Docs](./ui/hub-portal.md) |
+| Admin Portal | `https://esalplatform.onrender.com/admin` | [Admin Docs](./ui/admin-portal.md) |
+| API Server | `https://esalplatform-1.onrender.com` | [API Docs](./api/README.md) |
 
 ## 🏗️ Platform Architecture
 
@@ -157,8 +157,8 @@ The ESAL Platform is built as a microservices architecture with multiple portals
    ```
 
 5. **Access the platform**
-   - Landing: http://localhost:3000
-   - API: http://localhost:8000
+   - Landing: https://esalplatform.onrender.com
+   - API: https://esalplatform-1.onrender.com
 
 ## 📞 Support
 

@@ -81,14 +81,10 @@ pnpm dev
 pnpm run dev:admin    # Admin portal
 ```
 
-### Portal URLs (Development)
-- **Main Portal**: http://localhost:3000
-- **Innovator Portal**: http://localhost:3001  
-- **Investor Portal**: http://localhost:3002
-- **Hub Portal**: http://localhost:3003
-- **Landing Page**: http://localhost:3004
-- **Admin Portal**: http://localhost:3005 (or auto-assigned port)
-- **API Server**: http://localhost:8000
+### Portal URLs (Production)
+- **Main Platform**: [https://esalplatform.onrender.com](https://esalplatform.onrender.com)
+- **API Server**: [https://esalplatform-1.onrender.com](https://esalplatform-1.onrender.com)
+- **API Documentation**: [https://esalplatform-1.onrender.com/docs](https://esalplatform-1.onrender.com/docs)
 
 ## New: Admin Portal 🚀
 

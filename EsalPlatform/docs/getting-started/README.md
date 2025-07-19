@@ -40,9 +40,9 @@ pnpm run dev
 ```
 
 Visit:
-- Landing Page: http://localhost:3000
-- Hub Portal: http://localhost:3001
-- API Documentation: http://localhost:8000/docs
+- Landing Page: https://esalplatform.onrender.com
+- Hub Portal: https://esalplatform.onrender.com/hub
+- API Documentation: https://esalplatform-1.onrender.com/docs
 
 ## Prerequisites
 
@@ -233,13 +233,13 @@ All applications support hot reloading:
 pnpm run dev
 
 # Services will be available at:
-# - Landing Page: http://localhost:3000
-# - Hub Portal: http://localhost:3001
-# - Innovator Portal: http://localhost:3002
-# - Investor Portal: http://localhost:3003
-# - Admin Portal: http://localhost:3004
-# - API: http://localhost:8000
-# - API Docs: http://localhost:8000/docs
+# - Landing Page: https://esalplatform.onrender.com
+# - Hub Portal: https://esalplatform.onrender.com/hub
+# - Innovator Portal: https://esalplatform.onrender.com/innovator
+# - Investor Portal: https://esalplatform.onrender.com/investor
+# - Admin Portal: https://esalplatform.onrender.com/admin
+# - API: https://esalplatform-1.onrender.com
+# - API Docs: https://esalplatform-1.onrender.com/docs
 ```
 
 ### Individual Services
@@ -367,7 +367,7 @@ Now that you have the platform running, here's what to explore:
 
 ### For Backend Developers
 
-1. **Review the API documentation**: http://localhost:8000/docs
+1. **Review the API documentation**: https://esalplatform-1.onrender.com/docs
 2. **Explore the database models**: `apps/api/models/`
 3. **Check out the authentication system**: `apps/api/auth/`
 4. **Review the test suite**: `apps/api/tests/`
@@ -431,7 +431,7 @@ Now that you have the platform running, here's what to explore:
 ### Getting Help
 
 - **Documentation**: Check the `docs/` folder
-- **API Reference**: http://localhost:8000/docs
+- **API Reference**: https://esalplatform-1.onrender.com/docs
 - **Issues**: Create an issue in the repository
 - **Discussion**: Use GitHub Discussions for questions
 

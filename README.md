@@ -1,6 +1,6 @@
 # 🚀 ESAL Platform - AI-Powered African Innovation Ecosystem
 
-**A comprehensive multi-portal platform co## 🧠 **AI Capabilities**necting African innovators, investors, and entrepreneurship hubs through intelligent AI-driven matching and idea generation.**
+**A comprehensive multi-portal platform connecting African innovators, investors, and entrepreneurship hubs through intelligent AI-driven matching and idea generation.**
 
 🌐 **Live Platform**: [https://esalplatform.onrender.com](https://esalplatform.onrender.com)
 

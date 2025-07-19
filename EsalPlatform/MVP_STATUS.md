@@ -57,12 +57,12 @@ pnpm run dev:admin   # Admin Portal
 
 ### 🌐 Access Your Platform
 
-Once running, access these URLs:
+Once deployed, access these URLs:
 
-- **Main Platform**: <http://localhost:3333>
-- **API Documentation**: <http://localhost:8000/docs>
-- **Admin Portal**: <http://localhost:3001>
-- **Health Check**: <http://localhost:8000/health>
+- **Main Platform**: <https://esalplatform.onrender.com>
+- **API Documentation**: <https://esalplatform-1.onrender.com/docs>
+- **API Server**: <https://esalplatform-1.onrender.com>
+- **Health Check**: <https://esalplatform-1.onrender.com/health>
 
 ## 🎯 Next Steps
 
